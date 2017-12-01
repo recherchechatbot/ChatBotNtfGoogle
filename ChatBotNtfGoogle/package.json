@@ -10,5 +10,14 @@
   },
   "author": {
     "name": "a.rousselot"
+  },
+  "dependencies": {
+    "actions-on-google": "^1.6.1",
+    "apiai": "^4.0.3",
+    "express": "^4.16.2",
+    "firebase-admin": "^4.2.1",
+    "firebase-functions": "^0.5.9",
+    "request": "^2.83.0",
+    "save": "^2.3.1"
   }
 }
