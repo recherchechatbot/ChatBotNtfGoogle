@@ -1,1 +1,1 @@
-web: node ./ChatbotNtfGoogle/server.js
+web: node ChatbotNtfGoogle/server.js
