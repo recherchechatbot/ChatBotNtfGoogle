@@ -2,10 +2,8 @@
   "name": "chat-bot-ntf-google",
   "version": "0.0.0",
   "description": "ChatBotNtfGoogle",
-  "scripts": {
-
-  },
-  "main": "ChatBotNtfGoogle/server.js",
+  "scripts": {},
+  "main": "./ChatBotNtfGoogle/server.js",
   "engines": {
     "node": "~6.10.x"
   },
