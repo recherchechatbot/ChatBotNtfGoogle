@@ -1,0 +1,14 @@
+{
+  "name": "chat-bot-ntf-google",
+  "version": "0.0.0",
+  "description": "ChatBotNtfGoogle",
+  "scripts": {
+    "start": "node server"
+  },
+  "engines": {
+    "node": "~6.10.x"
+  },
+  "author": {
+    "name": "a.rousselot"
+  }
+}
