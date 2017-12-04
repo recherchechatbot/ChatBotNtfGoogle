@@ -156,7 +156,7 @@ function processV1Request(request, response) {
         });
         
     },
-    'recherche.recette': () => {
+    'recherche.produit': () => {
         let myProduct = parameters.Nourriture;
         let myIdPdv = 1;
         let cookie = 'ASP.NET_SessionId=eydtdmtk3bqlgvnokd2ykgkh' + ';IdPdv=' + myIdPdv;
