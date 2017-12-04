@@ -108,7 +108,8 @@ function processV1Request(request, response) {
         console.log("myText:" + myText);
         //sendResponse("Je fonctionne mais mcommerce c'est lent");
         getRecette('poulet','32e88d45-0f1a-4d39-b35b-a8469da5ad10')
-        .then((r)=>{
+            .then((r) => {
+                console.log("Resultat de la requete http des recettes: " + r);
             let listeRecettes=JSON.parse(r);
             let len=listeRecettes.Recettes.length;
             for (var i=0;i<len;i++){
