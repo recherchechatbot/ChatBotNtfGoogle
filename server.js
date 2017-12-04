@@ -32,8 +32,8 @@ myApp.post('/webhook', (request, response) => {
     //    return response.status(400).end('Invalid Webhook Request (expecting v1 or v2 webhook request)');
     //}
     console.log("avant toute chose dans le app.post");
-    var body = JSONbig.parse(request.body);
-    console.log("On vien de definir le body");
+    var body = JSON.stringify(request.body);
+    console.log("On vient de definir le body");
 
     if (body) {
         console.log("avant toute chose dans le app.post");
