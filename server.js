@@ -81,7 +81,7 @@ function getProduit(produit, idPdv, c) {
 
     var options = {
         method: 'POST',
-        uri: FO_URL + "RechercheJs",
+        uri:  "https://drive.intermarche.com/RechercheJs",
         headers: {
             cookie: c,
         },
