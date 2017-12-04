@@ -83,7 +83,7 @@ function getProduit(produit, idPdv, c) {
         method: 'POST',
         uri:  "https://drive.intermarche.com/RechercheJs",
         headers: {
-            cookie: c,
+            Cookie: c,
         },
         body: {
             mot: produit
@@ -166,7 +166,7 @@ function processV1Request(request, response) {
                 let myText = 'Voici les produits que je peux te proposer: ';
                 let len = Math.min(5, r.length)
                 for (var i = 0; i < len; i++) {
-                    myText = myText + ' ' + r[i].Libelle;
+                    myText = myText + ' ' + i + ' ' + r[i].Libelle + ', ';
                 }
                 sendResponse(myText);
             })
