@@ -3,7 +3,7 @@
 const express = require('express');
 const JSONbig = require('json-bigint');
 const request=require('request');
-const functions = require('firebase-functions'); // Cloud Functions for Firebase library
+/*const functions = require('firebase-functions');*/ // Cloud Functions for Firebase library
 const DialogflowApp = require('actions-on-google').DialogflowApp; // Google Assistant helper library
 //exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, response) => {
 //  console.log('Dialogflow Request headers: ' + JSON.stringify(request.headers));
@@ -18,9 +18,10 @@ const DialogflowApp = require('actions-on-google').DialogflowApp; // Google Assi
 //  }
 //});
 const REST_PORT = (process.env.PORT || 5000);
-
 const myApp = express();
+myApp.use(bodyParser.text({ type: 'application/json' }));
 myApp.post('/webhook', (request, response) => {
+
     //console.log(request);
     //console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + JSON.stringify(request.body));
     //if (request.body.result) {
@@ -33,8 +34,9 @@ myApp.post('/webhook', (request, response) => {
     //}
     console.log("avant toute chose dans le app.post");
     var body = JSON.stringify(request.body);
-    console.log("On vient de definir le body");
 
+    console.log("On vient de definir le body");
+    
     if (body) {
         console.log("avant toute chose dans le app.post");
         console.log("A priori le body existe quand on le big parse, le voici: " + JSON.stringify(body));
