@@ -22,14 +22,20 @@ const myApp = express();
 myApp.post('/webhook', (request, response) => {
     console.log(request);
     console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + JSON.stringify(request.body));
-    if (request.body.result) {
+    //if (request.body.result) {
+    //    processV1Request(request, response);
+    //} else if (request.body.queryResult) {
+    //    processV2Request(request, response);
+    //} else {
+    //    console.log('Invalid Request');
+    //    return response.status(400).end('Invalid Webhook Request (expecting v1 or v2 webhook request)');
+    //}
+
+    if (request) {
         processV1Request(request, response);
-    } else if (request.body.queryResult) {
-        processV2Request(request, response);
     } else {
         console.log('Invalid Request');
         return response.status(400).end('Invalid Webhook Request (expecting v1 or v2 webhook request)');
-    }
 });
 
 function getRecette(product,token){
