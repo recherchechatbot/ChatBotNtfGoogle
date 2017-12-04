@@ -16,6 +16,7 @@ const DialogflowApp = require('actions-on-google').DialogflowApp; // Google Assi
 //    return response.status(400).end('Invalid Webhook Request (expecting v1 or v2 webhook request)');
 //  }
 //});
+const REST_PORT = (process.env.PORT || 5000);
 
 const myApp = express();
 myApp.post('/webhook', (request, response) => {
@@ -363,3 +364,8 @@ const richResponsesV2 = [
     'card': richResponseV2Card
   }
 ];
+
+myApp.listen(REST_PORT, () => {
+    console.log('Rest service ready on port ' + REST_PORT);
+});
+
