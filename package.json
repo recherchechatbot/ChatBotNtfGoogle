@@ -17,6 +17,7 @@
     "firebase-functions": "^0.5.9",
     "json-bigint": "^0.2.3",
     "request": "^2.83.0",
-    "save": "^2.3.1"
+    "save": "^2.3.1",
+    "body-parser": "^1.18.2"
   }
 }

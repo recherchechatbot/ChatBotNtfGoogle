@@ -18,6 +18,7 @@ const DialogflowApp = require('actions-on-google').DialogflowApp; // Google Assi
 //  }
 //});
 const REST_PORT = (process.env.PORT || 5000);
+const bodyParser = require('body-parser');
 const myApp = express();
 myApp.use(bodyParser.text({ type: 'application/json' }));
 myApp.post('/webhook', (request, response) => {
