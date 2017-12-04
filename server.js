@@ -106,16 +106,17 @@ function processV1Request(request, response) {
     'recherche.recette':()=>{
         let myText='Voici quelques recettes pour toi: ';
         console.log("myText:" + myText);
-        sendResponse("Je fonctionne mais mcommerce c'est lent");
-        //getRecette('poulet','32e88d45-0f1a-4d39-b35b-a8469da5ad10')
-        //.then((r)=>{
-        //    let listeRecettes=JSON.parse(r);
-        //    let len=listeRecettes.Recettes.length;
-        //    for (var i=0;i<len;i++){
-        //        myText=myText + listeRecettes.Recettes[i].Titre + ' ';
-        //    }
-        //    sendResponse(myText);
-        //});
+        //sendResponse("Je fonctionne mais mcommerce c'est lent");
+        getRecette('poulet','32e88d45-0f1a-4d39-b35b-a8469da5ad10')
+        .then((r)=>{
+            let listeRecettes=JSON.parse(r);
+            let len=listeRecettes.Recettes.length;
+            for (var i=0;i<len;i++){
+                myText=myText + listeRecettes.Recettes[i].Titre + ' ';
+            }
+            sendResponse("Voici les resultats de votre recherche: ")
+                .then(() => sendResponse(myText))
+        });
         
     },
     // Default handler for unknown or undefined actions
