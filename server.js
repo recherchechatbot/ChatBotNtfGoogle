@@ -115,32 +115,7 @@ function getProduit(produit, idPdv, c) {
     })
 }
 
-function repeatProducts() {
-    let myText="Pas de problème, je répète: "
-    //pas besoin de if car on l'appelle que quand on déclenche un intent qui doit obligatoirement suivre la recherche produits
-    for (var i = 0; i < arrayProducts[productIndex].length; i++) {
-        myText = myText + arrayProducts[productIndex][i];
-    }
-    sendResponse(myText);
-}
 
-function nextProducts() {
-    productIndex += 1;
-    let myText = "Voici les produits suivants: ";
-    for (var i = 0; i < arrayProducts[productIndex].length; i++) {
-        myText = myText + arrayProducts[productIndex][i];
-    }
-    sendResponse(myText);
-}
-
-function previousProducts() {
-    productIndex -= 1;
-    let myText = "Pas de problème, je reviens en arrière :";
-    for (var i = 0; i < arrayProducts[productIndex].length; i++) {
-        myText = myText + arrayProducts[productIndex][i];
-    }
-    sendResponse(myText);
-}
 
 
 /*
@@ -300,7 +275,35 @@ function processV1Request(request, response) {
       console.log('Response to Dialogflow: ' + JSON.stringify(responseJson));
       response.json(responseJson); // Send response to Dialogflow
     }
+  };
+  function repeatProducts() {
+      let myText = "Pas de problème, je répète: "
+      //pas besoin de if car on l'appelle que quand on déclenche un intent qui doit obligatoirement suivre la recherche produits
+      for (var i = 0; i < arrayProducts[productIndex].length; i++) {
+          myText = myText + arrayProducts[productIndex][i];
+      }
+      sendResponse(myText);
   }
+
+  function nextProducts() {
+      productIndex += 1;
+      let myText = "Voici les produits suivants: ";
+      for (var i = 0; i < arrayProducts[productIndex].length; i++) {
+          myText = myText + arrayProducts[productIndex][i];
+      }
+      sendResponse(myText);
+  }
+
+  function previousProducts() {
+      productIndex -= 1;
+      let myText = "Pas de problème, je reviens en arrière :";
+      for (var i = 0; i < arrayProducts[productIndex].length; i++) {
+          myText = myText + arrayProducts[productIndex][i];
+      }
+      sendResponse(myText);
+  }
+
+
 }
 // Construct rich response for Google Assistant (v1 requests only)
 const app = new DialogflowApp();
