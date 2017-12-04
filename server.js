@@ -116,7 +116,7 @@ function processV1Request(request, response) {
   let action = body.result.action; // https://dialogflow.com/docs/actions-and-parameters
   let parameters = body.result.parameters; // https://dialogflow.com/docs/actions-and-parameters
   let inputContexts = body.result.contexts; // https://dialogflow.com/docs/contexts
-  let requestSource = (body.originalRequest) ? request.body.originalRequest.source : undefined;
+  let requestSource = (body.originalRequest) ? body.originalRequest.source : undefined;
   const googleAssistantRequest = 'google'; // Constant to identify Google Assistant requests
   const app = new DialogflowApp({request: request, response: response});
   // Create handlers for Dialogflow actions as well as a 'default' handler
