@@ -178,12 +178,26 @@ function processV1Request(request, response) {
         getProduit(myProduct, myIdPdv, cookie)
             .then((r) => {
                 arrayProducts = [];
+                let arrayTemp = [];
+                let indexCoupe = 0;
                 let myText = 'Voici les produits que je peux te proposer: ';
-                let len = Math.min(5, r.length)
-                for (var i = 0; i < len; i++) {
+                let len = Math.min(5, r.length);
+                for (var i = 0; i < r.length; i++) {
                     myText = myText + ' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ';
-                    arrayProducts.push([' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ']);
+                    if (indexCoupe == 4) {
+                        arrayProducts.push(arrayTemp);
+                        indexCoupe = 0;
+                        arrayTemp = [];
+
+                    }
+                    else {
+                        arrayTemp.push(' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ');
+                        indexCoupe += 1;
+                    }
+
+                    //arrayProducts.push([' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ']);
                 }
+                
                 if (requestSource === googleAssistantRequest) {
                     sendGoogleResponse(myText);
                 } else {
