@@ -1,6 +1,7 @@
 'use strict';
 
-const express=require('express');
+const express = require('express');
+const JSONbig = require('json-bigint');
 const request=require('request');
 const functions = require('firebase-functions'); // Cloud Functions for Firebase library
 const DialogflowApp = require('actions-on-google').DialogflowApp; // Google Assistant helper library
@@ -30,8 +31,10 @@ myApp.post('/webhook', (request, response) => {
     //    console.log('Invalid Request');
     //    return response.status(400).end('Invalid Webhook Request (expecting v1 or v2 webhook request)');
     //}
+    const body=JSONbig.parse(request.body);
 
-    if (request) {
+    if (body) {
+        console.log("A priori le body existe quand on le big parse, le voici: " + body);
         processV1Request(request, response);
     } else {
         console.log('Invalid Request');

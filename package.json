@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "description": "ChatBotNtfGoogle",
   "main": "./server.js",
-
   "engines": {
     "node": "~6.10.x"
   },
@@ -16,6 +15,7 @@
     "express": "^4.16.2",
     "firebase-admin": "^4.2.1",
     "firebase-functions": "^0.5.9",
+    "json-bigint": "^0.2.3",
     "request": "^2.83.0",
     "save": "^2.3.1"
   }
