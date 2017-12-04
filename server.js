@@ -75,11 +75,12 @@ function getRecette(product,token){
 /*
 * Function to handle v1 webhook requests from Dialogflow
 */
-function processV1Request (request, response) {
-  let action = request.body.result.action; // https://dialogflow.com/docs/actions-and-parameters
-  let parameters = request.body.result.parameters; // https://dialogflow.com/docs/actions-and-parameters
-  let inputContexts = request.body.result.contexts; // https://dialogflow.com/docs/contexts
-  let requestSource = (request.body.originalRequest) ? request.body.originalRequest.source : undefined;
+function processV1Request(request, response) {
+  var body = JSON.parse(request.body);
+  let action = body.result.action; // https://dialogflow.com/docs/actions-and-parameters
+  let parameters = body.result.parameters; // https://dialogflow.com/docs/actions-and-parameters
+  let inputContexts = body.result.contexts; // https://dialogflow.com/docs/contexts
+  let requestSource = (body.originalRequest) ? request.body.originalRequest.source : undefined;
   const googleAssistantRequest = 'google'; // Constant to identify Google Assistant requests
   const app = new DialogflowApp({request: request, response: response});
   // Create handlers for Dialogflow actions as well as a 'default' handler
