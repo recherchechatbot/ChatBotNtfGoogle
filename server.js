@@ -36,6 +36,7 @@ myApp.post('/webhook', (request, response) => {
     } else {
         console.log('Invalid Request');
         return response.status(400).end('Invalid Webhook Request (expecting v1 or v2 webhook request)');
+    }
 });
 
 function getRecette(product,token){
