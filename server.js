@@ -151,7 +151,11 @@ function processV1Request(request, response) {
             for (var i=0;i<len;i++){
                 myText=myText + listeRecettes.Recettes[i].Titre + ' ';
             }
-            sendResponse(myText);
+            if (requestSource === googleAssistantRequest) {
+                sendGoogleResponse(myText);
+            } else {
+                sendResponse(myText);
+            }
                 
         });
         
@@ -168,7 +172,12 @@ function processV1Request(request, response) {
                 for (var i = 0; i < len; i++) {
                     myText = myText + ' ' + i + ' ' + r[i].Libelle + ', ';
                 }
-                sendResponse(myText);
+                if (requestSource === googleAssistantRequest) {
+                    sendGoogleResponse(myText);
+                } else {
+                    sendResponse(myText); 
+                }
+                
             })
         
     },
