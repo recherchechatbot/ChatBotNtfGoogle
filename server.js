@@ -72,6 +72,42 @@ function getRecette(product,token){
         );
     
 }
+
+function getProduit(produit, idPdv, c) {
+    console.log("DEBUT getProduit");
+    
+
+    console.log("produit = " + produit);
+
+    var options = {
+        method: 'POST',
+        uri: FO_URL + "RechercheJs",
+        headers: {
+            cookie: c,
+        },
+        body: {
+            mot: produit
+        },
+        json: true
+    };
+
+    console.log("FIN getProduit");
+
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+                console.log("ON A UN RETOUR 200 !!!!!!!");
+                console.log("voila le body = " + response.body);
+                resolve(response.body);
+            }
+            else {
+                console.log("ON FAIT UN REJECT");
+                reject(error);
+            }
+        })
+    })
+}
+
 /*
 * Function to handle v1 webhook requests from Dialogflow
 */
@@ -118,6 +154,22 @@ function processV1Request(request, response) {
             sendResponse(myText);
                 
         });
+        
+    },
+    'recherche.recette': () => {
+        let myProduct = parameters.Nourriture;
+        let myIdPdv = 1;
+        let cookie = 'ASP.NET_SessionId=eydtdmtk3bqlgvnokd2ykgkh' + ';IdPdv=' + myIdPdv;
+
+        getProduit(myProduct, myIdPdv, cookie)
+            .then((r) => {
+                let myText = 'Voici les produits que je peux te proposer: ';
+                let len = Math.min(5, r.length)
+                for (var i = 0; i < len; i++) {
+                    myText = myText + ' ' + r[i].Libelle;
+                }
+                sendResponse(myText);
+            })
         
     },
     // Default handler for unknown or undefined actions
