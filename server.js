@@ -31,7 +31,7 @@ myApp.post('/webhook', (request, response) => {
     //    console.log('Invalid Request');
     //    return response.status(400).end('Invalid Webhook Request (expecting v1 or v2 webhook request)');
     //}
-    const body=JSONbig.parse(request.body);
+    var body=JSONbig.parse(request.body);
 
     if (body) {
         console.log("A priori le body existe quand on le big parse, le voici: " + body);
