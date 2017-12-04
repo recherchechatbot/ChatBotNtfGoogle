@@ -170,7 +170,7 @@ function processV1Request(request, response) {
                 let myText = 'Voici les produits que je peux te proposer: ';
                 let len = Math.min(5, r.length)
                 for (var i = 0; i < len; i++) {
-                    myText = myText + ' ' + i + ' ' + r[i].Libelle + ', ';
+                    myText = myText + ' ' + i+1 + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ';
                 }
                 if (requestSource === googleAssistantRequest) {
                     sendGoogleResponse(myText);
