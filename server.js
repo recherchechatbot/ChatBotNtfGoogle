@@ -31,10 +31,13 @@ myApp.post('/webhook', (request, response) => {
     //    console.log('Invalid Request');
     //    return response.status(400).end('Invalid Webhook Request (expecting v1 or v2 webhook request)');
     //}
-    var body=JSONbig.parse(request.body);
+    console.log("avant toute chose dans le app.post");
+    var body = JSONbig.parse(request.body);
+    console.log("On vien de definir le body");
 
     if (body) {
-        console.log("A priori le body existe quand on le big parse, le voici: " + body);
+        console.log("avant toute chose dans le app.post");
+        console.log("A priori le body existe quand on le big parse, le voici: " + JSON.stringify(body));
         processV1Request(request, response);
     } else {
         console.log('Invalid Request');
