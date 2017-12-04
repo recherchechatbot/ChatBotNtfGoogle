@@ -20,6 +20,12 @@ const DialogflowApp = require('actions-on-google').DialogflowApp; // Google Assi
 const REST_PORT = (process.env.PORT || 5000);
 const bodyParser = require('body-parser');
 const myApp = express();
+
+//Memoire de la derniere recherche
+var arrayProducts = [];
+//Memoire du dernier groupe de 5 produits renvoyés
+var productIndex = 0;
+
 myApp.use(bodyParser.text({ type: 'application/json' }));
 myApp.post('/webhook', (request, response) => {
 
@@ -74,6 +80,7 @@ function getRecette(product,token){
 }
 
 function getProduit(produit, idPdv, c) {
+    
     console.log("DEBUT getProduit");
     
 
@@ -107,6 +114,34 @@ function getProduit(produit, idPdv, c) {
         })
     })
 }
+
+function repeatProducts() {
+    let myText="Pas de problème, je répète: "
+    //pas besoin de if car on l'appelle que quand on déclenche un intent qui doit obligatoirement suivre la recherche produits
+    for (var i = 0; i < arrayProducts[productIndex].length; i++) {
+        myText = myText + arrayProducts[productIndex][i];
+    }
+    sendResponse(myText);
+}
+
+function nextProducts() {
+    productIndex += 1;
+    let myText = "Voici les produits suivants: ";
+    for (var i = 0; i < arrayProducts[productIndex].length; i++) {
+        myText = myText + arrayProducts[productIndex][i];
+    }
+    sendResponse(myText);
+}
+
+function previousProducts() {
+    productIndex -= 1;
+    let myText = "Pas de problème, je reviens en arrière :";
+    for (var i = 0; i < arrayProducts[productIndex].length; i++) {
+        myText = myText + arrayProducts[productIndex][i];
+    }
+    sendResponse(myText);
+}
+
 
 /*
 * Function to handle v1 webhook requests from Dialogflow
@@ -167,10 +202,12 @@ function processV1Request(request, response) {
 
         getProduit(myProduct, myIdPdv, cookie)
             .then((r) => {
+                arrayProducts = [];
                 let myText = 'Voici les produits que je peux te proposer: ';
                 let len = Math.min(5, r.length)
                 for (var i = 0; i < len; i++) {
-                    myText = myText + ' ' + (i+1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ';
+                    myText = myText + ' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ';
+                    arrayProducts.push([' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ']);
                 }
                 if (requestSource === googleAssistantRequest) {
                     sendGoogleResponse(myText);
@@ -181,6 +218,17 @@ function processV1Request(request, response) {
             })
         
     },
+    'repeat.produit': () => {
+        repeatProducts();
+    },
+    'next.produit': () => {
+        nextProducts();
+    },
+    'previous.produit': () => {
+        previousProducts();
+    },
+    
+
     // Default handler for unknown or undefined actions
     'default': () => {
       // Use the Actions on Google lib to respond to Google requests; for other requests use JSON
