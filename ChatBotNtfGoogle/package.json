@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "ChatBotNtfGoogle",
   "scripts": {},
-  "main": "./ChatBotNtfGoogle/server.js",
+  "main": "./server.js",
   "engines": {
     "node": "~6.10.x"
   },
