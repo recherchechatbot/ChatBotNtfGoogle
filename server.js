@@ -20,7 +20,8 @@ const REST_PORT = (process.env.PORT || 5000);
 
 const myApp = express();
 myApp.post('/webhook', (request, response) => {
-    console.log(request)
+    console.log(request);
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + JSON.stringify(request.body));
     if (request.body.result) {
         processV1Request(request, response);
     } else if (request.body.queryResult) {
