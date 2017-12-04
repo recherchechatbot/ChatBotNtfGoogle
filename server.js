@@ -115,8 +115,8 @@ function processV1Request(request, response) {
             for (var i=0;i<len;i++){
                 myText=myText + listeRecettes.Recettes[i].Titre + ' ';
             }
-            sendResponse("Voici les resultats de votre recherche: ")
-                .then(() => sendResponse(myText))
+            sendResponse(myText);
+                
         });
         
     },
