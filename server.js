@@ -185,9 +185,11 @@ function processV1Request(request, response) {
                 for (var i = 0; i < r.length; i++) {
                     //myText = myText + ' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ';
                     if (arrayTemp.length == 5) {
+
                         arrayProducts.push(arrayTemp);
                         
                         arrayTemp = [];
+                        arrayTemp.push(' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ');
 
                     }
                     else {
