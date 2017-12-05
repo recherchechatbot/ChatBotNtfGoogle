@@ -183,7 +183,7 @@ function processV1Request(request, response) {
                 let myText = 'Voici les produits que je peux te proposer: ';
                 let len = Math.min(5, r.length);
                 for (var i = 0; i < r.length; i++) {
-                    myText = myText + ' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ';
+                    //myText = myText + ' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ';
                     if (indexCoupe == 4) {
                         arrayProducts.push(arrayTemp);
                         indexCoupe = 0;
@@ -197,12 +197,8 @@ function processV1Request(request, response) {
 
                     //arrayProducts.push([' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ']);
                 }
-                
-                if (requestSource === googleAssistantRequest) {
-                    sendGoogleResponse(myText);
-                } else {
-                    sendResponse(myText); 
-                }
+
+                sayProducts(myText);
                 
             })
         
@@ -293,28 +289,33 @@ function processV1Request(request, response) {
   function repeatProducts() {
       let myText = "Pas de problème, je répète: "
       //pas besoin de if car on l'appelle que quand on déclenche un intent qui doit obligatoirement suivre la recherche produits
-      for (var i = 0; i < arrayProducts[productIndex].length; i++) {
-          myText = myText + arrayProducts[productIndex][i];
-      }
-      sendResponse(myText);
+      sayProducts(myText);
   }
 
   function nextProducts() {
       productIndex += 1;
       let myText = "Voici les produits suivants: ";
-      for (var i = 0; i < arrayProducts[productIndex].length; i++) {
-          myText = myText + arrayProducts[productIndex][i];
-      }
-      sendResponse(myText);
+      sayProducts(myText);
   }
 
   function previousProducts() {
       productIndex -= 1;
       let myText = "Pas de problème, je reviens en arrière :";
+      sayProducts(myText);
+  }
+
+  function sayProducts(text) {
       for (var i = 0; i < arrayProducts[productIndex].length; i++) {
-          myText = myText + arrayProducts[productIndex][i];
+          text = text + arrayProducts[productIndex][i];
       }
-      sendResponse(myText);
+
+      if (requestSource === googleAssistantRequest) {
+          sendGoogleResponse(text);
+      } else {
+          sendResponse(text);
+      }
+      
+
   }
 
 
