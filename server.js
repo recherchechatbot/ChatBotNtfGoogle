@@ -215,9 +215,9 @@ function processV1Request(request, response) {
             })
             .catch((err) => {
                 if (requestSource === googleAssistantRequest) {
-                    sendGoogleResponse("Je n'ai pas réussi à trouver des résultats pour ta recherche, vérifie que tu es bien connecté sur ton compte");
+                    sendGoogleResponse("Je n\'ai pas r\u00E9ussi \u00E0 trouver des r\u00E9sultats pour ta recherche, v\u00E9rifie que tu es bien connect\u00E9 sur ton compte");
                 } else {
-                    sendResponse("Je n'ai pas réussi à trouver des résultats pour ta recherche, vérifie que tu es bien connecté sur ton compte");
+                    sendResponse("Je n\'ai pas r\u00E9ussi \u00E0 trouver des r\u00E9sultats pour ta recherche, v\u00E9rifie que tu es bien connect\u00E9 sur ton compte");
                 }
                 console.log("ERREUR:" + err);
             })
