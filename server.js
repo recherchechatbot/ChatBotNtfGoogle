@@ -325,16 +325,21 @@ function processV1Request(request, response) {
   }
 
   function sayProducts(text) {
-      for (var i = 0; i < arrayProducts[productIndex].length; i++) {
-          text = text + arrayProducts[productIndex][i];
-      }
+      if (arrayProducts[productIndex]) {
+          for (var i = 0; i < arrayProducts[productIndex].length; i++) {
+              text = text + arrayProducts[productIndex][i];
+          }
 
-      if (requestSource === googleAssistantRequest) {
-          sendGoogleResponse(text);
+          if (requestSource === googleAssistantRequest) {
+              sendGoogleResponse(text);
+          } else {
+              sendResponse(text);
+          }
+          return text;
       } else {
-          sendResponse(text);
+          return text;
       }
-      return text;
+      
   }
 
 
