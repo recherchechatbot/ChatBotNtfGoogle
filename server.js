@@ -290,7 +290,7 @@ function processV1Request(request, response) {
     }
   };
   function repeatProducts() {
-      let myText = "Pas de problème, je répète: "
+      let myText = "Pas de probleme, je répète: "
       //pas besoin de if car on l'appelle que quand on déclenche un intent qui doit obligatoirement suivre la recherche produits
       sayProducts(myText);
   }
@@ -302,7 +302,7 @@ function processV1Request(request, response) {
           sayProducts(myText);
       }
       else {
-          let text = "Désolé c'est tout ce que j'ai en rayon";
+          let text = "Désolé, c'est tout ce que j'ai en rayon";
           if (requestSource === googleAssistantRequest) {
               sendGoogleResponse(text);
           } else {
