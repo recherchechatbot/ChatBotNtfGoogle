@@ -189,7 +189,7 @@ function processV1Request(request, response) {
                         arrayProducts.push(arrayTemp);
                         
                         arrayTemp = [];
-                        arrayTemp.push(' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', '++ r[i].Prix + ' ' + r[i].Conditionnement + ', ');
+                        arrayTemp.push(' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', '+ r[i].Prix + ' ' + r[i].Conditionnement + ', ');
 
                     }
                     else {
