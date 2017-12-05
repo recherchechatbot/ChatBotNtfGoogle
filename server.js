@@ -184,16 +184,16 @@ function processV1Request(request, response) {
                 
                 for (var i = 0; i < r.length; i++) {
                     
-                    if (arrayTemp.length == 5) {
+                    if (arrayTemp.length == 4) {
 
                         arrayProducts.push(arrayTemp);
                         
                         arrayTemp = [];
-                        arrayTemp.push(' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ');
+                        arrayTemp.push(' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', '++ r[i].Prix + ' ' + r[i].Conditionnement + ', ');
 
                     }
                     else {
-                        arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' );
+                        arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ' );
                         
                     }
 
