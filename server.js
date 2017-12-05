@@ -78,6 +78,43 @@ function getRecette(product,token){
         );
     
 }
+function getProduit(produit, idPdv, c) {
+
+    console.log("DEBUT getProduit");
+
+
+    console.log("produit = " + produit);
+
+    var options = {
+        method: 'POST',
+        uri: "https://drive.intermarche.com/RechercheJs",
+        headers: {
+            Cookie: c,
+        },
+        body: {
+            mot: produit
+        },
+        json: true
+    };
+
+    console.log("FIN getProduit");
+
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+                console.log("ON A UN RETOUR 200 !!!!!!!");
+                console.log("voila le body = " + response.body);
+                resolve(response.body);
+            }
+            else {
+                console.log("ON FAIT UN REJECT");
+                reject(error);
+
+            }
+        })
+    })
+}
+
 
 
 
@@ -328,72 +365,6 @@ function processV1Request(request, response) {
       }
       
   }
-
-
-  function getProduit(produit, idPdv, c) {
-
-      console.log("DEBUT getProduit");
-
-
-      console.log("produit = " + produit);
-
-      var options = {
-          method: 'POST',
-          uri: "https://drive.intermarche.com/RechercheJs",
-          headers: {
-              Cookie: c,
-          },
-          body: {
-              mot: produit
-          },
-          json: true
-      };
-
-      console.log("FIN getProduit");
-
-      return new Promise((resolve, reject) => {
-          request(options, (error, response) => {
-              if (!error && response.statusCode == 200) {
-                  console.log("ON A UN RETOUR 200 !!!!!!!");
-                  console.log("voila le body = " + response.body);
-                  resolve(response.body);
-              }
-              else {
-                  console.log("ON FAIT UN REJECT");
-                  reject(error);
-
-              }
-          })
-      })
-  }
-
-  function getRecette(product, token) {
-      let url = "https://wsmcommerce.intermarche.com/api/v1/recherche/recette?mot=" + product;
-      console.log("URRRRLL:" + url);
-      var options = {
-          method: 'GET',
-          uri: url,
-          headers: {
-              'TokenAuthentification': token
-          }
-      };
-      console.log("my Options:" + options);
-      return new Promise((resolve, reject) => {
-          request(options, (error, response) => {
-              if (!error && response.statuscode == 200) {
-                  resolve(response.body);
-              }
-              else {
-                  reject(error);
-              }
-          });
-      }
-      );
-
-  }
-
-
-
 }
 // Construct rich response for Google Assistant (v1 requests only)
 const app = new DialogflowApp();
