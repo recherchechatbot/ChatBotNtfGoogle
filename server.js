@@ -189,16 +189,13 @@ function processV1Request(request, response) {
                   arrayProducts = [];
                   let arrayTemp = [];
                   let myText = 'Voici les produits que je peux te proposer: ';
-                  console.log("avant la boucle for");
                   for (var i = 0; i < r.length; i++) {
                       if (arrayTemp.length == 4 && sayProducts(myText).length < 640) {
-                          console.log("dans le if");
                           arrayProducts.push(arrayTemp);
                           arrayTemp = [];
                           arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
                       }
                       else if (arrayTemp.length == 4 && sayProducts(myText).length >= 640) {
-                          console.log("dans le elseif");
                           let popped = arrayTemps.pop();
                           arrayProducts.push(arrayTemp);
                           arrayTemp = [popped];
@@ -207,12 +204,10 @@ function processV1Request(request, response) {
                       else {
                           console.log("dans le else");
                           if (i == (r.length - 1) && arrayTemp.length < 3) {
-                              console.log("dans le else, if");
                             arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
                             arrayProducts.push(arrayTemp);
                         }
                           else {
-                              console.log("dans le else, else");
                             arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
                         }
                     }
