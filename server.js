@@ -215,9 +215,9 @@ function processV1Request(request, response) {
             })
             .catch((err) => {
                 if (requestSource === googleAssistantRequest) {
-                    sendGoogleResponse("Je n\'ai pas r\u00E9ussi \u00E0 trouver des r\u00E9sultats pour ta recherche, v\u00E9rifie que tu es bien connect\u00E9 sur ton compte");
+                    sendGoogleResponse("Je n\'ai pas r\u00E9ussi \u00E0 trouver de r\u00E9sultats pour ta recherche, v\u00E9rifie que tu es bien connect\u00E9 sur ton compte");
                 } else {
-                    sendResponse("Je n\'ai pas r\u00E9ussi \u00E0 trouver des r\u00E9sultats pour ta recherche, v\u00E9rifie que tu es bien connect\u00E9 sur ton compte");
+                    sendResponse("Je n\'ai pas r\u00E9ussi \u00E0 trouver de r\u00E9sultats pour ta recherche, v\u00E9rifie que tu es bien connect\u00E9 sur ton compte");
                 }
                 console.log("ERREUR:" + err);
             })
@@ -308,7 +308,7 @@ function processV1Request(request, response) {
     }
   };
   function repeatProducts() {
-      let myText = "Pas de probleme, je répète: "
+      let myText = "Pas de probleme, je r\u00E9p\u00E8te: "
       //pas besoin de if car on l'appelle que quand on déclenche un intent qui doit obligatoirement suivre la recherche produits
       sayProducts(myText);
   }
@@ -320,7 +320,7 @@ function processV1Request(request, response) {
           sayProducts(myText);
       }
       else {
-          let text = "Désolé, c'est tout ce que j'ai en rayon";
+          let text = "D\u00E9sol\u00E9, c\'est tout ce que j\'ai en rayon";
           if (requestSource === googleAssistantRequest) {
               sendGoogleResponse(text);
           } else {
@@ -337,7 +337,7 @@ function processV1Request(request, response) {
           repeatProducts();
       }
       else {
-          let myText = "Pas de problème, je reviens en arrière :";
+          let myText = "Pas de probl\u00E8me, je reviens en arri\u00E8re :";
           sayProducts(myText);
       }
   }
