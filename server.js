@@ -184,15 +184,15 @@ function processV1Request(request, response) {
                 let len = Math.min(5, r.length);
                 for (var i = 0; i < r.length; i++) {
                     //myText = myText + ' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ';
-                    if (indexCoupe == 4) {
+                    if (arrayTemp.length == 5) {
                         arrayProducts.push(arrayTemp);
-                        indexCoupe = 0;
+                        
                         arrayTemp = [];
 
                     }
                     else {
                         arrayTemp.push(' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ');
-                        indexCoupe += 1;
+                        
                     }
 
                     //arrayProducts.push([' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ']);
