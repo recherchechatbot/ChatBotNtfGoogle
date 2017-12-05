@@ -168,7 +168,7 @@ function processV1Request(request, response) {
                           arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
                       }
                       else {
-                          console.log(dans le else);
+                          console.log("dans le else");
                         if (i == (r.length - 1) && arrayTemp.length<3) {
                             arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
                             arrayProducts.push(arrayTemp);
