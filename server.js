@@ -179,9 +179,9 @@ function processV1Request(request, response) {
             .then((r) => {
                 arrayProducts = [];
                 let arrayTemp = [];
-                let indexCoupe = 0;
+                
                 let myText = 'Voici les produits que je peux te proposer: ';
-                let len = Math.min(5, r.length);
+                
                 for (var i = 0; i < r.length; i++) {
                     //myText = myText + ' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ';
                     if (arrayTemp.length == 5) {
