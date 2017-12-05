@@ -183,7 +183,7 @@ function processV1Request(request, response) {
                 let myText = 'Voici les produits que je peux te proposer: ';
                 
                 for (var i = 0; i < r.length; i++) {
-                    //myText = myText + ' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ';
+                    
                     if (arrayTemp.length == 5) {
 
                         arrayProducts.push(arrayTemp);
@@ -193,7 +193,7 @@ function processV1Request(request, response) {
 
                     }
                     else {
-                        arrayTemp.push(' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ');
+                        arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
                         
                     }
 
