@@ -169,11 +169,13 @@ function processV1Request(request, response) {
                       }
                       else {
                           console.log("dans le else");
-                        if (i == (r.length - 1) && arrayTemp.length<3) {
+                          if (i == (r.length - 1) && arrayTemp.length < 3) {
+                              console.log("dans le else, if");
                             arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
                             arrayProducts.push(arrayTemp);
                         }
-                        else {
+                          else {
+                              console.log("dans le else, else");
                             arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
                         }
                     }
