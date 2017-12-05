@@ -96,75 +96,79 @@ function processV1Request(request, response) {
   const app = new DialogflowApp({request: request, response: response});
   // Create handlers for Dialogflow actions as well as a 'default' handler
   const actionHandlers = {
-    // The default welcome intent has been matched, welcome the user (https://dialogflow.com/docs/events#default_welcome_intent)
-    'input.welcome': () => {
-      // Use the Actions on Google lib to respond to Google requests; for other requests use JSON
-      if (requestSource === googleAssistantRequest) {
-        sendGoogleResponse('Hello, Welcome to my Dialogflow agent!'); // Send simple response to user
-      } else {
-        sendResponse('Hello, Welcome to my Dialogflow agent!'); // Send simple response to user
-      }
-    },
-    // The default fallback intent has been matched, try to recover (https://dialogflow.com/docs/intents#fallback_intents)
-    'input.unknown': () => {
-      // Use the Actions on Google lib to respond to Google requests; for other requests use JSON
-      if (requestSource === googleAssistantRequest) {
-        sendGoogleResponse('I\'m having trouble, can you try that again?'); // Send simple response to user
-      } else {
-        sendResponse('I\'m having trouble, can you try that again?'); // Send simple response to user
-      }
-    },
-    'recherche.recette':()=>{
-        let myText='Voici quelques recettes pour toi: ';
-        console.log("myText:" + myText);
-        //sendResponse("Je fonctionne mais mcommerce c'est lent");
-        getRecette('poulet','32e88d45-0f1a-4d39-b35b-a8469da5ad10')
-            .then((r) => {
-                console.log("Resultat de la requete http des recettes: " + r);
-            let listeRecettes=JSON.parse(r);
-            let len=listeRecettes.Recettes.length;
-            for (var i=0;i<len;i++){
-                myText=myText + listeRecettes.Recettes[i].Titre + ' ';
-            }
-            if (requestSource === googleAssistantRequest) {
-                sendGoogleResponse(myText);
-            } else {
-                sendResponse(myText);
-            }
-                
-            })
-            .catch((err) => {
-                if (requestSource === googleAssistantRequest) {
-                    sendGoogleResponse("Je n'ai pas réussi à trouver des résultats pour ta recherche, vérifie que tu es bien connecté sur ton compte");
-                } else {
-                    sendResponse("Je n'ai pas réussi à trouver des résultats pour ta recherche, vérifie que tu es bien connecté sur ton compte");
-                }
-                console.log("ERREUR:" + err);
-            })
-    },
-    'recherche.produit': () => {
-        let myProduct = parameters.Nourriture;
-        let myIdPdv = 1;
-        let cookie = 'ASP.NET_SessionId=nzhapp2btrogfnrgp0xko4cf' + ';IdPdv=' + myIdPdv;
+      // The default welcome intent has been matched, welcome the user (https://dialogflow.com/docs/events#default_welcome_intent)
+      'input.welcome': () => {
+          // Use the Actions on Google lib to respond to Google requests; for other requests use JSON
+          if (requestSource === googleAssistantRequest) {
+              sendGoogleResponse('Hello, Welcome to my Dialogflow agent!'); // Send simple response to user
+          } else {
+              sendResponse('Hello, Welcome to my Dialogflow agent!'); // Send simple response to user
+          }
+      },
+      // The default fallback intent has been matched, try to recover (https://dialogflow.com/docs/intents#fallback_intents)
+      'input.unknown': () => {
+          // Use the Actions on Google lib to respond to Google requests; for other requests use JSON
+          if (requestSource === googleAssistantRequest) {
+              sendGoogleResponse('I\'m having trouble, can you try that again?'); // Send simple response to user
+          } else {
+              sendResponse('I\'m having trouble, can you try that again?'); // Send simple response to user
+          }
+      },
+      'recherche.recette': () => {
+          let myText = 'Voici quelques recettes pour toi: ';
+          console.log("myText:" + myText);
+          //sendResponse("Je fonctionne mais mcommerce c'est lent");
+          getRecette('poulet', '32e88d45-0f1a-4d39-b35b-a8469da5ad10')
+              .then((r) => {
+                  console.log("Resultat de la requete http des recettes: " + r);
+                  let listeRecettes = JSON.parse(r);
+                  let len = listeRecettes.Recettes.length;
+                  for (var i = 0; i < len; i++) {
+                      myText = myText + listeRecettes.Recettes[i].Titre + ' ';
+                  }
+                  if (requestSource === googleAssistantRequest) {
+                      sendGoogleResponse(myText);
+                  } else {
+                      sendResponse(myText);
+                  }
 
-        getProduit(myProduct, myIdPdv, cookie)
-            .then((r) => {
-                arrayProducts = [];
-                let arrayTemp = [];
-                let myText = 'Voici les produits que je peux te proposer: ';
-                for (var i = 0; i < r.length; i++) {
-                    if (arrayTemp.length == 4 && sayProducts(myText).length<640) {
-                        arrayProducts.push(arrayTemp);
-                        arrayTemp = [];
-                        arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', '+ r[i].Prix + ' ' + r[i].Conditionnement + ', ');
-                    }
-                    else if (arrayTemp.length == 4 && sayProducts(myText).length >= 640) {
-                        let popped = arrayTemps.pop();
-                        arrayProducts.push(arrayTemp);
-                        arrayTemp = [popped];
-                        arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
-                    }
-                    else {
+              })
+              .catch((err) => {
+                  if (requestSource === googleAssistantRequest) {
+                      sendGoogleResponse("Je n'ai pas réussi à trouver des résultats pour ta recherche, vérifie que tu es bien connecté sur ton compte");
+                  } else {
+                      sendResponse("Je n'ai pas réussi à trouver des résultats pour ta recherche, vérifie que tu es bien connecté sur ton compte");
+                  }
+                  console.log("ERREUR:" + err);
+              })
+      },
+      'recherche.produit': () => {
+          let myProduct = parameters.Nourriture;
+          let myIdPdv = 1;
+          let cookie = 'ASP.NET_SessionId=nzhapp2btrogfnrgp0xko4cf' + ';IdPdv=' + myIdPdv;
+
+          getProduit(myProduct, myIdPdv, cookie)
+              .then((r) => {
+                  arrayProducts = [];
+                  let arrayTemp = [];
+                  let myText = 'Voici les produits que je peux te proposer: ';
+                  console.log("avant la boucle for");
+                  for (var i = 0; i < r.length; i++) {
+                      if (arrayTemp.length == 4 && sayProducts(myText).length < 640) {
+                          console.log("dans le if");
+                          arrayProducts.push(arrayTemp);
+                          arrayTemp = [];
+                          arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
+                      }
+                      else if (arrayTemp.length == 4 && sayProducts(myText).length >= 640) {
+                          console.log("dans le elseif");
+                          let popped = arrayTemps.pop();
+                          arrayProducts.push(arrayTemp);
+                          arrayTemp = [popped];
+                          arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
+                      }
+                      else {
+                          console.log(dans le else);
                         if (i == (r.length - 1) && arrayTemp.length<3) {
                             arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
                             arrayProducts.push(arrayTemp);
