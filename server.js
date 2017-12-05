@@ -132,8 +132,15 @@ function processV1Request(request, response) {
                 sendResponse(myText);
             }
                 
-        });
-        
+            })
+            .catch((err) => {
+                if (requestSource === googleAssistantRequest) {
+                    sendGoogleResponse("Je n'ai pas réussi à trouver des résultats pour ta recherche, vérifie que tu es bien connecté sur ton compte");
+                } else {
+                    sendResponse("Je n'ai pas réussi à trouver des résultats pour ta recherche, vérifie que tu es bien connecté sur ton compte");
+                }
+                console.log("ERREUR:" + err);
+            })
     },
     'recherche.produit': () => {
         let myProduct = parameters.Nourriture;
@@ -169,6 +176,15 @@ function processV1Request(request, response) {
                 }
                 sayProducts(myText);
             })
+            .catch((err) => {
+                if (requestSource === googleAssistantRequest) {
+                    sendGoogleResponse("Je n'ai pas réussi à trouver des résultats pour ta recherche, vérifie que tu es bien connecté sur ton compte");
+                } else {
+                    sendResponse("Je n'ai pas réussi à trouver des résultats pour ta recherche, vérifie que tu es bien connecté sur ton compte");
+                }
+                console.log("ERREUR:" + err);
+            })
+
         
     },
     'repeat.produit': () => {
@@ -338,11 +354,6 @@ function processV1Request(request, response) {
               }
               else {
                   console.log("ON FAIT UN REJECT");
-                  if (requestSource === googleAssistantRequest) {
-                      sendGoogleResponse("Je n'ai pas réussi à trouver des résultats pour ta recherche, vérifie que tu es bien connecté sur ton compte");
-                  } else {
-                      sendResponse("Je n'ai pas réussi à trouver des résultats pour ta recherche, vérifie que tu es bien connecté sur ton compte");
-                  }
                   reject(error);
 
               }
@@ -367,11 +378,6 @@ function processV1Request(request, response) {
                   resolve(response.body);
               }
               else {
-                  if (requestSource === googleAssistantRequest) {
-                      sendGoogleResponse("Je n'ai pas réussi à trouver des résultats pour ta recherche, vérifie que tu es bien connecté sur ton compte");
-                  } else {
-                      sendResponse("Je n'ai pas réussi à trouver des résultats pour ta recherche, vérifie que tu es bien connecté sur ton compte");
-                  }
                   reject(error);
               }
           });
