@@ -179,29 +179,30 @@ function processV1Request(request, response) {
             .then((r) => {
                 arrayProducts = [];
                 let arrayTemp = [];
-                
                 let myText = 'Voici les produits que je peux te proposer: ';
-                
                 for (var i = 0; i < r.length; i++) {
-                    
-                    if (arrayTemp.length == 4) {
-
+                    if (arrayTemp.length == 4 && sayProducts(myText).length<640) {
                         arrayProducts.push(arrayTemp);
-                        
                         arrayTemp = [];
-                        arrayTemp.push(' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', '+ r[i].Prix + ' ' + r[i].Conditionnement + ', ');
-
+                        arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', '+ r[i].Prix + ' ' + r[i].Conditionnement + ', ');
+                    }
+                    else if (arrayTemp.length == 4 && sayProducts(myText).length >= 640) {
+                        let popped = arrayTemps.pop();
+                        arrayProducts.push(arrayTemp);
+                        arrayTemp = [popped];
+                        arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
                     }
                     else {
-                        arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ' );
-                        
+                        if (i == (r.length - 1) && arrayTemp.length<3) {
+                            arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
+                            arrayProducts.push(arrayTemp);
+                        }
+                        else {
+                            arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
+                        }
                     }
-
-                    //arrayProducts.push([' ' + (i + 1) + ', ' + r[i].Libelle + ' ' + r[i].Marque + ', ']);
                 }
-
                 sayProducts(myText);
-                
             })
         
     },
@@ -296,14 +297,30 @@ function processV1Request(request, response) {
 
   function nextProducts() {
       productIndex += 1;
-      let myText = "Voici les produits suivants: ";
-      sayProducts(myText);
-  }
+      if (arrayProducts[productIndex]) {
+          let myText = "Voici les produits suivants: ";
+          sayProducts(myText);
+      }
+      else {
+          let text = "Désolé c'est tout ce que j'ai en rayon";
+          if (requestSource === googleAssistantRequest) {
+              sendGoogleResponse(text);
+          } else {
+              sendResponse(text);
+          }
+      }
+   
 
   function previousProducts() {
       productIndex -= 1;
-      let myText = "Pas de problème, je reviens en arrière :";
-      sayProducts(myText);
+      if (productIndex < 0) {
+          productIndex = 0;
+          repeatProducts();
+      }
+      else {
+          let myText = "Pas de problème, je reviens en arrière :";
+          sayProducts(myText);
+      }
   }
 
   function sayProducts(text) {
@@ -316,8 +333,7 @@ function processV1Request(request, response) {
       } else {
           sendResponse(text);
       }
-      
-
+      return text;
   }
 
 
