@@ -309,6 +309,7 @@ function processV1Request(request, response) {
               sendResponse(text);
           }
       }
+  }
    
 
   function previousProducts() {
