@@ -173,7 +173,7 @@ function processV1Request(request, response) {
     'recherche.produit': () => {
         let myProduct = parameters.Nourriture;
         let myIdPdv = 1;
-        let cookie = 'ASP.NET_SessionId=eydtdmtk3bqlgvnokd2ykgkh' + ';IdPdv=' + myIdPdv;
+        let cookie = 'ASP.NET_SessionId=nzhapp2btrogfnrgp0xko4cf' + ';IdPdv=' + myIdPdv;
 
         getProduit(myProduct, myIdPdv, cookie)
             .then((r) => {
