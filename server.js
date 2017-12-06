@@ -235,6 +235,7 @@ function processV1Request(request, response) {
     },
     'choix.produit': () => {
         let myChoice = parameters.number;
+        selectProduct(myChoice);
 
     },
     
