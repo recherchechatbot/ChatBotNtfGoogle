@@ -25,6 +25,7 @@ const myApp = express();
 var arrayProducts = [];
 //Memoire du dernier groupe de 5 produits renvoyés
 var productIndex = 0;
+var actualProduct = '';
 
 myApp.use(bodyParser.text({ type: 'application/json' }));
 myApp.post('/webhook', (request, response) => {
@@ -236,9 +237,15 @@ function processV1Request(request, response) {
     'choix.produit': () => {
         let myChoice = parameters.number;
         selectProduct(myChoice);
-
     },
-    
+    'choix.produit.quantité': () => {
+        let myNumber = parameters.number;
+        if (requestSource === googleAssistantRequest) {
+            sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct + ' à ton panier');// TODO VRAIMENT L'AJOUTER AU PANIER'
+        } else {
+            sendResponse("Je n\'ai pas r\u00E9ussi \u00E0 trouver de r\u00E9sultats pour ta recherche, v\u00E9rifie que tu es bien connect\u00E9 sur ton compte");
+        }
+    },
 
     // Default handler for unknown or undefined actions
     'default': () => {
@@ -372,8 +379,9 @@ function processV1Request(request, response) {
       if (requestSource === googleAssistantRequest) {
           sendGoogleResponse("Tu as choisi le num\u00E9ro: " + mergedList[(number-1)] + ". C'est bien cela? Si oui combien en veux-tu?");
       } else {
-          sendResponse(text);
+          sendResponse("Tu as choisi le num\u00E9ro: " + mergedList[(number-1)] + ". C'est bien cela? Si oui combien en veux-tu?");
       }
+      actualProduct = mergedList[(number - 1)];// produit actuel pour pouvoir le citer après
       
   }
 }
