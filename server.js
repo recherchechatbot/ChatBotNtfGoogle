@@ -283,7 +283,7 @@ function processV1Request(request, response) {
                 if (requestSource === googleAssistantRequest) {
                     sendGoogleResponse("je ne vous ai pas trouv\u00E9, verifiez que vous etes bien connect\u00E9");
                 } else {
-                    sendResponse(("je ne vous ai pas trouv\u00E9, verifiez que vous etes bien connect\u00E9");
+                    sendResponse("je ne vous ai pas trouv\u00E9, verifiez que vous etes bien connect\u00E9");
                 }
             });
 
