@@ -243,7 +243,7 @@ function processV1Request(request, response) {
         if (requestSource === googleAssistantRequest) {
             sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct + ' à ton panier');// TODO VRAIMENT L'AJOUTER AU PANIER'
         } else {
-            sendResponse("Je n\'ai pas r\u00E9ussi \u00E0 trouver de r\u00E9sultats pour ta recherche, v\u00E9rifie que tu es bien connect\u00E9 sur ton compte");
+            sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct + ' à ton panier');
         }
     },
 
