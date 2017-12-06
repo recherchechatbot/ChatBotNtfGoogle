@@ -239,13 +239,13 @@ function processV1Request(request, response) {
         let myChoice = parameters.number;
         selectProduct(myChoice);
     },
-    'yolo': () => {
+    'choix.quantite.produit': () => {
         console.log("on est bien dans le bon onglet \"action\" ")
         let myNumber = parameters.number;
         if (requestSource === googleAssistantRequest) {
-            sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct + ' à ton panier');// TODO VRAIMENT L'AJOUTER AU PANIER'
+            sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct + ' \u00E0 ton panier');// TODO VRAIMENT L'AJOUTER AU PANIER'
         } else {
-            sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct + ' à ton panier');
+            sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct + ' \u00E0 ton panier');
         }
     },
 
