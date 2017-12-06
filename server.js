@@ -233,6 +233,10 @@ function processV1Request(request, response) {
     'previous.produit': () => {
         previousProducts();
     },
+    'choix.produit': () => {
+        let myChoice = parameters.number;
+
+    },
     
 
     // Default handler for unknown or undefined actions
@@ -353,9 +357,21 @@ function processV1Request(request, response) {
           } else {
               sendResponse(text);
           }
-          return text;
+      }
+      return text;
+  }
+
+  function selectProduct(number) {
+      var mergedList = [];
+      for (var i= 0; i < arrayProducts.length;i++){
+          for (var j = 0; j < arrayProducts[i].length; j++) {
+              mergedList.push(arrayProducts[i][j]);// BEURK PAS BEAU
+          }
+      }
+      if (requestSource === googleAssistantRequest) {
+          sendGoogleResponse("Tu as choisi le num\u00E9ro: " + mergedList[(number-1)] + ". C'est bien cela? Si oui combien en veux-tu?");
       } else {
-          return text;
+          sendResponse(text);
       }
       
   }
