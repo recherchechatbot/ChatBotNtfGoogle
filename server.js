@@ -431,37 +431,44 @@ function processV1Request(request, response) {
 
   function getMcoUserInfo(token) {
       console.log("et ici, on rentre?");
+      var options = {
+          method: 'GET',
+          uri: MCO_URL + "api/v1/clientRc",
+          headers: {
+              'TokenAuthentification': token
+          },
+          
+          json: true
+      };
       return new Promise((resolve, reject) => {
-          request({
-              uri: MCO_URL + "api/v1/clientRc",
-              method: 'GET',
-              headers: {
-                  'TokenAuthentification': token
-              }
-          }, (error, response) => {
-              if (error) {
-                  console.log('Error while getting Mco user info: ', error);
-                  reject(error);
-              } else {
+          request(options, (error, response) => {
+              if (!error && response.statusCode==200) {
                   console.log('Mco user info result : ', response.body);
                   resolve(response.body);
+                  
+              } else {
+                  console.log('Error while getting Mco user info: ', error);
+                  reject(error);
               }
           });
       })
   }
 
   function getNamePdv(idPdv) {
+      console.log("on est rentrés dans getNamePdv");
+      var options = {
+          method: 'GET',
+          uri: MCO_URL + "api/v1/pdv/fiche/" + idPdv,
+          json: true
+      };
       return new Promise((resolve, reject) => {
-          request({
-              uri: MCO_URL + "api/v1/pdv/fiche/" + idPdv,
-              method: 'GET',
-          }, (error, response) => {
-              if (error) {
+          request(options, (error, response) => {
+              if (!error && response.statusCode == 200) {
+                  console.log('Fiche PDV ', response.body);
+                  resolve(response.body);
+              } else {
                   console.log('Error while getting name PDV: ', error);
                   reject(error);
-              } else {
-                  //console.log('Fiche PDV ', response.body);
-                  resolve(response.body);
               }
           });
       })
