@@ -249,6 +249,7 @@ function processV1Request(request, response) {
         getMcoUserInfo(myToken)
             .then((u) => {
                 var userInfos = JSON.parse(u);
+                console.log(userInfos);
                 var nomFamille = userInfos.AdresseDeFacturation.Nom;
                 var prenom = userInfos.AdresseDeFacturation.Prenom;
                 var idPdvFavori = userInfos.IdPdv;
@@ -441,7 +442,7 @@ function processV1Request(request, response) {
                   console.log('Error while getting Mco user info: ', error);
                   reject(error);
               } else {
-                  //console.log('Mco user info result : ', response.body);
+                  console.log('Mco user info result : ', response.body);
                   resolve(response.body);
               }
           });
