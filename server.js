@@ -26,6 +26,9 @@ var arrayProducts = [];
 //Memoire du dernier groupe de 5 produits renvoyés
 var productIndex = 0;
 var actualProduct = '';
+var myToken = '32e88d45-0f1a-4d39-b35b-a8469da5ad10';
+var MCO_URL = "https://wsmcommerce.intermarche.com/";
+
 
 myApp.use(bodyParser.text({ type: 'application/json' }));
 myApp.post('/webhook', (request, response) => {
@@ -61,6 +64,7 @@ function getRecette(product,token){
     var options={
         method:'GET',
         uri:url,
+
         headers:{
             'TokenAuthentification':token
         }
@@ -80,12 +84,8 @@ function getRecette(product,token){
     
 }
 function getProduit(produit, idPdv, c) {
-
     console.log("DEBUT getProduit");
-
-
     console.log("produit = " + produit);
-
     var options = {
         method: 'POST',
         uri: "https://drive.intermarche.com/RechercheJs",
@@ -97,9 +97,7 @@ function getProduit(produit, idPdv, c) {
         },
         json: true
     };
-
     console.log("FIN getProduit");
-
     return new Promise((resolve, reject) => {
         request(options, (error, response) => {
             if (!error && response.statusCode == 200) {
@@ -110,7 +108,6 @@ function getProduit(produit, idPdv, c) {
             else {
                 console.log("ON FAIT UN REJECT");
                 reject(error);
-
             }
         })
     })
@@ -156,7 +153,7 @@ function processV1Request(request, response) {
           let myText = 'Voici quelques recettes pour toi: ';
           console.log("myText:" + myText);
           //sendResponse("Je fonctionne mais mcommerce c'est lent");
-          getRecette('poulet', '32e88d45-0f1a-4d39-b35b-a8469da5ad10')
+          getRecette('poulet', myToken)
               .then((r) => {
                   console.log("Resultat de la requete http des recettes: " + r);
                   let listeRecettes = JSON.parse(r);
@@ -247,6 +244,50 @@ function processV1Request(request, response) {
         } else {
             sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct + ' \u00E0 ton panier');
         }
+    },
+    'horaires.pdv': () => {
+        getMcoUserInfo(myToken)
+            .then((u) => {
+                var userInfos = JSON.parse(u);
+                var nomFamille = userInfos.AdresseDeFacturation.Nom;
+                var prenom = userInfos.AdresseDeFacturation.Prenom;
+                var idPdvFavori = userInfos.IdPdv;
+                var sexe = "";
+                if (userInfos.AdresseDeFacturation.IdCivilite == 1) {
+                    sexe = "Monsieur";
+                }
+                else {
+                    sexe = "Madame"
+                }
+                getNamePdv(idPdvFavori)
+                    .then((n) => {
+                        var fichePdv = JSON.parse(n);
+                        if (fichePdv.Site && fichePdv.HorairesLundi && fichePdv.HoraireDimanche) {
+                            var horairesSemaine = fichePdv.HorairesLundi.replace(";;;;", " \u00E0 ");
+                            var horairesDim = fichePdv.HorairesDimanche.replace(";;;;", " \u00E0 ");
+                            var namePdvFavori = fichePdv.Site;
+                            if (requestSource === googleAssistantRequest) {
+                                sendGoogleResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaine + ' et le Dimanche de ' + horairesDim);// Aller chercher les infos client sur l'app'
+                            } else {
+                                sendResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaine + ' et le Dimanche de ' + horairesDim);
+                            }
+                        }
+
+                    })
+                    .catch(err => {
+                        console.log("Impossible de recuperer le nom du PDV");
+                    })
+
+            })
+            .catch(err => {
+                if (requestSource === googleAssistantRequest) {
+                    sendGoogleResponse("je ne vous ai pas trouv\u00E9, verifiez que vous etes bien connect\u00E9");
+                } else {
+                    sendResponse(("je ne vous ai pas trouv\u00E9, verifiez que vous etes bien connect\u00E9");
+                }
+            });
+
+        
     },
 
     // Default handler for unknown or undefined actions
@@ -386,6 +427,45 @@ function processV1Request(request, response) {
       actualProduct = mergedList[(number - 1)];// produit actuel pour pouvoir le citer après
       
   }
+
+  function getMcoUserInfo(token) {
+      return new Promise((resolve, reject) => {
+          request({
+              uri: MCO_URL + "api/v1/clientRc",
+              method: 'GET',
+              headers: {
+                  'TokenAuthentification': token
+              }
+          }, (error, response) => {
+              if (error) {
+                  console.log('Error while getting Mco user info: ', error);
+                  reject(error);
+              } else {
+                  //console.log('Mco user info result : ', response.body);
+                  resolve(response.body);
+              }
+          });
+      })
+  }
+
+  function getNamePdv(idPdv) {
+      return new Promise((resolve, reject) => {
+          request({
+              uri: MCO_URL + "api/v1/pdv/fiche/" + idPdv,
+              method: 'GET',
+          }, (error, response) => {
+              if (error) {
+                  console.log('Error while getting name PDV: ', error);
+                  reject(error);
+              } else {
+                  //console.log('Fiche PDV ', response.body);
+                  resolve(response.body);
+              }
+          });
+      })
+  }
+
+    
 }
 // Construct rich response for Google Assistant (v1 requests only)
 const app = new DialogflowApp();
