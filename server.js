@@ -212,7 +212,8 @@ function processV1Request(request, response) {
                         }
                     }
                 }
-                sayProducts(myText);
+                  sayProducts(myText);
+                  productIndex = 0;
             })
             .catch((err) => {
                 if (requestSource === googleAssistantRequest) {
@@ -239,6 +240,7 @@ function processV1Request(request, response) {
         selectProduct(myChoice);
     },
     'choix.produit.quantité': () => {
+        console.log("on est bien dans le bon onglet \"action\" ")
         let myNumber = parameters.number;
         if (requestSource === googleAssistantRequest) {
             sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct + ' à ton panier');// TODO VRAIMENT L'AJOUTER AU PANIER'
