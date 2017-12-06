@@ -430,6 +430,7 @@ function processV1Request(request, response) {
   }
 
   function getMcoUserInfo(token) {
+      console.log("et ici, on rentre?");
       return new Promise((resolve, reject) => {
           request({
               uri: MCO_URL + "api/v1/clientRc",
