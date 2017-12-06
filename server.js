@@ -239,7 +239,7 @@ function processV1Request(request, response) {
         let myChoice = parameters.number;
         selectProduct(myChoice);
     },
-    'choix.produit.quantité': () => {
+    'yolo': () => {
         console.log("on est bien dans le bon onglet \"action\" ")
         let myNumber = parameters.number;
         if (requestSource === googleAssistantRequest) {
