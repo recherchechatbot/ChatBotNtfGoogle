@@ -295,8 +295,8 @@ function processV1Request(request, response) {
         getMcoUserInfo(myToken)
             .then((u) => {
                 //console.log(JSON.stringify(u));
-                //var userInfos = JSON.parse(u);
-                console.log("MYUSER INFOS:" + JSON.parse(u));
+                var userInfos = u;
+                console.log("MYUSER INFOS:" + userInfos);
                 var nomFamille = userInfos.AdresseDeFacturation.Nom;
                 var prenom = userInfos.AdresseDeFacturation.Prenom;
                 var idPdvFavori = userInfos.IdPdv;
