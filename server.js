@@ -113,6 +113,52 @@ function getProduit(produit, idPdv, c) {
     })
 }
 
+function getMcoUserInfo(token) {
+    console.log("et ici, on rentre?");
+    var options = {
+        method: 'GET',
+        uri: MCO_URL + "api/v1/clientRc",
+        headers: {
+            'TokenAuthentification': token
+        },
+        json: true
+    };
+    console.log("myOptions" + JSON.stringify(options));
+    return new Promise((resolve, reject) => {
+        console.log("dans le promise");
+        request(options, (error, response) => {
+            console.log('dans le request');
+            if (!error && response.statusCode == 200) {
+                console.log('Mco user info result : ' + response.body);
+                resolve(response.body);
+            } else {
+                console.log('Error while getting Mco user info: ' + error);
+                reject(error);
+            }
+        });
+    })
+}
+
+function getNamePdv(idPdv) {
+    console.log("on est rentrés dans getNamePdv");
+    var options = {
+        method: 'GET',
+        uri: MCO_URL + "api/v1/pdv/fiche/" + idPdv,
+        json: true
+    };
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+                console.log('Fiche PDV ' + response.body);
+                resolve(response.body);
+            } else {
+                console.log('Error while getting name PDV: ' + error);
+                reject(error);
+            }
+        });
+    })
+}
+
 
 
 
@@ -430,52 +476,7 @@ function processV1Request(request, response) {
       
   }
 
-  function getMcoUserInfo(token) {
-      console.log("et ici, on rentre?");
-      var options = {
-          method: 'GET',
-          uri: MCO_URL + "api/v1/clientRc",
-          headers: {
-              'TokenAuthentification': token
-          },
-          
-          json: true
-      };
-      console.log("myOptions" + JSON.stringify(options));
-      return new Promise((resolve, reject) => {
-          console.log("dans le promise");
-          request(options, (error, response) => {
-              console.log('dans le request');
-              if (!error && response.statusCode==200) {
-                  console.log('Mco user info result : '+ response.body);
-                  resolve(response.body);
-              } else {
-                  console.log('Error while getting Mco user info: ' + error);
-                  reject(error);
-              }
-          });
-      })
-  }
-
-  function getNamePdv(idPdv) {
-      console.log("on est rentrés dans getNamePdv");
-      var options = {
-          method: 'GET',
-          uri: MCO_URL + "api/v1/pdv/fiche/" + idPdv,
-          json: true
-      };
-      return new Promise((resolve, reject) => {
-          request(options, (error, response) => {
-              if (!error && response.statusCode == 200) {
-                  console.log('Fiche PDV '+ response.body);
-                  resolve(response.body);
-              } else {
-                  console.log('Error while getting name PDV: '+ error);
-                  reject(error);
-              }
-          });
-      })
-  }
+  
 
     
 }
