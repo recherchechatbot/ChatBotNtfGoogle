@@ -309,7 +309,7 @@ function processV1Request(request, response) {
                 }
                 getNamePdv(idPdvFavori)
                     .then((n) => {
-                        var fichePdv = JSON.parse(n);
+                        var fichePdv = n
                         if (fichePdv.Site && fichePdv.HorairesLundi && fichePdv.HoraireDimanche) {
                             var horairesSemaine = fichePdv.HorairesLundi.replace(";;;;", " \u00E0 ");
                             var horairesDim = fichePdv.HorairesDimanche.replace(";;;;", " \u00E0 ");
