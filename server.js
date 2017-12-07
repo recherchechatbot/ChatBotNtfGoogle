@@ -447,10 +447,10 @@ function processV1Request(request, response) {
           request(options, (error, response) => {
               console.log('dans le request');
               if (!error && response.statusCode==200) {
-                  console.log('Mco user info result : ', response.body);
+                  console.log('Mco user info result : '+ response.body);
                   resolve(response.body);
               } else {
-                  console.log('Error while getting Mco user info: ', error);
+                  console.log('Error while getting Mco user info: ' + error);
                   reject(error);
               }
           });
@@ -467,10 +467,10 @@ function processV1Request(request, response) {
       return new Promise((resolve, reject) => {
           request(options, (error, response) => {
               if (!error && response.statusCode == 200) {
-                  console.log('Fiche PDV ', response.body);
+                  console.log('Fiche PDV '+ response.body);
                   resolve(response.body);
               } else {
-                  console.log('Error while getting name PDV: ', error);
+                  console.log('Error while getting name PDV: '+ error);
                   reject(error);
               }
           });
