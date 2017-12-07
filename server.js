@@ -307,9 +307,14 @@ function processV1Request(request, response) {
                 else {
                     sexe = "Madame"
                 }
+                if (requestSource === googleAssistantRequest) {
+                    sendGoogleResponse(sexe + " " + nomFamille + ", " + "attend un instant que je me renseigne");
+                } else {
+                    sendResponse("je ne vous ai pas trouv\u00E9, verifiez que vous etes bien connect\u00E9");
+                }
                 getNamePdv(idPdvFavori)
                     .then((n) => {
-                        var fichePdv = n
+                        var fichePdv = n;
                         if (fichePdv.Site && fichePdv.HorairesLundi && fichePdv.HoraireDimanche) {
                             var horairesSemaine = fichePdv.HorairesLundi.replace(";;;;", " \u00E0 ");
                             var horairesDim = fichePdv.HorairesDimanche.replace(";;;;", " \u00E0 ");
