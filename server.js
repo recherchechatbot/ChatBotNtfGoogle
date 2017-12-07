@@ -307,11 +307,7 @@ function processV1Request(request, response) {
                 else {
                     sexe = "Madame"
                 }
-                if (requestSource === googleAssistantRequest) {
-                    sendGoogleResponse(sexe + " " + nomFamille + ", " + "attend un instant que je me renseigne");
-                } else {
-                    sendResponse(sexe + " " + nomFamille + ", " + "attend un instant que je me renseigne");
-                }
+                
                 getNamePdv(idPdvFavori)
                     .then((n) => {
                         var fichePdv = n;
