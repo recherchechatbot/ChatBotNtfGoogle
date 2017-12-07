@@ -296,7 +296,7 @@ function processV1Request(request, response) {
             .then((u) => {
                 //console.log(JSON.stringify(u));
                 //var userInfos = JSON.parse(u);
-                console.log("MYUSER INFOS:" + userInfos);
+                console.log("MYUSER INFOS:" + JSON.parse(u));
                 var nomFamille = userInfos.AdresseDeFacturation.Nom;
                 var prenom = userInfos.AdresseDeFacturation.Prenom;
                 var idPdvFavori = userInfos.IdPdv;
