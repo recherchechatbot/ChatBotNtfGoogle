@@ -441,6 +441,7 @@ function processV1Request(request, response) {
           
           json: true
       };
+      console.log("myOptions" + options);
       return new Promise((resolve, reject) => {
           request(options, (error, response) => {
               if (!error && response.statusCode==200) {
