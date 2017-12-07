@@ -1,0 +1,46 @@
+﻿<html>
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<script type="text/javascript">
+		$( document ).ready(function() {
+			/* attach a submit handler to the form */
+			$("#identification").submit(function(event) {
+
+				/* stop form from submitting normally */
+				event.preventDefault();
+
+				/* get the action attribute from the <form action=""> element */
+				var $form = $( this ),
+					url = $form.attr( 'action' );
+				  
+				$.ajax({
+					type: "POST",
+					url: url,
+					data: JSON.stringify({ email: $('#email').val(), mdp: $('#password').val(), accountLinkingToken: $('#accountLinkingToken').val(), redirectURI: $('#redirectURI').val() }),
+					contentType: 'application/json',
+					success: function(reponse) {
+						if (reponse && !reponse.EstEnErreur) {
+							// reponse.redirect contains the string URL to redirect to
+							window.location.href = reponse.urlRedirection;
+						}
+						else {
+							alert("Erreur");
+						}
+					}
+				});
+			});
+		});
+	</script>
+
+
+	<form action="/login" method="post" id="identification">
+		Email : <input type="text" name="email" id="email"><br>
+		Mdp  : <input type="password" name="password" id="password"><br>
+		<input type="hidden" id="accountLinkingToken" name="accountLinkingToken" value="<%= accountLinkingToken %>">
+		<input type="hidden" id="redirectURI" name="redirectURI" value="<%= redirectURI %>">
+	   <button>Connexion</button>
+	</form>
+	
+</html>

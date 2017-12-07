@@ -26,15 +26,137 @@ var arrayProducts = [];
 //Memoire du dernier groupe de 5 produits renvoyés
 var productIndex = 0;
 var actualProduct = '';
-var myToken = '32e88d45-0f1a-4d39-b35b-a8469da5ad10';
-var MCO_URL = "https://wsmcommerce.intermarche.com/";
-
+//Config vars, TODO à cacher plus tard
+const MCO_URL = "https://wsmcommerce.intermarche.com/";
+const RC_URL = "https://api-vip-dmz.mousquetaires.com/";
+const FO_URL = "https://drive.intermarche.com/";
+const MSQ_APP_RC = "ecommerce";
+const MSQ_JETON_APP_RC = "9206b4da-b84f-4145-8473-a7b40d5ecd56";
+//Vars authentification
+var email = "";
+var mdp = "";
+var myToken = "";/*'32e88d45-0f1a-4d39-b35b-a8469da5ad10';*/
+var ASPSessionId = "";
 
 myApp.use(bodyParser.text({ type: 'application/json' }));
-myApp.post('/login', function (request, response) {
-    console.log(request.body);
+
+myApp.post('/login', function (req, res) {
+
+    var resultat = JSONbig.parse(req.body);
+
+
+    console.log("VALEUR DE BODY : " + JSON.stringify(req.body));
+
+    //const userLogin = UserStore.get(username);
+    //if (!userLogin || userLogin.password !== password) {
+    //    res.render('authorize', {
+    //        redirectURI,
+    //        username,
+    //        password,
+    //        errorMessage: !userLogin
+    //            ? 'Uh oh. That username doesn’t exist. Please use the demo account or try again.' // eslint-disable-line max-len
+    //            : 'Oops. Incorrect password',
+    //        errorInput: !userLogin ? 'username' : 'password',
+    //    });
+    //} else {
+    //    linkAccountToMessenger(res, userLogin.username, redirectURI);
+    //}
+
+    var authCode = null;
+
+    loginRC(resultat.email, resultat.mdp)
+        .then((rep) => {
+            console.log("REPONSE du RCCCCCCCCCCCCCC");
+            console.log("Res: " + JSON.stringify(rep));
+            console.log("Res.id :" + rep.id);
+
+            if (rep.id) {
+                loginMCommerce(resultat.email, resultat.mdp, rep.id)
+                    .then((r) => {
+                        console.log("ICIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
+                        console.log("rrrrrrrrrrrrrrrrrrr" + JSON.stringify(r));
+
+                        if (r.TokenAuthentification) {
+
+                            email = resultat.email;
+
+                            myToken = r.TokenAuthentification
+                            console.log("le token a bien été récupéré");
+                            const redirectURISuccess = `${resultat.redirectURI}&authorization_code=${myToken}`;
+                            console.log("URL DE REDIRECTION: " + redirectURISuccess);
+
+                            console.log("on link le mco " + myToken + " avec l'email " + resultat.email);
+                            
+
+                            getAspNetSessionId(resultat.email, resultat.mdp)
+                                .then((c) => {
+                                    //UserStore.linkFoSession(resultat.email, c["ASP.NET_SessionId"]);
+                                    ASPSessionId = c["ASP.NET_SessionId"]
+                                })
+                                .catch(err => {
+                                    console.log("impossible de recuperer session id ASP");
+                                });
+
+                            return res.json({
+                                EstEnErreur: false,
+                                urlRedirection: redirectURISuccess
+                            });
+                        }
+                        else {
+                            console.log("le token n'a pas été récupéré mais la réponse est ok");
+                            return res.json({
+                                EstEnErreur: true,
+                                urlRedirection: ""
+                            });
+                        }
+                    })
+            }
+            else {
+                console.log("Impossible de récuperer l'idRC");
+                return res.json({
+                    EstEnErreur: true,
+                    urlRedirection: ""
+                });
+            }
+        })
+        .catch(err => {
+            return res.json({
+                EstEnErreur: true,
+                urlRedirection: ""
+            });
+        });
+
+
+    /*
+      The auth code can be any thing you can use to uniquely identify a user.
+      Once the redirect below happens, this bot will receive an account link
+      message containing this auth code allowing us to identify the user.
+      NOTE: It is considered best practice to use a unique id instead of
+      something guessable like a users username so that malicious
+      users cannot spoof a link.
+     */
+    //const authCode = uuid();
+
+    // set the messenger id of the user to the authCode.
+    // this will be replaced on successful account link
+    // with the users id.
+
+    // Redirect users to this URI on successful login
+
 });
-myApp.post('/login/token', function (request, response) { });
+myApp.get('/authorize', function (req, res) {
+    var accountLinkingToken = req.query.account_linking_token;
+    var redirectURI = req.query.redirect_uri;
+
+
+    // Redirect users to this URI on successful login
+
+    res.render('authorize', {
+        accountLinkingToken: accountLinkingToken,
+        redirectURI: redirectURI
+    });
+});
+
 myApp.post('/webhook', (request, response) => {
 
     //console.log(request);
@@ -62,7 +184,100 @@ myApp.post('/webhook', (request, response) => {
     }
 });
 
-function getRecette(product,token){
+function loginRC(email, mdp) {
+    console.log("Email : " + email);
+    console.log("Mdp : " + mdp);
+
+    return new Promise((resolve, reject) => {
+        request({
+            url: RC_URL + 'ReferentielClient/v1/login',
+            method: 'POST',
+            body: {
+                email: email,
+                mdp: mdp
+            },
+            headers: {
+                "Msq-Jeton-App": MSQ_JETON_APP_RC,
+                "Msq-App": MSQ_APP_RC
+            },
+            json: true
+        }, (error, response) => {
+            if (error) {
+                console.log('Erreur login Referentiel Client: ', error);
+                reject(error);
+            } else if (response.body.error) {
+                console.log('Error: ', response.body.error);
+                reject(new Error(response.body.error));
+            }
+
+            resolve(response.body);
+        });
+    });
+}
+
+function getAspNetSessionId(email, mdp) {
+    var options = {
+        method: 'POST',
+        uri: FO_URL + "Connexion",
+        body: {
+            txtEmail: email,
+            txtMotDePasse: mdp,
+            largeur: "800",
+            hauteur: "300",
+            resteConnecte: true,
+        },
+        json: true,
+        headers: {
+            referer: 'http://google.fr'
+        }
+    };
+
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+                console.log("getAspNetSessionId retourne : " + response.headers['set-cookie']);
+
+                resolve(parseCookies(response.headers['set-cookie'].toString()));
+            }
+            else {
+                console.log("getAspNetSessionId ERREUR" + error);
+                reject(error);
+            }
+        })
+    });
+}
+
+function loginMCommerce(email, mdp, idrc) {
+    console.log("Email : " + email);
+    console.log("Mdp : " + mdp);
+
+    return new Promise((resolve, reject) => {
+        request({
+            url: MCO_URL + 'api/v1/loginRc',
+            method: 'POST',
+            body: {
+                email: email,
+                motdepasse: mdp,
+                idrc: idrc,
+                veutcartefid: false
+            },
+            json: true
+        }, (error, response) => {
+            if (error) {
+                console.log('Erreur login mcommerce: ', error);
+                reject(error);
+            } else if (response.body.error) {
+                console.log('Error: ', response.body.error);
+                reject(new Error(response.body.error));
+            }
+
+            resolve(response.body);
+        });
+    });
+}
+
+
+function getRecette(product, token) {
     let url="https://wsmcommerce.intermarche.com/api/v1/recherche/recette?mot="+product;
     console.log("URRRRLL:" + url);
     var options={
