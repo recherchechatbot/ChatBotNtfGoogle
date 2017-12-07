@@ -441,13 +441,14 @@ function processV1Request(request, response) {
           
           json: true
       };
-      console.log("myOptions" + options);
+      console.log("myOptions" + JSON.stringify(options));
       return new Promise((resolve, reject) => {
+          console.log("dans le promise");
           request(options, (error, response) => {
+              console.log('dans le request');
               if (!error && response.statusCode==200) {
                   console.log('Mco user info result : ', response.body);
                   resolve(response.body);
-                  
               } else {
                   console.log('Error while getting Mco user info: ', error);
                   reject(error);
