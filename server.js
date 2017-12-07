@@ -248,6 +248,7 @@ function processV1Request(request, response) {
     'horaires.pdv': () => {
         getMcoUserInfo(myToken)
             .then((u) => {
+                console.log(JSON.stringify(u));
                 var userInfos = JSON.parse(u);
                 console.log(userInfos);
                 var nomFamille = userInfos.AdresseDeFacturation.Nom;
