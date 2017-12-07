@@ -294,9 +294,9 @@ function processV1Request(request, response) {
     'horaires.pdv': () => {
         getMcoUserInfo(myToken)
             .then((u) => {
-                console.log(JSON.stringify(u));
+                //console.log(JSON.stringify(u));
                 var userInfos = JSON.parse(u);
-                console.log(userInfos);
+                console.log("MYUSER INFOS:" + userInfos);
                 var nomFamille = userInfos.AdresseDeFacturation.Nom;
                 var prenom = userInfos.AdresseDeFacturation.Prenom;
                 var idPdvFavori = userInfos.IdPdv;
