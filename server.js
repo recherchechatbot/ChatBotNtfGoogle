@@ -151,7 +151,7 @@ myApp.get('/authorize', function (req, res) {
 
     // Redirect users to this URI on successful login
 
-    res.render('./views/authorize.ejs', {
+    res.render('authorize.ejs', {
         accountLinkingToken: accountLinkingToken,
         redirectURI: redirectURI
     });
