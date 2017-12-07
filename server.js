@@ -31,8 +31,10 @@ var MCO_URL = "https://wsmcommerce.intermarche.com/";
 
 
 myApp.use(bodyParser.text({ type: 'application/json' }));
-myApp.post('/login', function (req, res) { });
-myApp.post('/login/token', function (req, res) { });
+myApp.post('/login', function (request, response) {
+    console.log(request.body);
+});
+myApp.post('/login/token', function (request, response) { });
 myApp.post('/webhook', (request, response) => {
 
     //console.log(request);
