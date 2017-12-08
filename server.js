@@ -144,6 +144,7 @@ myApp.post('/login', function (req, res) {
     // Redirect users to this URI on successful login
 
 });
+myApp.set('view engine', 'ejs');
 myApp.get('/authorize', function (req, res) {
     var accountLinkingToken = req.query.account_linking_token;
     var redirectURI = req.query.redirect_uri;
