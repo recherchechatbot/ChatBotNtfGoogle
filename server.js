@@ -22,10 +22,11 @@ const bodyParser = require('body-parser');
 const myApp = express();
 
 //Memoire de la derniere recherche
-var arrayProducts = [];
+var arrayProducts = [];//array de dim2 avec les strings qu'on veut renvoyer, coupée tous les 5 produits'
+var arrayProductsFull = [];
 //Memoire du dernier groupe de 5 produits renvoyés
 var productIndex = 0;
-var actualProduct = '';
+var actualProduct = [];
 //Config vars, TODO à cacher plus tard
 const MCO_URL = "https://wsmcommerce.intermarche.com/";
 const RC_URL = "https://api-vip-dmz.mousquetaires.com/";
@@ -290,7 +291,6 @@ function loginMCommerce(email, mdp, idrc) {
     });
 }
 
-
 function getRecette(product, token) {
     let url="https://wsmcommerce.intermarche.com/api/v1/recherche/recette?mot="+product;
     console.log("URRRRLL:" + url);
@@ -316,6 +316,7 @@ function getRecette(product, token) {
         );
     
 }
+
 function getProduit(produit, idPdv, c) {
     console.log("DEBUT getProduit");
     console.log("produit = " + produit);
@@ -405,7 +406,58 @@ function parseCookies(cookiesString) {
     return list;
 }
 
+function addProductBasketFront(idProduit, cookie) {
+    return new Promise((resolve, reject) => {
+        request({
+            url: FO_URL + 'Plus',
+            method: 'POST',
+            body: {
+                "idProduit": idProduit,
+                "trackingCode": null,
+                "idSource": null,
+                "idUniversProduitComplementaire": null
+            },
+            headers: {
+                'cookie': cookie
+            },
+            json: true
+        }, (error, response) => {
+            if (error) {
+                console.log('Erreur lors de l\'ajout du panier : ', error);
+                reject(error);
+            } else if (response.body.error) {
+                console.log('Error: ', response.body.error);
+                reject(new Error(response.body.error));
+            }
+            //console.log("ceci est le body lorsqu'on essaye d'ajouter un truc au panier:" + JSON.stringify(response.body));
+            resolve(response.body);
+        });
 
+    });
+
+
+}
+
+function hitFO(cookie) {
+    return new Promise((resolve, reject) => {
+        request({
+            url: FO_URL,
+            method: 'GET',
+            headers: {
+                'cookie': cookie
+            }
+        }, (error, response) => {
+            if (error) {
+                reject(error);
+            } else if (response.body.error) {
+                reject(new Error(response.body.error));
+            }
+
+            console.log("HIT FO OK :");
+            resolve();
+        });
+    });
+}
 
 
 
@@ -472,11 +524,12 @@ function processV1Request(request, response) {
       'recherche.produit': () => {
           let myProduct = parameters.Nourriture;
           let myIdPdv = 1;
-          let cookie = 'ASP.NET_SessionId=w0gtsxuo3cismvwpg2b30jap' + ';IdPdv=' + myIdPdv;
+          let cookie = 'ASP.NET_SessionId=' + ASPSessionId + ';IdPdv=' + myIdPdv;
 
           getProduit(myProduct, myIdPdv, cookie)
               .then((r) => {
                   arrayProducts = [];
+                  arrayProductsFull=[]
                   let arrayTemp = [];
                   let myText = 'Voici les produits que je peux te proposer: ';
                   for (var i = 0; i < r.length; i++) {
@@ -484,20 +537,24 @@ function processV1Request(request, response) {
                           arrayProducts.push(arrayTemp);
                           arrayTemp = [];
                           arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
+                          arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
                       }
                       else if (arrayTemp.length == 4 && sayProducts(myText).length >= 640) {
                           let popped = arrayTemps.pop();
                           arrayProducts.push(arrayTemp);
                           arrayTemp = [popped];
                           arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
+                          arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
                       }
                       else {                          
                           if (i == (r.length - 1) && arrayTemp.length < 3) {
                             arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
                             arrayProducts.push(arrayTemp);
+                            arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
                         }
                           else {
-                            arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
+                              arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
+                              arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
                         }
                     }
                 }
@@ -531,10 +588,19 @@ function processV1Request(request, response) {
     'choix.quantite.produit': () => {
         console.log("on est bien dans le bon onglet \"action\" ")
         let myNumber = parameters.number;
-        if (requestSource === googleAssistantRequest) {
-            sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct + ' \u00E0 ton panier');// TODO VRAIMENT L'AJOUTER AU PANIER'
-        } else {
-            sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct + ' \u00E0 ton panier');
+        var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
+        for (var i = 0; i < number; i++) {
+            hitFO(cookieSession)
+                .then(() => {
+                    addProductBasketFront(actualProduct[1], cookieSession)
+                        .then((r) => {
+                            if (requestSource === googleAssistantRequest) {
+                                sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');// TODO VRAIMENT L'AJOUTER AU PANIER'
+                            } else {
+                                sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
+                            }
+                        })
+                })
         }
     },
     'horaires.pdv': () => {
@@ -698,18 +764,14 @@ function processV1Request(request, response) {
   }
 
   function selectProduct(number) {
-      var mergedList = [];
-      for (var i= 0; i < arrayProducts.length;i++){
-          for (var j = 0; j < arrayProducts[i].length; j++) {
-              mergedList.push(arrayProducts[i][j]);// BEURK PAS BEAU
-          }
-      }
+      
+      
       if (requestSource === googleAssistantRequest) {
-          sendGoogleResponse("Tu as choisi le num\u00E9ro: " + mergedList[(number-1)] + ". C'est bien cela? Si oui combien en veux-tu?");
+          sendGoogleResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[(number - 1)][0] + ". C'est bien cela? Si oui combien en veux-tu?");
       } else {
-          sendResponse("Tu as choisi le num\u00E9ro: " + mergedList[(number-1)] + ". C'est bien cela? Si oui combien en veux-tu?");
+          sendResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[(number - 1)][0] + ". C'est bien cela? Si oui combien en veux-tu?");
       }
-      actualProduct = mergedList[(number - 1)];// produit actuel pour pouvoir le citer après
+      actualProduct = arrayProductsFull[(number - 1)];// produit actuel pour pouvoir le citer après
       
   }
 
