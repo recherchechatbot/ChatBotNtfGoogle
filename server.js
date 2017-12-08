@@ -589,7 +589,7 @@ function processV1Request(request, response) {
         console.log("on est bien dans le bon onglet \"action\" ")
         let myNumber = parameters.number;
         var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
-        for (var i = 0; i < number; i++) {
+        for (var i = 0; i < myNumber; i++) {
             hitFO(cookieSession)
                 .then(() => {
                     addProductBasketFront(actualProduct[1], cookieSession)
