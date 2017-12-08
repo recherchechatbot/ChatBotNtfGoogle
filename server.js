@@ -45,6 +45,7 @@ myApp.post('/login', function (req, res) {
 
     var resultat = JSONbig.parse(req.body);
 
+    console.log("VALEUR DE QUERY : " + JSON.stringify(req.query));
 
     console.log("VALEUR DE BODY : " + JSON.stringify(req.body));
 
@@ -83,7 +84,7 @@ myApp.post('/login', function (req, res) {
 
                             myToken = r.TokenAuthentification
                             console.log("le token a bien été récupéré");
-                            const redirectURISuccess = `${resultat.redirectURI}#authorization_code=${myToken}`;
+                            const redirectURISuccess = `${resultat.redirectURI}#authorization_code=${myToken}&token_type=bearer&state=`;
                             console.log("URL DE REDIRECTION: " + redirectURISuccess);
 
                             console.log("on link le mco " + myToken + " avec l'email " + resultat.email);
