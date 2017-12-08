@@ -37,6 +37,7 @@ var email = "";
 var mdp = "";
 var myToken = "";/*'32e88d45-0f1a-4d39-b35b-a8469da5ad10';*/
 var ASPSessionId = "";
+var userInfos = {};
 
 myApp.use(bodyParser.text({ type: 'application/json' }));
 
@@ -90,11 +91,17 @@ myApp.post('/login', function (req, res) {
 
                             getAspNetSessionId(resultat.email, resultat.mdp)
                                 .then((c) => {
-                                    //UserStore.linkFoSession(resultat.email, c["ASP.NET_SessionId"]);
                                     ASPSessionId = c["ASP.NET_SessionId"]
                                 })
                                 .catch(err => {
                                     console.log("impossible de recuperer session id ASP");
+                                });
+                            getMcoUserInfo(myToken)
+                                .then((u) => {
+                                    userInfos = u;
+                                })
+                                .catch(err => {
+                                    console.log("impossible de récupérer idpdvfavori, erreur suivante: " + err);
                                 });
 
                             return res.json({
@@ -379,6 +386,19 @@ function getNamePdv(idPdv) {
     })
 }
 
+function parseCookies(cookiesString) {
+    var list = {};
+
+    cookiesString && cookiesString.split(';').forEach(function (c1) {
+        c1 && c1.split(',').forEach(function (cookie) {
+            var parts = cookie.split('=');
+            list[parts.shift().trim()] = decodeURI(parts.join('='));
+        });
+    });
+
+    return list;
+}
+
 
 
 
@@ -512,49 +532,39 @@ function processV1Request(request, response) {
         }
     },
     'horaires.pdv': () => {
-        getMcoUserInfo(myToken)
-            .then((u) => {
-                //console.log(JSON.stringify(u));
-                var userInfos = u;
-                console.log("MYUSER INFOS:" + userInfos);
-                var nomFamille = userInfos.AdresseDeFacturation.Nom;
-                var prenom = userInfos.AdresseDeFacturation.Prenom;
-                var idPdvFavori = userInfos.IdPdv;
-                var sexe = "";
-                if (userInfos.AdresseDeFacturation.IdCivilite == 1) {
-                    sexe = "Monsieur";
-                }
-                else {
-                    sexe = "Madame"
-                }
+        console.log("MYUSER INFOS:" + userInfos);
+        var nomFamille = userInfos.AdresseDeFacturation.Nom;
+        var prenom = userInfos.AdresseDeFacturation.Prenom;
+        var idPdvFavori = userInfos.IdPdv;
+        var sexe = "";
+        if (userInfos.AdresseDeFacturation.IdCivilite == 1) {
+            sexe = "Monsieur";
+        }
+        else {
+            sexe = "Madame"
+        }
                 
-                getNamePdv(idPdvFavori)
-                    .then((n) => {
-                        var fichePdv = n;
-                        if (fichePdv.Site && fichePdv.HorairesLundi && fichePdv.HoraireDimanche) {
-                            var horairesSemaine = fichePdv.HorairesLundi.replace(";;;;", " \u00E0 ");
-                            var horairesDim = fichePdv.HorairesDimanche.replace(";;;;", " \u00E0 ");
-                            var namePdvFavori = fichePdv.Site;
-                            if (requestSource === googleAssistantRequest) {
-                                sendGoogleResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaine + ' et le Dimanche de ' + horairesDim);// Aller chercher les infos client sur l'app'
-                            } else {
-                                sendResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaine + ' et le Dimanche de ' + horairesDim);
-                            }
-                        }
-
-                    })
-                    .catch(err => {
-                        console.log("Impossible de recuperer le nom du PDV");
-                    })
+        getNamePdv(idPdvFavori)
+            .then((n) => {
+                var fichePdv = n;
+                if (fichePdv.Site && fichePdv.HorairesLundi && fichePdv.HoraireDimanche) {
+                    var horairesSemaine = fichePdv.HorairesLundi.replace(";;;;", " \u00E0 ");
+                    var horairesDim = fichePdv.HorairesDimanche.replace(";;;;", " \u00E0 ");
+                    var namePdvFavori = fichePdv.Site;
+                    if (requestSource === googleAssistantRequest) {
+                        sendGoogleResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaine + ' et le Dimanche de ' + horairesDim);// Aller chercher les infos client sur l'app'
+                    } else {
+                        sendResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaine + ' et le Dimanche de ' + horairesDim);
+                    }
+                }
 
             })
             .catch(err => {
-                if (requestSource === googleAssistantRequest) {
-                    sendGoogleResponse("je ne vous ai pas trouv\u00E9, verifiez que vous etes bien connect\u00E9");
-                } else {
-                    sendResponse("je ne vous ai pas trouv\u00E9, verifiez que vous etes bien connect\u00E9");
-                }
-            });
+                console.log("Impossible de recuperer le nom du PDV");
+            })
+
+
+            
 
         
     },
