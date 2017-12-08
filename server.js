@@ -157,6 +157,7 @@ myApp.get('/authorize', function (req, res) {
     var accountLinkingToken = req.query.account_linking_token;
     var redirectURI = req.query.redirect_uri;
     var state = req.query.state;
+    console.log("STATE: " +  state)
     
 
 
