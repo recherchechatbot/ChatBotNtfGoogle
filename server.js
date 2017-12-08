@@ -45,7 +45,7 @@ myApp.post('/login', function (req, res) {
 
     var resultat = JSONbig.parse(req.body);
 
-    console.log("VALEUR DE QUERY : " + JSON.stringify(req.query));
+    
 
     console.log("VALEUR DE BODY : " + JSON.stringify(req.body));
 
@@ -84,7 +84,7 @@ myApp.post('/login', function (req, res) {
 
                             myToken = r.TokenAuthentification
                             console.log("le token a bien été récupéré");
-                            const redirectURISuccess = `${resultat.redirectURI}#authorization_code=${myToken}&token_type=bearer&state=`;
+                            const redirectURISuccess = `${resultat.redirectURI}#authorization_code=${myToken}&token_type=bearer&state=${resultat.state}`;
                             console.log("URL DE REDIRECTION: " + redirectURISuccess);
 
                             console.log("on link le mco " + myToken + " avec l'email " + resultat.email);
@@ -156,13 +156,16 @@ myApp.set('view engine', 'ejs');
 myApp.get('/authorize', function (req, res) {
     var accountLinkingToken = req.query.account_linking_token;
     var redirectURI = req.query.redirect_uri;
+    var state = req.query.state;
+    
 
 
     // Redirect users to this URI on successful login
 
     res.render('authorize', {
         accountLinkingToken: accountLinkingToken,
-        redirectURI: redirectURI
+        redirectURI: redirectURI,
+        state:state
     });
 });
 
