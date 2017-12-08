@@ -158,7 +158,7 @@
 				$.ajax({
 					type: "POST",
 					url: url,
-					data: JSON.stringify({ email: $('#email').val(), mdp: $('#password').val(), accountLinkingToken: $('#accountLinkingToken').val(), redirectURI: $('#redirectURI').val() }),
+					data: JSON.stringify({ email: $('#email').val(), mdp: $('#password').val(), accountLinkingToken: $('#accountLinkingToken').val(), redirectURI: $('#redirectURI').val(), state: $('#state').val() }),
 					contentType: 'application/json',
 					success: function(reponse) {
 						if (reponse && !reponse.EstEnErreur) {
