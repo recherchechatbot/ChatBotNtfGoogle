@@ -83,7 +83,7 @@ myApp.post('/login', function (req, res) {
 
                             myToken = r.TokenAuthentification
                             console.log("le token a bien été récupéré");
-                            const redirectURISuccess = `${resultat.redirectURI}&authorization_code=${myToken}`;
+                            const redirectURISuccess = `${resultat.redirectURI}#authorization_code=${myToken}`;
                             console.log("URL DE REDIRECTION: " + redirectURISuccess);
 
                             console.log("on link le mco " + myToken + " avec l'email " + resultat.email);
