@@ -529,8 +529,8 @@ function processV1Request(request, response) {
           getProduit(myProduct, myIdPdv, cookie)
               .then((r) => {
                   arrayProducts = [];
+                  arrayProductsFull = []
                   //Version avec 4 produits:
-                //  arrayProductsFull=[]
                 //  let arrayTemp = [];
                 //  let myText = 'Voici les produits que je peux te proposer: ';
                 //  for (var i = 0; i < r.length; i++) {
@@ -563,6 +563,7 @@ function processV1Request(request, response) {
                   for (var i = 0; i < r.length; i++) {
                       if (r[i].StockEpuise==false) {
                           arrayProducts.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
+                          arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
                       }
                   }
                   sayProducts(myText);
@@ -607,12 +608,12 @@ function processV1Request(request, response) {
         for (var i = 0; i < myNumber; i++) {
             hitFO(cookieSession)
                 .then(() => {
-                    addProductBasketFront(actualProduct, cookieSession)
+                    addProductBasketFront(actualProduct[1], cookieSession)
                         .then((r) => {
                             if (requestSource === googleAssistantRequest) {
-                                sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct + ' \u00E0 ton panier');
+                                sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
                             } else {
-                                sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct + ' \u00E0 ton panier');
+                                sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
                             }
                         })
                 })
@@ -796,18 +797,18 @@ function processV1Request(request, response) {
       //actualProduct = arrayProductsFull[(number - 1)];// produit actuel pour pouvoir le citer après
       if (number == -1) {
           if (requestSource === googleAssistantRequest) {
-              sendGoogleResponse("Tu as choisi le num\u00E9ro: " + arrayProducts[productIndex] + ". C'est bien cela? Si oui combien en veux-tu?");
+              sendGoogleResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[productIndex][0] + ". C'est bien cela? Si oui combien en veux-tu?");
           } else {
-              sendResponse("Tu as choisi le num\u00E9ro: " + arrayProducts[productIndex] + ". C'est bien cela? Si oui combien en veux-tu?");
+              sendResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[productIndex][0] + ". C'est bien cela? Si oui combien en veux-tu?");
           }
-          actualProduct = arrayProducts[productIndex];// produit actuel pour pouvoir le citer après
+          actualProduct = arrayProductsFull[productIndex];// produit actuel pour pouvoir le citer après
       } else {
           if (requestSource === googleAssistantRequest) {
-              sendGoogleResponse("Tu as choisi le num\u00E9ro: " + arrayProducts[number - 1] + ". C'est bien cela? Si oui combien en veux-tu?");
+              sendGoogleResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[number - 1][0] + ". C'est bien cela? Si oui combien en veux-tu?");
           } else {
-              sendResponse("Tu as choisi le num\u00E9ro: " + arrayProducts[number - 1] + ". C'est bien cela? Si oui combien en veux-tu?");
+              sendResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[number - 1][0] + ". C'est bien cela? Si oui combien en veux-tu?");
           }
-          actualProduct = arrayProducts[number - 1];// produit actuel pour pouvoir le citer après
+          actualProduct = arrayProductsFull[number - 1];// produit actuel pour pouvoir le citer après
       }
   }
 }
