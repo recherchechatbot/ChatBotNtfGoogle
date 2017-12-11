@@ -36,9 +36,10 @@ const MSQ_JETON_APP_RC = "9206b4da-b84f-4145-8473-a7b40d5ecd56";
 //Vars authentification
 var email = "";
 var mdp = "";
-var myToken = "";/*'32e88d45-0f1a-4d39-b35b-a8469da5ad10';*/
+var myToken = "";
 var ASPSessionId = "";
 var userInfos = {};
+var myIdCreneau = 0;
 
 myApp.use(bodyParser.text({ type: 'application/json' }));
 
@@ -459,6 +460,27 @@ function hitFO(cookie) {
     });
 }
 
+function getCreneaux(tok) {
+    var options = {
+        method: 'GET',
+        uri: MCO_URL + "api/v1/pdv/creneaux",
+        headers: {
+            'TokenAuthentification': tok
+        },
+        json: true
+    };
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+                console.log('reponse creneaux' + response.body);
+                resolve(response.body);
+            } else {
+                console.log('Error while getting creneaux ' + error);
+                reject(error);
+            }
+        });
+    })
+}
 
 
 
@@ -650,13 +672,46 @@ function processV1Request(request, response) {
             .catch(err => {
                 console.log("Impossible de recuperer le nom du PDV");
             })
+    },
+    'choix.creneau': () => {
+       //TO DO, séparer si l'utilisateur met seulement un jour ou seulement une heure'
+        getCreneaux(myToken)
+            .then((r) => {
+                if (parameters.date && parameters.time) {
+                    let heure = parameters.time.slice(0, -3);//Mettre heure de type 00:00:00 en format 00h00
+                    let leni = r.Drive.CreneauxSemaine.length;
+                    for (var i = 0; i < leni; i++) {
+                        let lenj = r.Drive.CreneauxSemaine[i].CreneauHoraires;
+                        for (var j = 0; j < lenj; j++) {
+                            if (r.Drive.CreneauxSemaine[i].HeureDebut == heure) {
+                                if (r.Drive.CreneauxSemaine[i].CreneauHoraires[j].DateCreneau.startsWith(parameters.date)) {
+                                    if (r.Drive.CreneauxSemaine[i].CreneauHoraires[j].Statut == "disponible") {
+                                        myIdCreneau = r.Drive.CreneauxSemaine[i].CreneauHoraires[j].IdCreneau;
+                                        if (requestSource === googleAssistantRequest) {
+                                            sendGoogleResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");//TODO annulation & recap date et heure
+                                        } else {
+                                            sendResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");
+                                        }
 
-
-            
-
+                                    }
+                                    else {
+                                        
+                                        if (requestSource === googleAssistantRequest) {
+                                            sendGoogleResponse("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");//TODO annulation & recap date et heure
+                                        } else {
+                                            sendResponse("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                    }
+                    
+                }
+            })
         
     },
-
     // Default handler for unknown or undefined actions
     'default': () => {
       // Use the Actions on Google lib to respond to Google requests; for other requests use JSON
