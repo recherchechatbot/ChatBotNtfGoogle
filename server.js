@@ -600,17 +600,19 @@ function processV1Request(request, response) {
     },
     'choix.quantite.produit': () => {
         console.log("on est bien dans le bon onglet \"action\" ")
+        
         let myNumber = parameters.number;
+     
         var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
         for (var i = 0; i < myNumber; i++) {
             hitFO(cookieSession)
                 .then(() => {
-                    addProductBasketFront(actualProduct[1], cookieSession)
+                    addProductBasketFront(actualProduct, cookieSession)
                         .then((r) => {
                             if (requestSource === googleAssistantRequest) {
-                                sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');// TODO VRAIMENT L'AJOUTER AU PANIER'
+                                sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct + ' \u00E0 ton panier');
                             } else {
-                                sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
+                                sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct + ' \u00E0 ton panier');
                             }
                         })
                 })
