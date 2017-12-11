@@ -797,16 +797,16 @@ function processV1Request(request, response) {
       //actualProduct = arrayProductsFull[(number - 1)];// produit actuel pour pouvoir le citer après
       if (number == -1) {
           if (requestSource === googleAssistantRequest) {
-              sendGoogleResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[productIndex][0] + ". C'est bien cela? Si oui combien en veux-tu?");
+              sendGoogleResponse("Tu as choisi " + arrayProductsFull[productIndex][0] + ". C'est bien cela? Si oui combien en veux-tu?");
           } else {
-              sendResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[productIndex][0] + ". C'est bien cela? Si oui combien en veux-tu?");
+              sendResponse("Tu as choisi " + arrayProductsFull[productIndex][0] + ". C'est bien cela? Si oui combien en veux-tu?");
           }
           actualProduct = arrayProductsFull[productIndex];// produit actuel pour pouvoir le citer après
       } else {
           if (requestSource === googleAssistantRequest) {
-              sendGoogleResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[number - 1][0] + ". C'est bien cela? Si oui combien en veux-tu?");
+              sendGoogleResponse("Tu as choisi " + arrayProductsFull[number - 1][0] + ". C'est bien cela? Si oui combien en veux-tu?");
           } else {
-              sendResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[number - 1][0] + ". C'est bien cela? Si oui combien en veux-tu?");
+              sendResponse("Tu as choisi " + arrayProductsFull[number - 1][0] + ". C'est bien cela? Si oui combien en veux-tu?");
           }
           actualProduct = arrayProductsFull[number - 1];// produit actuel pour pouvoir le citer après
       }
