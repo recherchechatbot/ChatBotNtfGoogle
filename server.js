@@ -529,35 +529,42 @@ function processV1Request(request, response) {
           getProduit(myProduct, myIdPdv, cookie)
               .then((r) => {
                   arrayProducts = [];
-                  arrayProductsFull=[]
-                  let arrayTemp = [];
-                  let myText = 'Voici les produits que je peux te proposer: ';
+                  //Version avec 4 produits:
+                //  arrayProductsFull=[]
+                //  let arrayTemp = [];
+                //  let myText = 'Voici les produits que je peux te proposer: ';
+                //  for (var i = 0; i < r.length; i++) {
+                //      if (arrayTemp.length == 4 && sayProducts(myText).length < 640) {
+                //          arrayProducts.push(arrayTemp);
+                //          arrayTemp = [];
+                //          arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
+                //          arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
+                //      }
+                //      else if (arrayTemp.length == 4 && sayProducts(myText).length >= 640) {
+                //          let popped = arrayTemps.pop();
+                //          arrayProducts.push(arrayTemp);
+                //          arrayTemp = [popped];
+                //          arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
+                //          arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
+                //      }
+                //      else {                          
+                //          if (i == (r.length - 1) && arrayTemp.length < 3) {
+                //            arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
+                //            arrayProducts.push(arrayTemp);
+                //            arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
+                //        }
+                //          else {
+                //              arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
+                //              arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
+                //        }
+                //    }
+                //}
+                  var myText = "Je peux te proposer: ";
                   for (var i = 0; i < r.length; i++) {
-                      if (arrayTemp.length == 4 && sayProducts(myText).length < 640) {
-                          arrayProducts.push(arrayTemp);
-                          arrayTemp = [];
-                          arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
-                          arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
+                      if (!r[i].StockEpuise) {
+                          arrayProducts.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
                       }
-                      else if (arrayTemp.length == 4 && sayProducts(myText).length >= 640) {
-                          let popped = arrayTemps.pop();
-                          arrayProducts.push(arrayTemp);
-                          arrayTemp = [popped];
-                          arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
-                          arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
-                      }
-                      else {                          
-                          if (i == (r.length - 1) && arrayTemp.length < 3) {
-                            arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
-                            arrayProducts.push(arrayTemp);
-                            arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
-                        }
-                          else {
-                              arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
-                              arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
-                        }
-                    }
-                }
+                  }
                   sayProducts(myText);
                   productIndex = 0;
             })
@@ -722,7 +729,9 @@ function processV1Request(request, response) {
   function nextProducts() {
       productIndex += 1;
       if (arrayProducts[productIndex]) {
-          let myText = "Voici les produits suivants: ";
+          //Version 4 produits
+          //let myText = "Voici les produits suivants: ";
+          let myText = "Voici le produit suivant: ";
           sayProducts(myText);
       }
       else {
@@ -749,30 +758,43 @@ function processV1Request(request, response) {
   }
 
   function sayProducts(text) {
-      if (arrayProducts[productIndex]) {
-          for (var i = 0; i < arrayProducts[productIndex].length; i++) {
-              text = text + arrayProducts[productIndex][i];
-          }
+      //Version 4 produits
+      //if (arrayProducts[productIndex]) {
+      //    for (var i = 0; i < arrayProducts[productIndex].length; i++) {
+      //        text = text + arrayProducts[productIndex][i];
+      //    }
 
-          if (requestSource === googleAssistantRequest) {
-              sendGoogleResponse(text);
-          } else {
-              sendResponse(text);
-          }
+      //    if (requestSource === googleAssistantRequest) {
+      //        sendGoogleResponse(text);
+      //    } else {
+      //        sendResponse(text);
+      //    }
+      //}
+      if (arrayProducts) {
+          text = text + arrayProducts[productIndex];
+          sendResponse(text);
       }
+
       return text;
   }
 
   function selectProduct(number) {
       
       
+      //if (requestSource === googleAssistantRequest) {
+      //    sendGoogleResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[(number - 1)][0] + ". C'est bien cela? Si oui combien en veux-tu?");
+      //} else {
+      //    sendResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[(number - 1)][0] + ". C'est bien cela? Si oui combien en veux-tu?");
+      //}
+      //actualProduct = arrayProductsFull[(number - 1)];// produit actuel pour pouvoir le citer après
+
       if (requestSource === googleAssistantRequest) {
-          sendGoogleResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[(number - 1)][0] + ". C'est bien cela? Si oui combien en veux-tu?");
+          sendGoogleResponse("Tu as choisi le num\u00E9ro: " + arrayProducts[(number - 1)] + ". C'est bien cela? Si oui combien en veux-tu?");
       } else {
-          sendResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[(number - 1)][0] + ". C'est bien cela? Si oui combien en veux-tu?");
+          sendResponse("Tu as choisi le num\u00E9ro: " + arrayProducts[(number - 1)] + ". C'est bien cela? Si oui combien en veux-tu?");
       }
-      actualProduct = arrayProductsFull[(number - 1)];// produit actuel pour pouvoir le citer après
-      
+      actualProduct = arrayProducts[(number - 1)];// produit actuel pour pouvoir le citer après
+
   }
 
   
