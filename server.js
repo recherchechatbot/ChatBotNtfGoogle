@@ -589,7 +589,11 @@ function processV1Request(request, response) {
         previousProducts();
     },
     'choix.produit': () => {
-        let myChoice = parameters.number;
+        if (parameters.number) {
+            let myChoice = parameters.number;
+        } else {
+            let myChoice = -1;
+        }
         selectProduct(myChoice);
     },
     'choix.quantite.produit': () => {
