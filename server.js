@@ -589,12 +589,14 @@ function processV1Request(request, response) {
         previousProducts();
     },
     'choix.produit': () => {
-        if (parameters.number) {
-            let myChoice = parameters.number;
+        let myChoice = 0;
+        if (parameters.number=1) {
+            myChoice = parameters.number;
         } else {
-            let myChoice = -1;
+            myChoice = -1;
         }
         selectProduct(myChoice);
+        
     },
     'choix.quantite.produit': () => {
         console.log("on est bien dans le bon onglet \"action\" ")
@@ -783,7 +785,6 @@ function processV1Request(request, response) {
   }
 
   function selectProduct(number) {
-      
       //Version 4 produits
       //if (requestSource === googleAssistantRequest) {
       //    sendGoogleResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[(number - 1)][0] + ". C'est bien cela? Si oui combien en veux-tu?");
@@ -806,13 +807,7 @@ function processV1Request(request, response) {
           }
           actualProduct = arrayProducts[number - 1];// produit actuel pour pouvoir le citer après
       }
-      
-
   }
-
-  
-
-    
 }
 // Construct rich response for Google Assistant (v1 requests only)
 const app = new DialogflowApp();
