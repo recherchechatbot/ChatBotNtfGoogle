@@ -780,20 +780,29 @@ function processV1Request(request, response) {
 
   function selectProduct(number) {
       
-      
+      //Version 4 produits
       //if (requestSource === googleAssistantRequest) {
       //    sendGoogleResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[(number - 1)][0] + ". C'est bien cela? Si oui combien en veux-tu?");
       //} else {
       //    sendResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[(number - 1)][0] + ". C'est bien cela? Si oui combien en veux-tu?");
       //}
       //actualProduct = arrayProductsFull[(number - 1)];// produit actuel pour pouvoir le citer après
-
-      if (requestSource === googleAssistantRequest) {
-          sendGoogleResponse("Tu as choisi le num\u00E9ro: " + arrayProducts[(number - 1)] + ". C'est bien cela? Si oui combien en veux-tu?");
+      if (number == -1) {
+          if (requestSource === googleAssistantRequest) {
+              sendGoogleResponse("Tu as choisi le num\u00E9ro: " + arrayProducts[(productIndex)] + ". C'est bien cela? Si oui combien en veux-tu?");
+          } else {
+              sendResponse("Tu as choisi le num\u00E9ro: " + arrayProducts[(productIndex)] + ". C'est bien cela? Si oui combien en veux-tu?");
+          }
+          actualProduct = arrayProducts[(productIndex)];// produit actuel pour pouvoir le citer après
       } else {
-          sendResponse("Tu as choisi le num\u00E9ro: " + arrayProducts[(number - 1)] + ". C'est bien cela? Si oui combien en veux-tu?");
+          if (requestSource === googleAssistantRequest) {
+              sendGoogleResponse("Tu as choisi le num\u00E9ro: " + arrayProducts[(number - 1)] + ". C'est bien cela? Si oui combien en veux-tu?");
+          } else {
+              sendResponse("Tu as choisi le num\u00E9ro: " + arrayProducts[(number - 1)] + ". C'est bien cela? Si oui combien en veux-tu?");
+          }
+          actualProduct = arrayProducts[(number - 1)];// produit actuel pour pouvoir le citer après
       }
-      actualProduct = arrayProducts[(number - 1)];// produit actuel pour pouvoir le citer après
+      
 
   }
 
