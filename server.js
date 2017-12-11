@@ -479,9 +479,9 @@ function processV1Request(request, response) {
       'input.welcome': () => {
           // Use the Actions on Google lib to respond to Google requests; for other requests use JSON
           if (requestSource === googleAssistantRequest) {
-              sendGoogleResponse('Hello, Welcome to my Dialogflow agent!'); // Send simple response to user
+              sendGoogleResponse('Salut ' + userInfos.AdresseDeFacturation.Prenom + '! Je suis Jacques Bobin ton assistant intermarch\u00E9. Demande moi ce que je sais faire!'); // Send simple response to user
           } else {
-              sendResponse('Hello, Welcome to my Dialogflow agent!'); // Send simple response to user
+              sendResponse('Salut ' + userInfos.AdresseDeFacturation.Prenom + '! Je suis Jacques Bobin ton conseiller intermarch\u00E9. Demande moi ce que je sais faire!');
           }
       },
       // The default fallback intent has been matched, try to recover (https://dialogflow.com/docs/intents#fallback_intents)
@@ -514,9 +514,9 @@ function processV1Request(request, response) {
               })
               .catch((err) => {
                   if (requestSource === googleAssistantRequest) {
-                      sendGoogleResponse("Je n'ai pas réussi à trouver des résultats pour ta recherche, vérifie que tu es bien connecté sur ton compte");
+                      sendGoogleResponse("Je n'ai pas r\u00E9ussi à trouver des r\u00E9sultats pour ta recherche, v\u00E9rifie que tu es bien connect\u00E9 sur ton compte");
                   } else {
-                      sendResponse("Je n'ai pas réussi à trouver des résultats pour ta recherche, vérifie que tu es bien connecté sur ton compte");
+                      sendResponse("Je n'ai pas r\u00E9ussi à trouver des r\u00E9sultats pour ta recherche, v\u00E9rifie que tu es bien connect\u00E9 sur ton compte");
                   }
                   console.log("ERREUR:" + err);
               })
