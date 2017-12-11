@@ -687,20 +687,21 @@ function processV1Request(request, response) {
                                 if (r.Drive.CreneauxSemaine[i].CreneauHoraires[j].DateCreneau.startsWith(parameters.date)) {
                                     if (r.Drive.CreneauxSemaine[i].CreneauHoraires[j].Statut == "disponible") {
                                         myIdCreneau = r.Drive.CreneauxSemaine[i].CreneauHoraires[j].IdCreneau;
-                                        if (requestSource === googleAssistantRequest) {
-                                            sendGoogleResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");//TODO annulation & recap date et heure
-                                        } else {
-                                            sendResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");
-                                        }
+                                        //if (requestSource === googleAssistantRequest) {
+                                        //    sendGoogleResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");//TODO annulation & recap date et heure
+                                        //} else {
+                                        //    sendResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");
+                                        //}
+                                        sendResponseFollowUp("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre","WAIT_EVENT");
 
                                     }
                                     else {
-                                        
-                                        if (requestSource === googleAssistantRequest) {
-                                            sendGoogleResponse("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");//TODO annulation & recap date et heure
-                                        } else {
-                                            sendResponse("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");
-                                        }
+                                        sendResponseFollowUp("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre", "WAIT_EVENT");
+                                        //if (requestSource === googleAssistantRequest) {
+                                        //    sendGoogleResponse("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");//TODO annulation & recap date et heure
+                                        //} else {
+                                        //    sendResponseFollowUp("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");
+                                        //}
                                     }
                                 }
                             }
@@ -783,6 +784,30 @@ function processV1Request(request, response) {
       console.log('Response to Dialogflow: ' + JSON.stringify(responseJson));
       response.json(responseJson); // Send response to Dialogflow
     }
+  };
+  function sendResponseFollowUp(responseToUser,followUpName) {
+      // if the response is a string send it as a response to the user
+      if (typeof responseToUser === 'string') {
+          let responseJson = {};
+          responseJson.speech = responseToUser; // spoken response
+          responseJson.displayText = responseToUser; // displayed response
+          responseJson.followupEvent = {
+              "name": followUpName
+          }
+          response.json(responseJson); // Send response to Dialogflow
+      } else {
+          // If the response to the user includes rich responses or contexts send them to Dialogflow
+          let responseJson = {};
+          // If speech or displayText is defined, use it to respond (if one isn't defined use the other's value)
+          responseJson.speech = responseToUser.speech || responseToUser.displayText;
+          responseJson.displayText = responseToUser.displayText || responseToUser.speech;
+          // Optional: add rich messages for integrations (https://dialogflow.com/docs/rich-messages)
+          responseJson.data = responseToUser.data;
+          // Optional: add contexts (https://dialogflow.com/docs/contexts)
+          responseJson.contextOut = responseToUser.outputContexts;
+          console.log('Response to Dialogflow: ' + JSON.stringify(responseJson));
+          response.json(responseJson); // Send response to Dialogflow
+      }
   };
   function repeatProducts() {
       let myText = "Pas de probleme, je r\u00E9p\u00E8te: "
