@@ -561,7 +561,7 @@ function processV1Request(request, response) {
                 //}
                   var myText = "Je peux te proposer: ";
                   for (var i = 0; i < r.length; i++) {
-                      if (!r[i].StockEpuise) {
+                      if (r[i].StockEpuise=='false') {
                           arrayProducts.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
                       }
                   }
