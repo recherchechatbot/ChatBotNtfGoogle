@@ -846,10 +846,10 @@ function processV1Request(request, response) {
                         console.log("constate le body qu'on recoit: " + JSON.stringify(res));
                         if (requestSource === googleAssistantRequest) {
                             console.log("On est actuellement dans le if google");
-                            sendGoogleResponse("Le montant total de votre panier s\'\u00E9l\u00E8ve \u00E0 " + res.Total);
+                            sendGoogleResponse("Le montant total de ton panier s\'\u00E9l\u00E8ve \u00E0 " + res.Total);
                         } else {
                             console.log("On est actuellement dans le if qui est pas google");
-                            sendResponse("Le montant total de votre panier s\'\u00E9l\u00E8ve \u00E0 " + res.Total);
+                            sendResponse("Le montant total de ton panier s\'\u00E9l\u00E8ve \u00E0 " + res.Total);
                         }
 
                     })
