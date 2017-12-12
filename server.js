@@ -531,7 +531,7 @@ function getMonth(n) {
 
 function getRecapPanier(c) {
     var options = {
-        method: 'GET',
+        method: 'POST',
         uri: FO_URL + "AfficherPanier",
         headers: {
             cookie: c
@@ -539,9 +539,10 @@ function getRecapPanier(c) {
     };
 
     return new Promise((resolve, reject) => {
+        console.log("on passe ça dans le request: " + JSON.stringify(options));
         request(options, (error, response) => {
             if (!error && response.statusCode == 200) {
-
+                console.log("On est dans le promise, et ya pas d'erreur");
                 resolve(response.body);
             }
             else {
@@ -837,11 +838,15 @@ function processV1Request(request, response) {
 
     'montant.panier': () => {
         var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
+        console.log("Ceci est mon cookiesession pour le montant panier: " + cookieSession);
         getRecapPanier(cookieSession)
             .then((res) => {
+                console.log("constate le body qu'on recoit: " + JSON.stringify(res));
                 if (requestSource === googleAssistantRequest) {
+                    console.log("On est actuellement dans le if google");
                     sendGoogleResponse("Le montant total de votre panier s\'\u00E9l\u00E8ve \u00E0 " + res.Total);
                 } else {
+                    console.log("On est actuellement dans le if qui est pas google");
                     sendResponse("Le montant total de votre panier s\'\u00E9l\u00E8ve \u00E0 " + res.Total);
                 }
                 
