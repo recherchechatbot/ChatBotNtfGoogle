@@ -691,7 +691,7 @@ function processV1Request(request, response) {
             if (parameters.date && parameters.time) {
                 let heure = parameters.time.slice(0, -3);//Met heure de type 00:00:00 en format 00h00
                 console.log("heure avant: " + heure);
-                heure = heure.replace(":", "h");
+                heure = parseFloat(heure);
                 console.log("HEURE  APRES" + heure);
                 let leni = responseChoixCreneau.Drive.CreneauxSemaine.length;
                 console.log("ON A PASSE LA PREMIERE MENTION DE responseChoixCreneau, voilà leni: " + leni);
@@ -699,8 +699,9 @@ function processV1Request(request, response) {
                     console.log("ON RENTRE DANS LE FOR, itération numéro : " + i);
                     let lenj = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires.length;
                     console.log("voilà lenj: " + lenj);
-                    console.log("ce quon compare avec heure: " + responseChoixCreneau.Drive.CreneauxSemaine[i].HeureDebut);
-                    if (responseChoixCreneau.Drive.CreneauxSemaine[i].HeureDebut == heure) {
+                    let truncHeureFin = responseChoixCreneau.Drive.CreneauxSemaine[i].HeureFin;
+                    console.log("ce quon compare avec heure: " + truncHeureFin);
+                    if (truncHeureFin== heure) {
                         console.log("ON RENTRE DANS LE PREMIER IF");
                         for (var j = 0; j < lenj; j++) {
                             console.log("on RENTRE DANS LE DEUXIEME FOR, itération numero: " + j);
