@@ -487,6 +487,48 @@ function getCreneaux(tok) {
     })
 }
 
+function getMonth(n) {
+    var x = "";
+    if (n === 1) {
+        x = "Janvier";
+    }
+    else if (n===2) {
+        x === "F\u00E9vrier";
+    }
+    else if (n === 3) {
+        x === "Mars";
+    }
+    else if (n === 4) {
+        x === "Avril";
+    }
+    else if (n === 5) {
+        x === "Mai";
+    }
+    else if (n === 6) {
+        x === "Juin";
+    }
+    else if (n === 7) {
+        x === "Juillet";
+    }
+    else if (n === 8) {
+        x === "Ao\u00FBt";
+    }
+    else if (n === 9) {
+        x === "Septembre";
+    }
+    else if (n === 10) {
+        x === "Octobre";
+    }
+    else if (n === 11) {
+        x === "Novembre";
+    }
+    else if (n === 12) {
+        x === "D\u00E9cembre";
+    }
+
+    return x;
+}
+
 
 
 /*
@@ -702,8 +744,9 @@ function processV1Request(request, response) {
                                 console.log("ON RENTRE DANS LE PREMIER IF");
                                 for (var j = 0; j < lenj; j++) {
                                     console.log("on RENTRE DANS LE DEUXIEME FOR, itération numero: " + j);
-                                    console.log("Date creneau en question: " + responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].DateCreneau);
-                                    if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].DateCreneau.startsWith(parameters.date)) {
+                                    let dateCreneau = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].DateCreneau;
+                                    console.log("Date creneau en question: " + dateCreneau);
+                                    if (dateCreneau.startsWith(parameters.date)) {
                                         console.log("ON RENTRE DANS LE DEUXIEME IF");
                                         console.log("statut en question: " + responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].Statut);
                                         if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].Statut === "Disponible") {
@@ -711,7 +754,7 @@ function processV1Request(request, response) {
                                             myIdCreneau = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].IdCreneau;
                                             console.log("Voici mon ID CRENEAU: " + myIdCreneau);
                                             if (requestSource === googleAssistantRequest) {
-                                                sendGoogleResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");//TODO annulation & recap date et heure
+                                                sendGoogleResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande le " + dateCreneau.slice(8, 10) + " " + getMonth(dateCreneau.slice(5,7)) + " entre " + responseChoixCreneau.Drive.CreneauxSemaine[i].HeureDebut + " et " + responseChoixCreneau.Drive.CreneauxSemaine[i].HeureFin );//TODO annulation & recap date et heure
                                             } else {
                                                 sendResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");
                                             }
