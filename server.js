@@ -712,11 +712,15 @@ function processV1Request(request, response) {
                 console.log("HorairesDimanche: " + fichePdv.HorairesDimanche);
                 if (fichePdv.Site && fichePdv.HorairesLundi && fichePdv.HorairesDimanche) {
                     console.log("on est dans le if youpi");
-                    var horairesSemaineOuverture = fichePdv.HorairesLundi.slice(0, 5);
-                    var horairesSemaineFermeture = fichePdv.HorairesLundi.slice(-5);//TODO PEUT ETRE SEPARER LE SAMEDI?
+                    var horairesSemaine = fichePdv.HorairesLundi.replace(/\;/g, "");
+                    console.log("horaires semaine avec le regex: " + horairesSemaine);
+                    var horairesSemaineOuverture = horairesSemaine.slice(0, 5);
+                    var horairesSemaineFermeture = horairesSemaine.slice(-5);//TODO PEUT ETRE SEPARER LE SAMEDI?
                     console.log("On vient de défnir les horaires de la semaine: " + horairesSemaineOuverture + " a " + horairesSemaineFermeture);
-                    var horairesDimOuverture = fichePdv.HorairesDimanche.slice(0, 5);
-                    var horairesDimFermeture = fichePdv.HorairesDimanche.slice(-5);
+                    var horairesDim = fichePdv.HorairesLundi.replace(/\;/g, "");
+                    console.log("horaires dimanche avec le regex: " + horairesDim);
+                    var horairesDimOuverture = horairesDim.slice(0, 5);
+                    var horairesDimFermeture = horairesDim.slice(-5);
                     console.log("On vient de défnir les horaires du dimanche: " + horairesDimOuverture + " a " + horairesDimFermeture);
                     var namePdvFavori = fichePdv.Site;
                     if (requestSource === googleAssistantRequest) {
