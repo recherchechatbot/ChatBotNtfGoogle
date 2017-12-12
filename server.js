@@ -699,7 +699,7 @@ function processV1Request(request, response) {
                     console.log("ON RENTRE DANS LE FOR, itération numéro : " + i);
                     let lenj = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires.length;
                     console.log("voilà lenj: " + lenj);
-                    console.log("ce quon compare avec heure: " + responseChoixCreneau.Drive.CreneauxSemaine[i].HeureDebut)
+                    console.log("ce quon compare avec heure: " + responseChoixCreneau.Drive.CreneauxSemaine[i].HeureDebut);
                     if (responseChoixCreneau.Drive.CreneauxSemaine[i].HeureDebut == heure) {
                         console.log("ON RENTRE DANS LE PREMIER IF");
                         for (var j = 0; j < lenj; j++) {
