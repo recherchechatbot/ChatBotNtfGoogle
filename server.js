@@ -719,8 +719,22 @@ function processV1Request(request, response) {
                     console.log("On vient de défnir les horaires du dimanche: " + horairesDim);
                     var namePdvFavori = fichePdv.Site;
                     if (requestSource === googleAssistantRequest) {
+                        console.log("oN EST DANS LE IF GOOGLE");
+                        console.log("Voici toutes les choses qui doivent être définies: ");
+                        console.log("sexe: " + sexe);
+                        console.log("nomFamille: " + nomFamille);
+                        console.log("namePdvFavori: " + namePdvFavori);
+                        console.log("horairesSemaine: " + horairesSemaine);
+                        console.log("horairesDimanche: " + HorairesDimanche);
                         sendGoogleResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaine + ' et le Dimanche de ' + horairesDim);// Aller chercher les infos client sur l'app'
                     } else {
+                        console.log("oN EST DANS LE IF  NON GOOGLE");
+                        console.log("Voici toutes les choses qui doivent être définies: ");
+                        console.log("sexe: " + sexe);
+                        console.log("nomFamille: " + nomFamille);
+                        console.log("namePdvFavori: " + namePdvFavori);
+                        console.log("horairesSemaine: " + horairesSemaine);
+                        console.log("horairesDimanche: " + HorairesDimanche);
                         sendResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaine + ' et le Dimanche de ' + horairesDim);
                     }
                 }
