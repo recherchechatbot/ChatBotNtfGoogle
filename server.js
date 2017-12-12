@@ -689,7 +689,7 @@ function processV1Request(request, response) {
             })
         
     },
-    'ChoixCreneau.ChoixCreneau-custom': () => {
+    'choix.creneau.follow': () => {
         if (responseChoixCreneau) {
             if (parameters.date && parameters.time) {
                 let heure = parameters.time.slice(0, -3);//Met heure de type 00:00:00 en format 00h00
