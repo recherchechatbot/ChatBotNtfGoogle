@@ -690,9 +690,13 @@ function processV1Request(request, response) {
         if (responseChoixCreneau) {
             if (parameters.date && parameters.time) {
                 let heure = parameters.time.slice(0, -3);//Met heure de type 00:00:00 en format 00h00
+                console.log("heure avant: " + heure);
                 heure = heure.replace(":", "h");
+                console.log("HEURE  APRES" + heure);
                 let leni = responseChoixCreneau.Drive.CreneauxSemaine.length;
+                console.log("ON A PASSE LA PREMIERE MENTION DE responseChoixCreneau");
                 for (var i = 0; i < leni; i++) {
+                    
                     let lenj = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauHoraires;
                     for (var j = 0; j < lenj; j++) {
                         if (responseChoixCreneau.Drive.CreneauxSemaine[i].HeureDebut == heure) {
