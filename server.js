@@ -713,10 +713,12 @@ function processV1Request(request, response) {
                 console.log("HorairesDimanche: " + fichePdv.HorairesDimanche);
                 if (fichePdv.Site && fichePdv.HorairesLundi && fichePdv.HorairesDimanche) {
                     console.log("on est dans le if youpi");
-                    var horairesSemaine = fichePdv.HorairesLundi.replace(";;;;", " \u00E0 ");
-                    console.log("On vient de défnir les horaires de la semaine: " + horairesSemaine);
-                    var horairesDim = fichePdv.HorairesDimanche.replace(";;;;", " \u00E0 ");
-                    console.log("On vient de défnir les horaires du dimanche: " + horairesDim);
+                    var horairesSemaineOuverture = fichePdv.HorairesLundi.slice(0, 5);
+                    var horairesSemaineFermeture = fichePdv.HorairesLundi.slice(-5);//TODO PEUT ETRE SEPARER LE SAMEDI?
+                    console.log("On vient de défnir les horaires de la semaine: " + horairesSemaineOuverture + " a " + horairesSemaineFermeture);
+                    var horairesDimOuverture = fichePdv.HorairesDimanche.slice(0, 5);
+                    var horairesDimFermeture = fichePdv.HorairesDimanche.slice(-5);
+                    console.log("On vient de défnir les horaires du dimanche: " + horairesDimOuverture + " a " + horairesDimFermeture);
                     var namePdvFavori = fichePdv.Site;
                     if (requestSource === googleAssistantRequest) {
                         console.log("oN EST DANS LE IF GOOGLE");
@@ -724,9 +726,7 @@ function processV1Request(request, response) {
                         console.log("sexe: " + sexe);
                         console.log("nomFamille: " + nomFamille);
                         console.log("namePdvFavori: " + namePdvFavori);
-                        console.log("horairesSemaine: " + horairesSemaine);
-                        console.log("horairesDimanche: " + HorairesDimanche);
-                        sendGoogleResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaine + ' et le Dimanche de ' + horairesDim);// Aller chercher les infos client sur l'app'
+                        sendGoogleResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture + ' et le Dimanche de ' + horairesDimOuverture + " a " + horairesDimFermeture);
                     } else {
                         console.log("oN EST DANS LE IF  NON GOOGLE");
                         console.log("Voici toutes les choses qui doivent être définies: ");
@@ -735,7 +735,7 @@ function processV1Request(request, response) {
                         console.log("namePdvFavori: " + namePdvFavori);
                         console.log("horairesSemaine: " + horairesSemaine);
                         console.log("horairesDimanche: " + HorairesDimanche);
-                        sendResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaine + ' et le Dimanche de ' + horairesDim);
+                        sendResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture + ' et le Dimanche de ' + horairesDimOuverture + " a " + horairesDimFermeture);
                     }
                 }
 
