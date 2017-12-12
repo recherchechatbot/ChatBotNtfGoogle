@@ -141,6 +141,7 @@ myApp.post('/login', function (req, res) {
     getCreneaux(myToken)
         .then((r) => {
             responseChoixCreneau = r;
+            console.log("my Choix Creneau: " + JSON.stringify(responseChoixCreneau));
 
         })
 
