@@ -840,9 +840,9 @@ function processV1Request(request, response) {
         getRecapPanier(cookieSession)
             .then((res) => {
                 if (requestSource === googleAssistantRequest) {
-                    sendGoogleResponse("Le montant total de votre panier s\'\u00E9l\u00E8ve \u00E0 " + res.total);
+                    sendGoogleResponse("Le montant total de votre panier s\'\u00E9l\u00E8ve \u00E0 " + res.Total);
                 } else {
-                    sendResponse("Le montant total de votre panier s\'\u00E9l\u00E8ve \u00E0 " + res.total);
+                    sendResponse("Le montant total de votre panier s\'\u00E9l\u00E8ve \u00E0 " + res.Total);
                 }
                 
             })
