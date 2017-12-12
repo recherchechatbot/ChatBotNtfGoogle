@@ -108,6 +108,13 @@ myApp.post('/login', function (req, res) {
                                 .catch(err => {
                                     console.log("impossible de récupérer idpdvfavori, erreur suivante: " + err);
                                 });
+                            //On récupère les créneaux dès la connexion pour l'instant parce que sinon trop long après (timeout maxi de 5s entre le moment ou dialogflow envoie quelque chose au webhook et ou il recoit la réponse, malheureusement heroku met trop de temps, TODO à CHANGER QUAND MEILLEURE SOLUTION D'HEBERGEMENT DE l'APP)'
+                            getCreneaux(myToken)
+                                .then((r) => {
+                                    responseChoixCreneau = r;
+                                    console.log("my Choix Creneau: " + JSON.stringify(responseChoixCreneau));
+
+                                })
 
                             return res.json({
                                 EstEnErreur: false,
@@ -137,14 +144,8 @@ myApp.post('/login', function (req, res) {
                 urlRedirection: ""
             });
         });
-    //On récupère les créneaux dès la connexion pour l'instant parce que sinon trop long après (timeout maxi de 5s entre le moment ou dialogflow envoie quelque chose au webhook et ou il recoit la réponse, malheureusement heroku met trop de temps, TODO à CHANGER QUAND MEILLEURE SOLUTION D'HEBERGEMENT DE l'APP)'
-    getCreneaux(myToken)
-        .then((r) => {
-            responseChoixCreneau = r;
-            console.log("my Choix Creneau: " + JSON.stringify(responseChoixCreneau));
-
-        })
-
+    
+    
 
 
 
