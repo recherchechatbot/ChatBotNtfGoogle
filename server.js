@@ -843,7 +843,7 @@ function processV1Request(request, response) {
             .then(() => {
                 getRecapPanier(cookieSession)
                     .then((res) => {
-                        resParsed = JSON.parse(res);
+                        let resParsed = JSON.parse(res);
                         console.log("constate le body qu'on recoit: " + JSON.stringify(res));
                         if (requestSource === googleAssistantRequest) {
                             console.log("On est actuellement dans le if google");
