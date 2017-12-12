@@ -40,6 +40,7 @@ var myToken = "";
 var ASPSessionId = "";
 var userInfos = {};
 var myIdCreneau = 0;
+var responseChoixCreneau = {};
 
 myApp.use(bodyParser.text({ type: 'application/json' }));
 
@@ -674,11 +675,19 @@ function processV1Request(request, response) {
             })
     },
     'choix.creneau': () => {
+        //sendResponseFollowUp("Cela va prendre un peu de temps, merci de patienter quelques secondes", "WAIT_EVENT");
+        //if (requestSource === googleAssistantRequest) {
+        //    sendGoogleResponse("Cela va prendre un peu de temps, merci de patienter quelques secondes");// Aller chercher les infos client sur l'app'
+        //} else {
+        //    sendResponse("Cela va prendre un peu de temps, merci de patienter quelques secondes");
+        //}
        //TO DO, séparer si l'utilisateur met seulement un jour ou seulement une heure'
         getCreneaux(myToken)
             .then((r) => {
+                responseChoixCreneau = r;
                 if (parameters.date && parameters.time) {
-                    let heure = parameters.time.slice(0, -3);//Mettre heure de type 00:00:00 en format 00h00
+                    let heure = parameters.time.slice(0, -3);//Met heure de type 00:00:00 en format 00h00
+                    heure = heure.replace(":", "h");
                     let leni = r.Drive.CreneauxSemaine.length;
                     for (var i = 0; i < leni; i++) {
                         let lenj = r.Drive.CreneauxSemaine[i].CreneauHoraires;
@@ -687,21 +696,18 @@ function processV1Request(request, response) {
                                 if (r.Drive.CreneauxSemaine[i].CreneauHoraires[j].DateCreneau.startsWith(parameters.date)) {
                                     if (r.Drive.CreneauxSemaine[i].CreneauHoraires[j].Statut == "disponible") {
                                         myIdCreneau = r.Drive.CreneauxSemaine[i].CreneauHoraires[j].IdCreneau;
-                                        //if (requestSource === googleAssistantRequest) {
-                                        //    sendGoogleResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");//TODO annulation & recap date et heure
-                                        //} else {
-                                        //    sendResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");
-                                        //}
-                                        sendResponseFollowUp("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre","WAIT_EVENT");
-
+                                        if (requestSource === googleAssistantRequest) {
+                                            sendGoogleResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");//TODO annulation & recap date et heure
+                                        } else {
+                                            sendResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");
+                                        }
                                     }
                                     else {
-                                        sendResponseFollowUp("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre", "WAIT_EVENT");
-                                        //if (requestSource === googleAssistantRequest) {
-                                        //    sendGoogleResponse("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");//TODO annulation & recap date et heure
-                                        //} else {
-                                        //    sendResponseFollowUp("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");
-                                        //}
+                                        if (requestSource === googleAssistantRequest) {
+                                            sendGoogleResponse("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");//TODO annulation & recap date et heure
+                                        } else {
+                                            sendResponseFollowUp("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");
+                                        }
                                     }
                                 }
                             }
