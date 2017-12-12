@@ -683,8 +683,8 @@ function processV1Request(request, response) {
             })
     },
     'choix.creneau': () => {
-       //TO DO, séparer si l'utilisateur met seulement un jour ou seulement une heure'
-        console.log("Nous appelons bien le followup");
+        //TO DO, séparer si l'utilisateur met seulement un jour ou seulement une heure'
+        console.log("on est dans choix creneau, voila le body dans lequel on tape: " + responseChoixCreneau);
         if (responseChoixCreneau) {
             if (parameters.date && parameters.time) {
                 let heure = parameters.time.slice(0, -3);//Met heure de type 00:00:00 en format 00h00
