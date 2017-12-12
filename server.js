@@ -707,7 +707,8 @@ function processV1Request(request, response) {
                             console.log("on RENTRE DANS LE DEUXIEME FOR, itération numero: " + j);
                             if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].DateCreneau.startsWith(parameters.date)) {
                                 console.log("ON RENTRE DANS LE DEUXIEME IF");
-                                if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].Statut == "disponible") {
+                                console.log("")
+                                if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].Statut === "Disponible") {
                                     console.log("ON RENTRE DANS LE TROISIEME IF");
                                     myIdCreneau = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].IdCreneau;
                                     console.log("Voici mon ID CRENEAU: " + myIdCreneau);
