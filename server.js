@@ -699,31 +699,35 @@ function processV1Request(request, response) {
                     console.log("ON RENTRE DANS LE FOR, itération numéro : " + i);
                     let lenj = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires.length;
                     console.log("voilà lenj: " + lenj);
-                    for (var j = 0; j < lenj; j++) {
-                        console.log("on RENTRE DANS LE DEUXIEME FOR, itération numero: "+ j);
-                        if (responseChoixCreneau.Drive.CreneauxSemaine[i].HeureDebut == heure) {
-                            console.log("ON RENTRE DANS LE PREMIER IF");
+                    console.log("ce quon compare avec heure: " + responseChoixCreneau.Drive.CreneauxSemaine[i].HeureDebut)
+                    if (responseChoixCreneau.Drive.CreneauxSemaine[i].HeureDebut == heure) {
+                        console.log("ON RENTRE DANS LE PREMIER IF");
+                        for (var j = 0; j < lenj; j++) {
+                            console.log("on RENTRE DANS LE DEUXIEME FOR, itération numero: " + j);
                             if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].DateCreneau.startsWith(parameters.date)) {
                                 console.log("ON RENTRE DANS LE DEUXIEME IF");
                                 if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].Statut == "disponible") {
                                     console.log("ON RENTRE DANS LE TROISIEME IF");
                                     myIdCreneau = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].IdCreneau;
-                                    console.log("Voici mi ID CRENEAU: " + myIdCreneau);
+                                    console.log("Voici mon ID CRENEAU: " + myIdCreneau);
                                     if (requestSource === googleAssistantRequest) {
                                         sendGoogleResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");//TODO annulation & recap date et heure
                                     } else {
                                         sendResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");
                                     }
-                                }
-                                else {
+                                } else {
                                     if (requestSource === googleAssistantRequest) {
                                         sendGoogleResponse("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");//TODO annulation & recap date et heure
                                     } else {
                                         sendResponseFollowUp("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");
                                     }
                                 }
+                            } else {
+                                console.log("PROBLEME DE COMPARAISON DE DATE");
                             }
                         }
+                    } else {
+                        console.log("PROBLEME DE COMPARAISON DHEURE");
                     }
                 }
             }
