@@ -108,13 +108,7 @@ myApp.post('/login', function (req, res) {
                                 .catch(err => {
                                     console.log("impossible de récupérer idpdvfavori, erreur suivante: " + err);
                                 });
-                            //On récupère les créneaux dès la connexion pour l'instant parce que sinon trop long après (timeout maxi de 5s entre le moment ou dialogflow envoie quelque chose au webhook et ou il recoit la réponse, malheureusement heroku met trop de temps, TODO à CHANGER QUAND MEILLEURE SOLUTION D'HEBERGEMENT DE l'APP)'
-                            getCreneaux(myToken)
-                                .then((r) => {
-                                    responseChoixCreneau = r;
-                                    console.log("my Choix Creneau: " + JSON.stringify(responseChoixCreneau));
-
-                                })
+                           
 
                             return res.json({
                                 EstEnErreur: false,
@@ -685,63 +679,69 @@ function processV1Request(request, response) {
             })
     },
     'choix.creneau': () => {
-        //TO DO, séparer si l'utilisateur met seulement un jour ou seulement une heure'
-        console.log("on est dans choix creneau, voila le body dans lequel on tape: " + responseChoixCreneau);
-        if (responseChoixCreneau) {
-            if (parameters.date && parameters.time) {
-                let heure = parameters.time.slice(0, -3);//Met heure de type 00:00:00 en format 00h00
-                console.log("heure avant: " + heure);
-                heure = parseFloat(heure);
-                console.log("HEURE  APRES" + heure);
-                let leni = responseChoixCreneau.Drive.CreneauxSemaine.length;
-                console.log("ON A PASSE LA PREMIERE MENTION DE responseChoixCreneau, voilà leni: " + leni);
-                for (var i = 0; i < leni; i++) {
-                    console.log("ON RENTRE DANS LE FOR, itération numéro : " + i);
-                    let lenj = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires.length;
-                    console.log("voilà lenj: " + lenj);
-                    let truncHeureFin = parseFloat(responseChoixCreneau.Drive.CreneauxSemaine[i].HeureFin);
-                    console.log("ce quon compare avec heure: " + truncHeureFin);
-                    if (truncHeureFin== heure) {
-                        console.log("ON RENTRE DANS LE PREMIER IF");
-                        for (var j = 0; j < lenj; j++) {
-                            console.log("on RENTRE DANS LE DEUXIEME FOR, itération numero: " + j);
-                            console.log("Date creneau en question: " + responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].DateCreneau);
-                            if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].DateCreneau.startsWith(parameters.date)) {
-                                console.log("ON RENTRE DANS LE DEUXIEME IF");
-                                console.log("statut en question: " + responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].Statut);
-                                if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].Statut === "Disponible") {
-                                    console.log("ON RENTRE DANS LE TROISIEME IF");
-                                    myIdCreneau = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].IdCreneau;
-                                    console.log("Voici mon ID CRENEAU: " + myIdCreneau);
-                                    if (requestSource === googleAssistantRequest) {
-                                        sendGoogleResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");//TODO annulation & recap date et heure
+        //On récupère les créneaux dès la connexion pour l'instant parce que sinon trop long après (timeout maxi de 5s entre le moment ou dialogflow envoie quelque chose au webhook et ou il recoit la réponse, malheureusement heroku met trop de temps, TODO à CHANGER QUAND MEILLEURE SOLUTION D'HEBERGEMENT DE l'APP)'
+        getCreneaux(myToken)
+            .then((responseChoixCreneau) => {
+                console.log("my Choix Creneau: " + JSON.stringify(responseChoixCreneau));
+                console.log("on est dans choix creneau, voila le body dans lequel on tape: " + responseChoixCreneau);
+                if (responseChoixCreneau) {
+                    if (parameters.date && parameters.time) {
+                        let heure = parameters.time.slice(0, -3);//Met heure de type 00:00:00 en format 00h00
+                        console.log("heure avant: " + heure);
+                        heure = parseFloat(heure);
+                        console.log("HEURE  APRES" + heure);
+                        let leni = responseChoixCreneau.Drive.CreneauxSemaine.length;
+                        console.log("ON A PASSE LA PREMIERE MENTION DE responseChoixCreneau, voilà leni: " + leni);
+                        for (var i = 0; i < leni; i++) {
+                            console.log("ON RENTRE DANS LE FOR, itération numéro : " + i);
+                            let lenj = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires.length;
+                            console.log("voilà lenj: " + lenj);
+                            let truncHeureFin = parseFloat(responseChoixCreneau.Drive.CreneauxSemaine[i].HeureFin);
+                            console.log("ce quon compare avec heure: " + truncHeureFin);
+                            if (truncHeureFin == heure) {
+                                console.log("ON RENTRE DANS LE PREMIER IF");
+                                for (var j = 0; j < lenj; j++) {
+                                    console.log("on RENTRE DANS LE DEUXIEME FOR, itération numero: " + j);
+                                    console.log("Date creneau en question: " + responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].DateCreneau);
+                                    if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].DateCreneau.startsWith(parameters.date)) {
+                                        console.log("ON RENTRE DANS LE DEUXIEME IF");
+                                        console.log("statut en question: " + responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].Statut);
+                                        if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].Statut === "Disponible") {
+                                            console.log("ON RENTRE DANS LE TROISIEME IF");
+                                            myIdCreneau = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].IdCreneau;
+                                            console.log("Voici mon ID CRENEAU: " + myIdCreneau);
+                                            if (requestSource === googleAssistantRequest) {
+                                                sendGoogleResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");//TODO annulation & recap date et heure
+                                            } else {
+                                                sendResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");
+                                            }
+                                        } else {
+                                            if (requestSource === googleAssistantRequest) {
+                                                sendGoogleResponse("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");//TODO annulation & recap date et heure
+                                            } else {
+                                                sendResponseFollowUp("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");
+                                            }
+                                        }
                                     } else {
-                                        sendResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");
-                                    }
-                                } else {
-                                    if (requestSource === googleAssistantRequest) {
-                                        sendGoogleResponse("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");//TODO annulation & recap date et heure
-                                    } else {
-                                        sendResponseFollowUp("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");
+                                        console.log("PROBLEME DE COMPARAISON DE DATE");
                                     }
                                 }
                             } else {
-                                console.log("PROBLEME DE COMPARAISON DE DATE");
+                                console.log("PROBLEME DE COMPARAISON DHEURE");
                             }
                         }
-                    } else {
-                        console.log("PROBLEME DE COMPARAISON DHEURE");
                     }
                 }
-            }
-        }
-        else {
-            if (requestSource === googleAssistantRequest) {
-                sendGoogleResponse("Oups, je n'ai pas r\u00E9ussi");//TODO annulation & recap date et heure
-            } else {
-                sendResponseFollowUp("Oups, je n'ai pas r\u00E9ussi");
-            }
-        }
+                else {
+                    if (requestSource === googleAssistantRequest) {
+                        sendGoogleResponse("Oups, je n'ai pas r\u00E9ussi");//TODO annulation & recap date et heure
+                    } else {
+                        sendResponseFollowUp("Oups, je n'ai pas r\u00E9ussi");
+                    }
+                }
+
+            })
+        //TO DO, séparer si l'utilisateur met seulement un jour ou seulement une heure'
         
     },
   
