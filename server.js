@@ -694,7 +694,7 @@ function processV1Request(request, response) {
                 heure = heure.replace(":", "h");
                 console.log("HEURE  APRES" + heure);
                 let leni = responseChoixCreneau.Drive.CreneauxSemaine.length;
-                console.log("ON A PASSE LA PREMIERE MENTION DE responseChoixCreneau");
+                console.log("ON A PASSE LA PREMIERE MENTION DE responseChoixCreneau, voilà leni: " + leni);
                 for (var i = 0; i < leni; i++) {
                     
                     let lenj = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauHoraires;
