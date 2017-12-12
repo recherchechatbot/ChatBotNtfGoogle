@@ -529,7 +529,27 @@ function getMonth(n) {
     return x;
 }
 
+function getRecapPanier(c) {
+    var options = {
+        method: 'GET',
+        uri: FO_URL + "AfficherPanier",
+        headers: {
+            cookie: c
+        }
+    };
 
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+
+                resolve(response.body);
+            }
+            else {
+                reject(error);
+            }
+        })
+    });
+}
 
 
 
@@ -813,6 +833,19 @@ function processV1Request(request, response) {
             })
         //TO DO, séparer si l'utilisateur met seulement un jour ou seulement une heure'
         
+    },
+
+    'montant.panier': () => {
+        var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
+        getRecapPanier(cookieSession)
+            .then((res) => {
+                if (requestSource === googleAssistantRequest) {
+                    sendGoogleResponse("Le montant total de votre panier s\'\u00E9l\u00E8ve \u00E0 " + res.total);
+                } else {
+                    sendResponse("Je n\'ai pas r\u00E9ussi \u00E0 trouver de r\u00E9sultats pour ta recherche, v\u00E9rifie que tu es bien connect\u00E9 sur ton compte");
+                }
+                
+            })
     },
   
     // Default handler for unknown or undefined actions
