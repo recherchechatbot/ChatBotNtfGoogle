@@ -694,14 +694,14 @@ function processV1Request(request, response) {
             if (parameters.date && parameters.time) {
                 let heure = parameters.time.slice(0, -3);//Met heure de type 00:00:00 en format 00h00
                 heure = heure.replace(":", "h");
-                let leni = r.Drive.CreneauxSemaine.length;
+                let leni = responseChoixCreneau.Drive.CreneauxSemaine.length;
                 for (var i = 0; i < leni; i++) {
-                    let lenj = r.Drive.CreneauxSemaine[i].CreneauHoraires;
+                    let lenj = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauHoraires;
                     for (var j = 0; j < lenj; j++) {
-                        if (r.Drive.CreneauxSemaine[i].HeureDebut == heure) {
-                            if (r.Drive.CreneauxSemaine[i].CreneauHoraires[j].DateCreneau.startsWith(parameters.date)) {
-                                if (r.Drive.CreneauxSemaine[i].CreneauHoraires[j].Statut == "disponible") {
-                                    myIdCreneau = r.Drive.CreneauxSemaine[i].CreneauHoraires[j].IdCreneau;
+                        if (responseChoixCreneau.Drive.CreneauxSemaine[i].HeureDebut == heure) {
+                            if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauHoraires[j].DateCreneau.startsWith(parameters.date)) {
+                                if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauHoraires[j].Statut == "disponible") {
+                                    myIdCreneau = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauHoraires[j].IdCreneau;
                                     if (requestSource === googleAssistantRequest) {
                                         sendGoogleResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");//TODO annulation & recap date et heure
                                     } else {
@@ -720,7 +720,6 @@ function processV1Request(request, response) {
                     }
                 }
             }
-            responseChoixCreneau = [];
         }
         else {
             if (requestSource === googleAssistantRequest) {
