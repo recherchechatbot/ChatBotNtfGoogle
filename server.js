@@ -531,6 +531,8 @@ function getMonth(n) {
 
 
 
+
+
 /*
 * Function to handle v1 webhook requests from Dialogflow
 */
@@ -702,11 +704,19 @@ function processV1Request(request, response) {
         }
                 
         getNamePdv(idPdvFavori)
-            .then((n) => {
-                var fichePdv = n;
+            .then((fichePdv) => {
+                console.log("A priori on a une réponse puisqu'on est dans le then");
+                console.log("ma fiche PDV: " + JSON.stringify(fichePdv));
+                console.log("On veut que ces trois trucs soient defined: ");
+                console.log("Site: " + fichePdv.Site);
+                console.log("HorairesLundi: " + fichePdv.HorairesLundi);
+                console.log("HorairesDimanche: " + fichePdv.HorairesDimanche);
                 if (fichePdv.Site && fichePdv.HorairesLundi && fichePdv.HoraireDimanche) {
+                    console.log("on est dans le if youpi");
                     var horairesSemaine = fichePdv.HorairesLundi.replace(";;;;", " \u00E0 ");
+                    console.log("On vient de défnir les horaires de la semaine: " + horairesSemaine);
                     var horairesDim = fichePdv.HorairesDimanche.replace(";;;;", " \u00E0 ");
+                    console.log("On vient de défnir les horaires du dimanche: " + horairesDim);
                     var namePdvFavori = fichePdv.Site;
                     if (requestSource === googleAssistantRequest) {
                         sendGoogleResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaine + ' et le Dimanche de ' + horairesDim);// Aller chercher les infos client sur l'app'
