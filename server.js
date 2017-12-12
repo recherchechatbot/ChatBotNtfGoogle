@@ -697,7 +697,7 @@ function processV1Request(request, response) {
                 console.log("ON A PASSE LA PREMIERE MENTION DE responseChoixCreneau, voilà leni: " + leni);
                 for (var i = 0; i < leni; i++) {
                     console.log("ON RENTRE DANS LE FOR, itération numéro : " + i);
-                    let lenj = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires;
+                    let lenj = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires.length;
                     console.log("voilà lenj: " + lenj);
                     for (var j = 0; j < lenj; j++) {
                         console.log("on RENTRE DANS LE DEUXIEME FOR, itération numero: "+ j);
