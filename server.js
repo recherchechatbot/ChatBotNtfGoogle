@@ -702,7 +702,6 @@ function processV1Request(request, response) {
         else {
             sexe = "Madame"
         }
-                
         getNamePdv(idPdvFavori)
             .then((fichePdv) => {
                 console.log("A priori on a une réponse puisqu'on est dans le then");
