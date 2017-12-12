@@ -711,7 +711,7 @@ function processV1Request(request, response) {
                 console.log("Site: " + fichePdv.Site);
                 console.log("HorairesLundi: " + fichePdv.HorairesLundi);
                 console.log("HorairesDimanche: " + fichePdv.HorairesDimanche);
-                if (fichePdv.Site && fichePdv.HorairesLundi && fichePdv.HoraireDimanche) {
+                if (fichePdv.Site && fichePdv.HorairesLundi && fichePdv.HorairesDimanche) {
                     console.log("on est dans le if youpi");
                     var horairesSemaine = fichePdv.HorairesLundi.replace(";;;;", " \u00E0 ");
                     console.log("On vient de défnir les horaires de la semaine: " + horairesSemaine);
