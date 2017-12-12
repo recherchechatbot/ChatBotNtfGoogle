@@ -696,13 +696,19 @@ function processV1Request(request, response) {
                 let leni = responseChoixCreneau.Drive.CreneauxSemaine.length;
                 console.log("ON A PASSE LA PREMIERE MENTION DE responseChoixCreneau, voilà leni: " + leni);
                 for (var i = 0; i < leni; i++) {
-                    
+                    console.log("ON RENTRE DANS LE FOR, itération numéro : " + i);
                     let lenj = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauHoraires;
+                    console.log("voilà lenj: " + leni);
                     for (var j = 0; j < lenj; j++) {
+                        console.log("on RENTRE DANS LE DEUXIEME FOR, itération numero: "+ j);
                         if (responseChoixCreneau.Drive.CreneauxSemaine[i].HeureDebut == heure) {
+                            console.log("ON RENTRE DANS LE PREMIER IF");
                             if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauHoraires[j].DateCreneau.startsWith(parameters.date)) {
+                                console.log("ON RENTRE DANS LE DEUXIEME IF");
                                 if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauHoraires[j].Statut == "disponible") {
+                                    console.log("ON RENTRE DANS LE TROISIEME IF");
                                     myIdCreneau = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauHoraires[j].IdCreneau;
+                                    console.log("Voici mi ID CRENEAU: " + myIdCreneau);
                                     if (requestSource === googleAssistantRequest) {
                                         sendGoogleResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");//TODO annulation & recap date et heure
                                     } else {
