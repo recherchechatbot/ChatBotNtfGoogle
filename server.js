@@ -842,7 +842,7 @@ function processV1Request(request, response) {
                 if (requestSource === googleAssistantRequest) {
                     sendGoogleResponse("Le montant total de votre panier s\'\u00E9l\u00E8ve \u00E0 " + res.total);
                 } else {
-                    sendResponse("Je n\'ai pas r\u00E9ussi \u00E0 trouver de r\u00E9sultats pour ta recherche, v\u00E9rifie que tu es bien connect\u00E9 sur ton compte");
+                    sendResponse("Le montant total de votre panier s\'\u00E9l\u00E8ve \u00E0 " + res.total);
                 }
                 
             })
