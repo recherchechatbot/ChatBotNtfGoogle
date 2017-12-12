@@ -839,18 +839,22 @@ function processV1Request(request, response) {
     'montant.panier': () => {
         var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
         console.log("Ceci est mon cookiesession pour le montant panier: " + cookieSession);
-        getRecapPanier(cookieSession)
-            .then((res) => {
-                console.log("constate le body qu'on recoit: " + JSON.stringify(res));
-                if (requestSource === googleAssistantRequest) {
-                    console.log("On est actuellement dans le if google");
-                    sendGoogleResponse("Le montant total de votre panier s\'\u00E9l\u00E8ve \u00E0 " + res.Total);
-                } else {
-                    console.log("On est actuellement dans le if qui est pas google");
-                    sendResponse("Le montant total de votre panier s\'\u00E9l\u00E8ve \u00E0 " + res.Total);
-                }
-                
+        hitFO(cookieSession)
+            .then(() => {
+                getRecapPanier(cookieSession)
+                    .then((res) => {
+                        console.log("constate le body qu'on recoit: " + JSON.stringify(res));
+                        if (requestSource === googleAssistantRequest) {
+                            console.log("On est actuellement dans le if google");
+                            sendGoogleResponse("Le montant total de votre panier s\'\u00E9l\u00E8ve \u00E0 " + res.Total);
+                        } else {
+                            console.log("On est actuellement dans le if qui est pas google");
+                            sendResponse("Le montant total de votre panier s\'\u00E9l\u00E8ve \u00E0 " + res.Total);
+                        }
+
+                    })
             })
+        
     },
   
     // Default handler for unknown or undefined actions
