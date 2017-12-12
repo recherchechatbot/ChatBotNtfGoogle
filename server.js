@@ -725,10 +725,7 @@ function processV1Request(request, response) {
         }
         
     },
-    'choix.creneau.follow': () => {
-        
-        
-    },
+  
     // Default handler for unknown or undefined actions
     'default': () => {
       // Use the Actions on Google lib to respond to Google requests; for other requests use JSON
