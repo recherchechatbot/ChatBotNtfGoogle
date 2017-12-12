@@ -137,6 +137,14 @@ myApp.post('/login', function (req, res) {
                 urlRedirection: ""
             });
         });
+    //On récupère les créneaux dès la connexion pour l'instant parce que sinon trop long après (timeout maxi de 5s entre le moment ou dialogflow envoie quelque chose au webhook et ou il recoit la réponse, malheureusement heroku met trop de temps, TODO à CHANGER QUAND MEILLEURE SOLUTION D'HEBERGEMENT DE l'APP)'
+    getCreneaux(myToken)
+        .then((r) => {
+            responseChoixCreneau = r;
+
+        })
+
+
 
 
     /*
@@ -675,21 +683,8 @@ function processV1Request(request, response) {
             })
     },
     'choix.creneau': () => {
-        sendResponseFollowUp("Cela va prendre un peu de temps, merci de patienter quelques secondes", "WAIT_EVENT");
-        //if (requestSource === googleAssistantRequest) {
-        //    sendGoogleResponse("Cela va prendre un peu de temps, merci de patienter quelques secondes");// Aller chercher les infos client sur l'app'
-        //} else {
-        //    sendResponse("Cela va prendre un peu de temps, merci de patienter quelques secondes");
-        //}
        //TO DO, séparer si l'utilisateur met seulement un jour ou seulement une heure'
-        getCreneaux(myToken)
-            .then((r) => {
-                responseChoixCreneau = r;
-                
-            })
-        
-    },
-    'choix.creneau.follow': () => {
+        console.log("Nous appelons bien le followup");
         if (responseChoixCreneau) {
             if (parameters.date && parameters.time) {
                 let heure = parameters.time.slice(0, -3);//Met heure de type 00:00:00 en format 00h00
@@ -728,6 +723,10 @@ function processV1Request(request, response) {
                 sendResponseFollowUp("Oups, je n'ai pas r\u00E9ussi");
             }
         }
+        
+    },
+    'choix.creneau.follow': () => {
+        
         
     },
     // Default handler for unknown or undefined actions
