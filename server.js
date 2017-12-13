@@ -556,7 +556,7 @@ function emptyBasket(token) {
     let options = {
         method: "DELETE",
         uri: MCO_URL + "api/v1/client/panier",
-        headers={
+        headers:{
             "TokenAuthentification": token
         },
         json: true
