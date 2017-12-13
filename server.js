@@ -6,22 +6,28 @@ const request=require('request');
 const DialogflowApp = require('actions-on-google').DialogflowApp; // Google Assistant helper library
 const REST_PORT = (process.env.PORT || 5000);
 const bodyParser = require('body-parser');
-const myApp = express(); 
+const myApp = express();
+const Mco = require("./mcorequests.js");
 //Global Vars
     //Memoire de la derniere recherche
 var arrayProducts = [];//array  avec le string qu'on veut renvoyer'
 var arrayProductsFull = [];//array de dimension 2: arrayProductsFull=[[r[i].Libelle, r[i].IdProduit]]
 var productIndex = 0;//curseur pour passer au produit suivant ou à celui d'avant'
 var actualProduct = [];//Produit actuel
-//Config vars, sont dans les configs d'heroku (dans settings->config vars)'
-
-//Vars authentification
+    //Vars authentification
 var email = "";
 var mdp = "";
 var myToken = "";
 var ASPSessionId = "";
 var userInfos = {};
 var myIdCreneau = 0;
+
+//Config vars, sont dans les configs d'heroku (dans settings->config vars)'
+const MCO_URL = process.env.MCO_URL;
+const RC_URL = process.env.RC_URL;
+const FO_URL = process.env.FO_URL;
+const MSQ_APP_RC = process.env.MSQ_APP_RC;
+const MSQ_JETON_APP_RC = process.env.MSQ_JETON_APP_RC;
 
 myApp.use(bodyParser.text({ type: 'application/json' }));
 //Process lancé quand l'utilisateur a rentré ses identifiants'
@@ -33,7 +39,7 @@ myApp.post('/login', function (req, res) {
         .then((rep) => {
             console.log("Res: " + JSON.stringify(rep));
             if (rep.id) {
-                loginMCommerce(resultat.email, resultat.mdp, rep.id)
+                Mco.loginMCommerce(resultat.email, resultat.mdp, rep.id)
                     .then((r) => {
                         if (r.TokenAuthentification) {
                             console.log("le token a bien été récupéré");
@@ -47,7 +53,7 @@ myApp.post('/login', function (req, res) {
                                 .catch(err => {
                                     console.log("impossible de recuperer session id ASP");
                                 });
-                            getMcoUserInfo(myToken)
+                            Mco.getMcoUserInfo(myToken)
                                 .then((u) => {
                                     userInfos = u;
                                 })
@@ -168,56 +174,6 @@ function getAspNetSessionId(email, mdp) {
     });
 }
 
-function loginMCommerce(email, mdp, idrc) {    
-    return new Promise((resolve, reject) => {
-        request({
-            url: MCO_URL + 'api/v1/loginRc',
-            method: 'POST',
-            body: {
-                email: email,
-                motdepasse: mdp,
-                idrc: idrc,
-                veutcartefid: false
-            },
-            json: true
-        }, (error, response) => {
-            if (error) {
-                console.log('Erreur login mcommerce: ', error);
-                reject(error);
-            } else if (response.body.error) {
-                console.log('Error: ', response.body.error);
-                reject(new Error(response.body.error));
-            }
-            resolve(response.body);
-        });
-    });
-}
-
-function getRecette(product, token) {
-    let url="https://wsmcommerce.intermarche.com/api/v1/recherche/recette?mot="+product;
-    console.log("URRRRLL:" + url);
-    var options={
-        method:'GET',
-        uri:url,
-
-        headers:{
-            'TokenAuthentification':token
-        }
-    };
-    console.log("my Options:" + options);
-        return new Promise ((resolve,reject)=>{
-            request(options,(error,response)=>{
-                if(!error && response.statuscode==200){
-                    resolve(response.body);
-                }
-                else{
-                    reject(error);
-                }
-            });
-        }
-        );
-}
-
 function getProduit(produit, idPdv, c) {
     var options = {
         method: 'POST',
@@ -239,45 +195,6 @@ function getProduit(produit, idPdv, c) {
                 reject(error);
             }
         })
-    })
-}
-
-function getMcoUserInfo(token) {
-    var options = {
-        method: 'GET',
-        uri: MCO_URL + "api/v1/clientRc",
-        headers: {
-            'TokenAuthentification': token
-        },
-        json: true
-    };
-    return new Promise((resolve, reject) => {
-        request(options, (error, response) => {
-            if (!error && response.statusCode == 200) {
-                resolve(response.body);
-            } else {
-                console.log('Error while getting Mco user info: ' + error);
-                reject(error);
-            }
-        });
-    })
-}
-
-function getNamePdv(idPdv) {
-    var options = {
-        method: 'GET',
-        uri: MCO_URL + "api/v1/pdv/fiche/" + idPdv,
-        json: true
-    };
-    return new Promise((resolve, reject) => {
-        request(options, (error, response) => {
-            if (!error && response.statusCode == 200) {
-                resolve(response.body);
-            } else {
-                console.log('Error while getting name PDV: ' + error);
-                reject(error);
-            }
-        });
     })
 }
 
@@ -343,28 +260,6 @@ function hitFO(cookie) {
     });
 }
 
-function getCreneaux(tok) {
-    var options = {
-        method: 'GET',
-        uri: MCO_URL + "api/v1/pdv/creneaux",
-        headers: {
-            'TokenAuthentification': tok
-        },
-        json: true
-    };
-    return new Promise((resolve, reject) => {
-        request(options, (error, response) => {
-            if (!error && response.statusCode == 200) {
-                console.log('reponse creneaux' + response.body);
-                resolve(response.body);
-            } else {
-                console.log('Error while getting creneaux ' + error);
-                reject(error);
-            }
-        });
-    })
-}
-
 function getMonth(n) {
     var x = "";
     if (n === 1) {
@@ -427,28 +322,6 @@ function getRecapPanier(c) {
     });
 }
 
-function emptyBasket(token) {
-    let options = {
-        method: "DELETE",
-        uri: MCO_URL + "api/v1/client/panier",
-        headers:{
-            "TokenAuthentification": token
-        },
-        json: true
-    }
-    return new Promise((resolve, reject) => {
-        request(options, (error, response) => {
-            if (!error && response.statusCode == 200) {
-                console.log("à priori le panier devrait être vidé");
-                resolve(response.body);
-            } else {
-                console.log("Il y a eu un problème lors du vidage du panier");
-                reject(error);
-            }
-        })
-    })
-}
-
 /*
 * Function qui gère les requêtes de type V1 de la part de dialogflow
 */
@@ -483,7 +356,7 @@ function processV1Request(request, response) {
       //Marche pas car timeout trop long
       'recherche.recette': () => {
           let myText = 'Voici quelques recettes pour toi: ';
-          getRecette('poulet', myToken)
+          Mco.getRecette('poulet', myToken)
               .then((r) => {
                   let listeRecettes = JSON.parse(r);
                   let len = listeRecettes.Recettes.length;
@@ -607,7 +480,7 @@ function processV1Request(request, response) {
           else {
               sexe = "Madame"
           }
-          getNamePdv(idPdvFavori)
+          Mco.getNamePdv(idPdvFavori)
               .then((fichePdv) => {
                   if (fichePdv.Site && fichePdv.HorairesLundi && fichePdv.HorairesDimanche) {
                       var horairesSemaine = fichePdv.HorairesLundi.replace(/\;/g, "");
@@ -630,7 +503,7 @@ function processV1Request(request, response) {
       },
       //TODO, faire une vraie reservation de créneau (avec annulation si necessaire), gérer les autres modes de retrait (uniquement le drive pour l'instant'), faire quelque chose si l'utilisateur met seulement un jour ou seulement une heure'
       'choix.creneau': () => {
-          getCreneaux(myToken)
+          Mco.getCreneaux(myToken)
               .then((responseChoixCreneau) => {
                   if (responseChoixCreneau) {
                       if (parameters.date && parameters.time) {
@@ -693,7 +566,7 @@ function processV1Request(request, response) {
               })
       },
       'vider.panier.confirmation': () => {
-          emptyBasket(myToken)
+          Mco.emptyBasket(myToken)
               .then((r) => {
                   if (requestSource === googleAssistantRequest) {
                       sendGoogleResponse("Ton panier a bien été vidé");
@@ -946,7 +819,7 @@ function processV2Request (request, response) {
     //'recherche.recette':()=>{
     //    let myText='Voici quelques recettes pour toi: ';
     //    console.log("myText:"+ myText);
-    //    getRecette('poulet','32e88d45-0f1a-4d39-b35b-a8469da5ad10')
+    //    Mco.getRecette('poulet','32e88d45-0f1a-4d39-b35b-a8469da5ad10')
     //    .then((r)=>{
     //        let listeRecettes=JSON.parse(r);
     //        let len=listeRecettes.Recettes.length;
