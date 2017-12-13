@@ -880,7 +880,7 @@ function processV1Request(request, response) {
         
     },
 
-    'vider panier': () => {
+    'vider.panier': () => {
         emptyBasket(myToken)
             .then((r) => {
                 if (requestSource === googleAssistantRequest) {
