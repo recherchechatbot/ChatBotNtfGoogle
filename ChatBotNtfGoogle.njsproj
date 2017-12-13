@@ -28,9 +28,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="dialogflow_functions.js">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="fo_requests.js">
       <SubType>Code</SubType>
     </Compile>
