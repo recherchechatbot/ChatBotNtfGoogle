@@ -3,36 +3,18 @@
 const express = require('express');
 const JSONbig = require('json-bigint');
 const request=require('request');
-/*const functions = require('firebase-functions');*/ // Cloud Functions for Firebase library
 const DialogflowApp = require('actions-on-google').DialogflowApp; // Google Assistant helper library
-//exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, response) => {
-//  console.log('Dialogflow Request headers: ' + JSON.stringify(request.headers));
-//  console.log('Dialogflow Request body: ' + JSON.stringify(request.body));
-//  if (request.body.result) {
-//    processV1Request(request, response);
-//  } else if (request.body.queryResult) {
-//    processV2Request(request, response);
-//  } else {
-//    console.log('Invalid Request');
-//    return response.status(400).end('Invalid Webhook Request (expecting v1 or v2 webhook request)');
-//  }
-//});
 const REST_PORT = (process.env.PORT || 5000);
 const bodyParser = require('body-parser');
-const myApp = express();
+const myApp = express(); 
+//Global Vars
+    //Memoire de la derniere recherche
+var arrayProducts = [];//array  avec le string qu'on veut renvoyer'
+var arrayProductsFull = [];//array de dimension 2: arrayProductsFull=[[r[i].Libelle, r[i].IdProduit]]
+var productIndex = 0;//curseur pour passer au produit suivant ou à celui d'avant'
+var actualProduct = [];//Produit actuel
+//Config vars, sont dans les configs d'heroku (dans settings->config vars)'
 
-//Memoire de la derniere recherche
-var arrayProducts = [];//array de dim2 avec les strings qu'on veut renvoyer, coupée tous les 5 produits'
-var arrayProductsFull = [];
-//Memoire du dernier groupe de 5 produits renvoyés
-var productIndex = 0;
-var actualProduct = [];
-//Config vars, TODO à cacher plus tard
-const MCO_URL = "https://wsmcommerce.intermarche.com/";
-const RC_URL = "https://api-vip-dmz.mousquetaires.com/";
-const FO_URL = "https://drive.intermarche.com/";
-const MSQ_APP_RC = "ecommerce";
-const MSQ_JETON_APP_RC = "9206b4da-b84f-4145-8473-a7b40d5ecd56";
 //Vars authentification
 var email = "";
 var mdp = "";
@@ -40,60 +22,24 @@ var myToken = "";
 var ASPSessionId = "";
 var userInfos = {};
 var myIdCreneau = 0;
-var responseChoixCreneau = {};
 
 myApp.use(bodyParser.text({ type: 'application/json' }));
-
+//Process lancé quand l'utilisateur a rentré ses identifiants'
 myApp.post('/login', function (req, res) {
-
     var resultat = JSONbig.parse(req.body);
-
-    
-
     console.log("VALEUR DE BODY : " + JSON.stringify(req.body));
-
-    //const userLogin = UserStore.get(username);
-    //if (!userLogin || userLogin.password !== password) {
-    //    res.render('authorize', {
-    //        redirectURI,
-    //        username,
-    //        password,
-    //        errorMessage: !userLogin
-    //            ? 'Uh oh. That username doesn’t exist. Please use the demo account or try again.' // eslint-disable-line max-len
-    //            : 'Oops. Incorrect password',
-    //        errorInput: !userLogin ? 'username' : 'password',
-    //    });
-    //} else {
-    //    linkAccountToMessenger(res, userLogin.username, redirectURI);
-    //}
-
     var authCode = null;
-
     loginRC(resultat.email, resultat.mdp)
         .then((rep) => {
-            console.log("REPONSE du RCCCCCCCCCCCCCC");
             console.log("Res: " + JSON.stringify(rep));
-            console.log("Res.id :" + rep.id);
-
             if (rep.id) {
                 loginMCommerce(resultat.email, resultat.mdp, rep.id)
                     .then((r) => {
-                        console.log("ICIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
-                        console.log("rrrrrrrrrrrrrrrrrrr" + JSON.stringify(r));
-
                         if (r.TokenAuthentification) {
-
-                            email = resultat.email;
-
-                            myToken = r.TokenAuthentification;
-                            console.log("State dans le login: " + resultat.state);
                             console.log("le token a bien été récupéré");
+                            email = resultat.email;
+                            myToken = r.TokenAuthentification;
                             const redirectURISuccess = `${resultat.redirectURI}#access_token=${myToken}&token_type=bearer&state=${resultat.state}`;
-                            console.log("URL DE REDIRECTION: " + redirectURISuccess);
-
-                            console.log("on link le mco " + myToken + " avec l'email " + resultat.email);
-                            
-
                             getAspNetSessionId(resultat.email, resultat.mdp)
                                 .then((c) => {
                                     ASPSessionId = c["ASP.NET_SessionId"]
@@ -108,8 +54,6 @@ myApp.post('/login', function (req, res) {
                                 .catch(err => {
                                     console.log("impossible de récupérer idpdvfavori, erreur suivante: " + err);
                                 });
-                           
-
                             return res.json({
                                 EstEnErreur: false,
                                 urlRedirection: redirectURISuccess
@@ -138,67 +82,27 @@ myApp.post('/login', function (req, res) {
                 urlRedirection: ""
             });
         });
-    
-    
-
-
-
-    /*
-      The auth code can be any thing you can use to uniquely identify a user.
-      Once the redirect below happens, this bot will receive an account link
-      message containing this auth code allowing us to identify the user.
-      NOTE: It is considered best practice to use a unique id instead of
-      something guessable like a users username so that malicious
-      users cannot spoof a link.
-     */
-    //const authCode = uuid();
-
-    // set the messenger id of the user to the authCode.
-    // this will be replaced on successful account link
-    // with the users id.
-
-    // Redirect users to this URI on successful login
-
 });
+//Set page html connexion sur le google home
 myApp.set('view engine', 'ejs');
+//Page de connexion, utilise OAuth 2 
 myApp.get('/authorize', function (req, res) {
     var accountLinkingToken = req.query.account_linking_token;
     var redirectURI = req.query.redirect_uri;
     var state = req.query.state;
     console.log("STATE: " + state);
-    
-
-
     // Redirect users to this URI on successful login
-
     res.render('authorize', {
         accountLinkingToken: accountLinkingToken,
         redirectURI: redirectURI,
         state:state
     });
 });
-
+//Webhook (échange dialogflow-appli par POST)
 myApp.post('/webhook', (request, response) => {
-
-    //console.log(request);
-    //console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + JSON.stringify(request.body));
-    //if (request.body.result) {
-    //    processV1Request(request, response);
-    //} else if (request.body.queryResult) {
-    //    processV2Request(request, response);
-    //} else {
-    //    console.log('Invalid Request');
-    //    return response.status(400).end('Invalid Webhook Request (expecting v1 or v2 webhook request)');
-    //}
-    console.log("avant toute chose dans le app.post");
     var body = JSON.parse(request.body);
-
-    console.log("On vient de definir le body");
-    
     if (body) {
-        console.log("avant toute chose dans le app.post");
-        console.log("A priori le body existe quand on le big parse, le voici: " + JSON.stringify(body));
-        processV1Request(request, response);
+        processV1Request(request, response);//Toujours en V1, dialogflow va passer progressivement en V2 (beta pour l'instant), il faudra changer à ce moment là
     } else {
         console.log('Invalid Request');
         return response.status(400).end('Invalid Webhook Request (expecting v1 or v2 webhook request)');
@@ -206,9 +110,6 @@ myApp.post('/webhook', (request, response) => {
 });
 
 function loginRC(email, mdp) {
-    console.log("Email : " + email);
-    console.log("Mdp : " + mdp);
-
     return new Promise((resolve, reject) => {
         request({
             url: RC_URL + 'ReferentielClient/v1/login',
@@ -252,7 +153,6 @@ function getAspNetSessionId(email, mdp) {
             referer: 'http://google.fr'
         }
     };
-
     return new Promise((resolve, reject) => {
         request(options, (error, response) => {
             if (!error && response.statusCode == 200) {
@@ -268,10 +168,7 @@ function getAspNetSessionId(email, mdp) {
     });
 }
 
-function loginMCommerce(email, mdp, idrc) {
-    console.log("Email : " + email);
-    console.log("Mdp : " + mdp);
-
+function loginMCommerce(email, mdp, idrc) {    
     return new Promise((resolve, reject) => {
         request({
             url: MCO_URL + 'api/v1/loginRc',
@@ -291,7 +188,6 @@ function loginMCommerce(email, mdp, idrc) {
                 console.log('Error: ', response.body.error);
                 reject(new Error(response.body.error));
             }
-
             resolve(response.body);
         });
     });
@@ -320,12 +216,9 @@ function getRecette(product, token) {
             });
         }
         );
-    
 }
 
 function getProduit(produit, idPdv, c) {
-    console.log("DEBUT getProduit");
-    console.log("produit = " + produit);
     var options = {
         method: 'POST',
         uri: "https://drive.intermarche.com/RechercheJs",
@@ -337,16 +230,12 @@ function getProduit(produit, idPdv, c) {
         },
         json: true
     };
-    console.log("FIN getProduit");
     return new Promise((resolve, reject) => {
         request(options, (error, response) => {
             if (!error && response.statusCode == 200) {
-                console.log("ON A UN RETOUR 200 !!!!!!!");
-                console.log("voila le body = " + response.body);
                 resolve(response.body);
             }
             else {
-                console.log("ON FAIT UN REJECT");
                 reject(error);
             }
         })
@@ -354,7 +243,6 @@ function getProduit(produit, idPdv, c) {
 }
 
 function getMcoUserInfo(token) {
-    console.log("et ici, on rentre?");
     var options = {
         method: 'GET',
         uri: MCO_URL + "api/v1/clientRc",
@@ -363,13 +251,9 @@ function getMcoUserInfo(token) {
         },
         json: true
     };
-    console.log("myOptions" + JSON.stringify(options));
     return new Promise((resolve, reject) => {
-        console.log("dans le promise");
         request(options, (error, response) => {
-            console.log('dans le request');
             if (!error && response.statusCode == 200) {
-                console.log('Mco user info result : ' + response.body);
                 resolve(response.body);
             } else {
                 console.log('Error while getting Mco user info: ' + error);
@@ -380,7 +264,6 @@ function getMcoUserInfo(token) {
 }
 
 function getNamePdv(idPdv) {
-    console.log("on est rentrés dans getNamePdv");
     var options = {
         method: 'GET',
         uri: MCO_URL + "api/v1/pdv/fiche/" + idPdv,
@@ -389,7 +272,6 @@ function getNamePdv(idPdv) {
     return new Promise((resolve, reject) => {
         request(options, (error, response) => {
             if (!error && response.statusCode == 200) {
-                console.log('Fiche PDV ' + response.body);
                 resolve(response.body);
             } else {
                 console.log('Error while getting name PDV: ' + error);
@@ -401,14 +283,12 @@ function getNamePdv(idPdv) {
 
 function parseCookies(cookiesString) {
     var list = {};
-
     cookiesString && cookiesString.split(';').forEach(function (c1) {
         c1 && c1.split(',').forEach(function (cookie) {
             var parts = cookie.split('=');
             list[parts.shift().trim()] = decodeURI(parts.join('='));
         });
     });
-
     return list;
 }
 
@@ -435,7 +315,6 @@ function addProductBasketFront(idProduit, cookie) {
                 console.log('Error: ', response.body.error);
                 reject(new Error(response.body.error));
             }
-            //console.log("ceci est le body lorsqu'on essaye d'ajouter un truc au panier:" + JSON.stringify(response.body));
             resolve(response.body);
         });
 
@@ -458,7 +337,6 @@ function hitFO(cookie) {
             } else if (response.body.error) {
                 reject(new Error(response.body.error));
             }
-
             console.log("HIT FO OK :");
             resolve();
         });
@@ -525,7 +403,6 @@ function getMonth(n) {
     else if (n === 12) {
         x === "D\u00E9cembre";
     }
-
     return x;
 }
 
@@ -537,9 +414,7 @@ function getRecapPanier(c) {
             cookie: c
         }
     };
-
     return new Promise((resolve, reject) => {
-        console.log("on passe ça dans le request: " + JSON.stringify(options));
         request(options, (error, response) => {
             if (!error && response.statusCode == 200) {
                 console.log("On est dans le promise, et ya pas d'erreur");
@@ -565,7 +440,7 @@ function emptyBasket(token) {
         request(options, (error, response) => {
             if (!error && response.statusCode == 200) {
                 console.log("à priori le panier devrait être vidé");
-                resolve(response.body);//A priori pas necessaire car pas juste "null" dans le body en cas de success
+                resolve(response.body);
             } else {
                 console.log("Il y a eu un problème lors du vidage du panier");
                 reject(error);
@@ -574,10 +449,8 @@ function emptyBasket(token) {
     })
 }
 
-
-
 /*
-* Function to handle v1 webhook requests from Dialogflow
+* Function qui gère les requêtes de type V1 de la part de dialogflow
 */
 function processV1Request(request, response) {
   var body = JSON.parse(request.body);
@@ -602,18 +475,16 @@ function processV1Request(request, response) {
       'input.unknown': () => {
           // Use the Actions on Google lib to respond to Google requests; for other requests use JSON
           if (requestSource === googleAssistantRequest) {
-              sendGoogleResponse('I\'m having trouble, can you try that again?'); // Send simple response to user
+              sendGoogleResponse('Je suis désolé ' + userInfos.AdresseDeFacturation.Prenom + ', mais je n\'ai pas compris ta requête, peux-tu essayer de la reformuler différement s\'il te plaît?'); 
           } else {
-              sendResponse('I\'m having trouble, can you try that again?'); // Send simple response to user
+              sendResponse('Je suis désolé ' + userInfos.AdresseDeFacturation.Prenom + ', mais je n\'ai pas compris ta requête, peux-tu essayer de la reformuler différement s\'il te plaît?');
           }
       },
+      //Marche pas car timeout trop long
       'recherche.recette': () => {
           let myText = 'Voici quelques recettes pour toi: ';
-          console.log("myText:" + myText);
-          //sendResponse("Je fonctionne mais mcommerce c'est lent");
           getRecette('poulet', myToken)
               .then((r) => {
-                  console.log("Resultat de la requete http des recettes: " + r);
                   let listeRecettes = JSON.parse(r);
                   let len = listeRecettes.Recettes.length;
                   for (var i = 0; i < len; i++) {
@@ -624,7 +495,6 @@ function processV1Request(request, response) {
                   } else {
                       sendResponse(myText);
                   }
-
               })
               .catch((err) => {
                   if (requestSource === googleAssistantRequest) {
@@ -639,7 +509,6 @@ function processV1Request(request, response) {
           let myProduct = parameters.Nourriture;
           let myIdPdv = 1;
           let cookie = 'ASP.NET_SessionId=' + ASPSessionId + ';IdPdv=' + myIdPdv;
-
           getProduit(myProduct, myIdPdv, cookie)
               .then((r) => {
                   arrayProducts = [];
@@ -691,229 +560,169 @@ function processV1Request(request, response) {
                 }
                 console.log("ERREUR:" + err);
             })
-
-        
-    },
-    'repeat.produit': () => {
-        repeatProducts();
-    },
-    'next.produit': () => {
-        nextProducts();
-    },
-    'previous.produit': () => {
-        previousProducts();
-    },
-    'choix.produit': () => {
-        let myChoice = 0;
-        if (parameters.number=1) {
-            myChoice = parameters.number;
-        } else {
-            myChoice = -1;
-        }
-        selectProduct(myChoice);
-        
-    },
-    'choix.quantite.produit': () => {
-        console.log("on est bien dans le bon onglet \"action\" ")
-        
-        let myNumber = parameters.number;
-     
-        var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
-        for (var i = 0; i < myNumber; i++) {
-            hitFO(cookieSession)
-                .then(() => {
-                    addProductBasketFront(actualProduct[1], cookieSession)
-                        .then((r) => {
-                            if (requestSource === googleAssistantRequest) {
-                                sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
-                            } else {
-                                sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
-                            }
-                        })
-                })
-        }
-    },
-    'horaires.pdv': () => {
-        console.log("MYUSER INFOS:" + userInfos);
-        var nomFamille = userInfos.AdresseDeFacturation.Nom;
-        var prenom = userInfos.AdresseDeFacturation.Prenom;
-        var idPdvFavori = userInfos.IdPdv;
-        var sexe = "";
-        if (userInfos.AdresseDeFacturation.IdCivilite == 1) {
-            sexe = "Monsieur";
-        }
-        else {
-            sexe = "Madame"
-        }
-        getNamePdv(idPdvFavori)
-            .then((fichePdv) => {
-                console.log("A priori on a une réponse puisqu'on est dans le then");
-                console.log("ma fiche PDV: " + JSON.stringify(fichePdv));
-                console.log("On veut que ces trois trucs soient defined: ");
-                console.log("Site: " + fichePdv.Site);
-                console.log("HorairesLundi: " + fichePdv.HorairesLundi);
-                console.log("HorairesDimanche: " + fichePdv.HorairesDimanche);
-                if (fichePdv.Site && fichePdv.HorairesLundi && fichePdv.HorairesDimanche) {
-                    console.log("on est dans le if youpi");
-                    var horairesSemaine = fichePdv.HorairesLundi.replace(/\;/g, "");
-                    console.log("horaires semaine avec le regex: " + horairesSemaine);
-                    var horairesSemaineOuverture = horairesSemaine.slice(0, 5);
-                    var horairesSemaineFermeture = horairesSemaine.slice(-5);//TODO PEUT ETRE SEPARER LE SAMEDI?
-                    console.log("On vient de défnir les horaires de la semaine: " + horairesSemaineOuverture + " a " + horairesSemaineFermeture);
-                    var horairesDim = fichePdv.HorairesLundi.replace(/\;/g, "");
-                    console.log("horaires dimanche avec le regex: " + horairesDim);
-                    var horairesDimOuverture = horairesDim.slice(0, 5);
-                    var horairesDimFermeture = horairesDim.slice(-5);
-                    console.log("On vient de défnir les horaires du dimanche: " + horairesDimOuverture + " a " + horairesDimFermeture);
-                    var namePdvFavori = fichePdv.Site;
-                    if (requestSource === googleAssistantRequest) {
-                        console.log("oN EST DANS LE IF GOOGLE");
-                        console.log("Voici toutes les choses qui doivent être définies: ");
-                        console.log("sexe: " + sexe);
-                        console.log("nomFamille: " + nomFamille);
-                        console.log("namePdvFavori: " + namePdvFavori);
-                        sendGoogleResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture + ' et le Dimanche de ' + horairesDimOuverture + " a " + horairesDimFermeture);
-                    } else {
-                        console.log("oN EST DANS LE IF  NON GOOGLE");
-                        console.log("Voici toutes les choses qui doivent être définies: ");
-                        console.log("sexe: " + sexe);
-                        console.log("nomFamille: " + nomFamille);
-                        console.log("namePdvFavori: " + namePdvFavori);
-                        console.log("horairesSemaine: " + horairesSemaine);
-                        console.log("horairesDimanche: " + HorairesDimanche);
-                        sendResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture + ' et le Dimanche de ' + horairesDimOuverture + " a " + horairesDimFermeture);
-                    }
-                }
-
-            })
-            .catch(err => {
-                console.log("Impossible de recuperer le nom du PDV");
-            })
-    },
-    'choix.creneau': () => {
-        //On récupère les créneaux dès la connexion pour l'instant parce que sinon trop long après (timeout maxi de 5s entre le moment ou dialogflow envoie quelque chose au webhook et ou il recoit la réponse, malheureusement heroku met trop de temps, TODO à CHANGER QUAND MEILLEURE SOLUTION D'HEBERGEMENT DE l'APP)'
-        getCreneaux(myToken)
-            .then((responseChoixCreneau) => {
-                console.log("my Choix Creneau: " + JSON.stringify(responseChoixCreneau));
-                console.log("on est dans choix creneau, voila le body dans lequel on tape: " + responseChoixCreneau);
-                if (responseChoixCreneau) {
-                    if (parameters.date && parameters.time) {
-                        let heure = parameters.time.slice(0, -3);//Met heure de type 00:00:00 en format 00h00
-                        console.log("heure avant: " + heure);
-                        heure = parseFloat(heure);
-                        console.log("HEURE  APRES" + heure);
-                        let leni = responseChoixCreneau.Drive.CreneauxSemaine.length;
-                        console.log("ON A PASSE LA PREMIERE MENTION DE responseChoixCreneau, voilà leni: " + leni);
-                        for (var i = 0; i < leni; i++) {
-                            console.log("ON RENTRE DANS LE FOR, itération numéro : " + i);
-                            let lenj = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires.length;
-                            console.log("voilà lenj: " + lenj);
-                            let truncHeureFin = parseFloat(responseChoixCreneau.Drive.CreneauxSemaine[i].HeureFin);
-                            console.log("ce quon compare avec heure: " + truncHeureFin);
-                            if (truncHeureFin == heure) {
-                                console.log("ON RENTRE DANS LE PREMIER IF");
-                                for (var j = 0; j < lenj; j++) {
-                                    console.log("on RENTRE DANS LE DEUXIEME FOR, itération numero: " + j);
-                                    let dateCreneau = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].DateCreneau;
-                                    console.log("Date creneau en question: " + dateCreneau);
-                                    if (dateCreneau.startsWith(parameters.date)) {
-                                        console.log("ON RENTRE DANS LE DEUXIEME IF");
-                                        console.log("statut en question: " + responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].Statut);
-                                        if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].Statut === "Disponible") {
-                                            console.log("ON RENTRE DANS LE TROISIEME IF");
-                                            myIdCreneau = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].IdCreneau;
-                                            console.log("Voici mon ID CRENEAU: " + myIdCreneau);
-                                            if (requestSource === googleAssistantRequest) {
-                                                sendGoogleResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande le " + dateCreneau.slice(8, 10) + " " + getMonth(dateCreneau.slice(5,7)) + " entre " + responseChoixCreneau.Drive.CreneauxSemaine[i].HeureDebut + " et " + responseChoixCreneau.Drive.CreneauxSemaine[i].HeureFin );//TODO annulation & recap date et heure
-                                            } else {
-                                                sendResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");
-                                            }
-                                        } else {
-                                            if (requestSource === googleAssistantRequest) {
-                                                sendGoogleResponse("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");//TODO annulation & recap date et heure
-                                            } else {
-                                                sendResponseFollowUp("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");
-                                            }
-                                        }
-                                    } else {
-                                        console.log("PROBLEME DE COMPARAISON DE DATE");
-                                    }
-                                }
-                            } else {
-                                console.log("PROBLEME DE COMPARAISON DHEURE");
-                            }
-                        }
-                    }
-                }
-                else {
-                    if (requestSource === googleAssistantRequest) {
-                        sendGoogleResponse("Oups, je n'ai pas r\u00E9ussi");//TODO annulation & recap date et heure
-                    } else {
-                        sendResponseFollowUp("Oups, je n'ai pas r\u00E9ussi");
-                    }
-                }
-
-            })
-        //TO DO, séparer si l'utilisateur met seulement un jour ou seulement une heure'
-        
-    },
-
-    'montant.panier': () => {
-        var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
-        console.log("Ceci est mon cookiesession pour le montant panier: " + cookieSession);
-        hitFO(cookieSession)
-            .then(() => {
-                getRecapPanier(cookieSession)
-                    .then((res) => {
-                        let resParsed = JSON.parse(res);
-                        console.log("constate le body qu'on recoit: " + JSON.stringify(res));
-                        if (requestSource === googleAssistantRequest) {
-                            console.log("On est actuellement dans le if google");
-                            sendGoogleResponse("Le montant total de ton panier s\'\u00E9l\u00E8ve \u00E0 " + resParsed.Total);
-                        } else {
-                            console.log("On est actuellement dans le if qui est pas google");
-                            sendResponse("Le montant total de ton panier s\'\u00E9l\u00E8ve \u00E0 " + resParsed.Total);
-                        }
-
-                    })
-            })
-        
-    },
-
-    'vider.panier.confirmation': () => {
-        emptyBasket(myToken)
-            .then((r) => {
-                if (requestSource === googleAssistantRequest) {
-                    console.log("Le panier a bien été vidé");
-                    sendGoogleResponse("Le panier a bien été vidé");
-                } else {
-                    console.log("Le panier a bien été vidé");
-                    sendResponse("Le panier a bien été vidé" );
-                }
-            })
-    },
-  
-    // Default handler for unknown or undefined actions
-    'default': () => {
-      // Use the Actions on Google lib to respond to Google requests; for other requests use JSON
-      if (requestSource === googleAssistantRequest) {
-        let responseToUser = {
-          //googleRichResponse: googleRichResponse, // Optional, uncomment to enable
-          //googleOutputContexts: ['weather', 2, { ['city']: 'rome' }], // Optional, uncomment to enable
-          speech: 'This message is from Dialogflow\'s Cloud Functions for Firebase editor!', // spoken response
-          text: 'This is from Dialogflow\'s Cloud Functions for Firebase editor! :-)' // displayed response
-        };
-        sendGoogleResponse(responseToUser);
-      } else {
-        let responseToUser = {
-          //data: richResponsesV1, // Optional, uncomment to enable
-          //outputContexts: [{'name': 'weather', 'lifespan': 2, 'parameters': {'city': 'Rome'}}], // Optional, uncomment to enable
-          speech: 'This message is from Dialogflow\'s Cloud Functions for Firebase editor!', // spoken response
-          text: 'This is from Dialogflow\'s Cloud Functions for Firebase editor! :-)' // displayed response
-        };
-        sendResponse(responseToUser);
+      },
+      'repeat.produit': () => {
+          repeatProducts();
+      },
+      'next.produit': () => {
+          nextProducts();
+      },
+      'previous.produit': () => {
+          previousProducts();
+      },
+      'choix.produit': () => {
+          let myChoice = 0;
+          if (parameters.number = 1) {
+              myChoice = parameters.number;
+          } else {
+              myChoice = -1;
+          }
+          selectProduct(myChoice);
+      },
+      'choix.quantite.produit': () => {
+          let myNumber = parameters.number;
+          var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
+          for (var i = 0; i < myNumber; i++) {
+              hitFO(cookieSession)
+                  .then(() => {
+                      addProductBasketFront(actualProduct[1], cookieSession)
+                          .then((r) => {
+                              if (requestSource === googleAssistantRequest) {
+                                  sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
+                              } else {
+                                  sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
+                              }
+                          })
+                  })
+          }
+      },
+      'horaires.pdv': () => {
+          var nomFamille = userInfos.AdresseDeFacturation.Nom;
+          var prenom = userInfos.AdresseDeFacturation.Prenom;
+          var idPdvFavori = userInfos.IdPdv;
+          var sexe = "";
+          if (userInfos.AdresseDeFacturation.IdCivilite == 1) {
+              sexe = "Monsieur";
+          }
+          else {
+              sexe = "Madame"
+          }
+          getNamePdv(idPdvFavori)
+              .then((fichePdv) => {
+                  if (fichePdv.Site && fichePdv.HorairesLundi && fichePdv.HorairesDimanche) {
+                      var horairesSemaine = fichePdv.HorairesLundi.replace(/\;/g, "");
+                      var horairesSemaineOuverture = horairesSemaine.slice(0, 5);
+                      var horairesSemaineFermeture = horairesSemaine.slice(-5);//TODO PEUT ETRE SEPARER LE SAMEDI?
+                      var horairesDim = fichePdv.HorairesLundi.replace(/\;/g, "");
+                      var horairesDimOuverture = horairesDim.slice(0, 5);
+                      var horairesDimFermeture = horairesDim.slice(-5);
+                      var namePdvFavori = fichePdv.Site;
+                      if (requestSource === googleAssistantRequest) {
+                          sendGoogleResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture + ' et le Dimanche de ' + horairesDimOuverture + " a " + horairesDimFermeture);
+                      } else {
+                          sendResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture + ' et le Dimanche de ' + horairesDimOuverture + " a " + horairesDimFermeture);
+                      }
+                  }
+              })
+              .catch(err => {
+                  console.log("Impossible de recuperer le nom du PDV");
+              })
+      },
+      //TODO, faire une vraie reservation de créneau (avec annulation si necessaire), gérer les autres modes de retrait (uniquement le drive pour l'instant'), faire quelque chose si l'utilisateur met seulement un jour ou seulement une heure'
+      'choix.creneau': () => {
+          getCreneaux(myToken)
+              .then((responseChoixCreneau) => {
+                  if (responseChoixCreneau) {
+                      if (parameters.date && parameters.time) {
+                          let heure = parameters.time.slice(0, -3);//Met heure de type 00:00:00 en format 00h00
+                          heure = parseFloat(heure);
+                          let leni = responseChoixCreneau.Drive.CreneauxSemaine.length;
+                          for (var i = 0; i < leni; i++) {
+                              let lenj = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires.length;
+                              let truncHeureFin = parseFloat(responseChoixCreneau.Drive.CreneauxSemaine[i].HeureFin);
+                              if (truncHeureFin == heure) {
+                                  for (var j = 0; j < lenj; j++) {
+                                      let dateCreneau = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].DateCreneau;
+                                      if (dateCreneau.startsWith(parameters.date)) {
+                                          if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].Statut === "Disponible") {
+                                              myIdCreneau = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].IdCreneau;
+                                              if (requestSource === googleAssistantRequest) {
+                                                  sendGoogleResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande le " + dateCreneau.slice(8, 10) + " " + getMonth(dateCreneau.slice(5, 7)) + " entre " + responseChoixCreneau.Drive.CreneauxSemaine[i].HeureDebut + " et " + responseChoixCreneau.Drive.CreneauxSemaine[i].HeureFin);//TODO annulation & recap date et heure
+                                              } else {
+                                                  sendResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");
+                                              }
+                                          } else {
+                                              if (requestSource === googleAssistantRequest) {
+                                                  sendGoogleResponse("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");//TODO annulation & recap date et heure
+                                              } else {
+                                                  sendResponseFollowUp("Malheureusement " + userInfos.AdresseDeFacturation.Prenom + ", ton cr\u00E9neau n'est pas disponible, je te prie donc d'en choisir un autre");
+                                              }
+                                          }
+                                      } else {
+                                          console.log("PROBLEME DE COMPARAISON DE DATE");
+                                      }
+                                  }
+                              } else {
+                                  console.log("PROBLEME DE COMPARAISON DHEURE");
+                              }
+                          }
+                      }
+                  }
+                  else {
+                      if (requestSource === googleAssistantRequest) {
+                          sendGoogleResponse("Oups, je n'ai pas r\u00E9ussi");
+                      } else {
+                          sendResponseFollowUp("Oups, je n'ai pas r\u00E9ussi");
+                      }
+                  }
+              })
+      },
+      'montant.panier': () => {
+          var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
+          hitFO(cookieSession)
+              .then(() => {
+                  getRecapPanier(cookieSession)
+                      .then((res) => {
+                          let resParsed = JSON.parse(res);
+                          if (requestSource === googleAssistantRequest) {
+                              sendGoogleResponse("Le montant total de ton panier s\'\u00E9l\u00E8ve \u00E0 " + resParsed.Total);
+                          } else {
+                              sendResponse("Le montant total de ton panier s\'\u00E9l\u00E8ve \u00E0 " + resParsed.Total);
+                          }
+                      })
+              })
+      },
+      'vider.panier.confirmation': () => {
+          emptyBasket(myToken)
+              .then((r) => {
+                  if (requestSource === googleAssistantRequest) {
+                      sendGoogleResponse("Ton panier a bien été vidé");
+                  } else {
+                      sendResponse("Ton panier a bien été vidé");
+                  }
+              })
+      },
+      // Default handler for unknown or undefined actions
+      'default': () => {
+          // Use the Actions on Google lib to respond to Google requests; for other requests use JSON
+          if (requestSource === googleAssistantRequest) {
+              let responseToUser = {
+                  //googleRichResponse: googleRichResponse, // Optional, uncomment to enable
+                  //googleOutputContexts: ['weather', 2, { ['city']: 'rome' }], // Optional, uncomment to enable
+                  speech: 'Oups, il y a eu un problème, peux-tu réessayer s\'il te plaît?', // spoken response
+                  text: 'Oups, il y a eu un problème, peux-tu réessayer s\'il te plaît?' // displayed response
+              };
+              sendGoogleResponse(responseToUser);
+          } else {
+              let responseToUser = {
+                  //data: richResponsesV1, // Optional, uncomment to enable
+                  //outputContexts: [{'name': 'weather', 'lifespan': 2, 'parameters': {'city': 'Rome'}}], // Optional, uncomment to enable
+                  speech: 'Oups, il y a eu un problème, peux-tu réessayer s\'il te plaît?', // spoken response
+                  text: 'Oups, il y a eu un problème, peux-tu réessayer s\'il te plaît?' // displayed response
+              };
+              sendResponse(responseToUser);
+          }
       }
-    }
   };
   // If undefined or unknown action use the default handler
   if (!actionHandlers[action]) {
@@ -965,30 +774,7 @@ function processV1Request(request, response) {
       response.json(responseJson); // Send response to Dialogflow
     }
   };
-  function sendResponseFollowUp(responseToUser,followUpName) {
-      // if the response is a string send it as a response to the user
-      if (typeof responseToUser === 'string') {
-          let responseJson = {};
-          responseJson.speech = responseToUser; // spoken response
-          responseJson.displayText = responseToUser; // displayed response
-          responseJson.followupEvent = {
-              "name": followUpName
-          }
-          response.json(responseJson); // Send response to Dialogflow
-      } else {
-          // If the response to the user includes rich responses or contexts send them to Dialogflow
-          let responseJson = {};
-          // If speech or displayText is defined, use it to respond (if one isn't defined use the other's value)
-          responseJson.speech = responseToUser.speech || responseToUser.displayText;
-          responseJson.displayText = responseToUser.displayText || responseToUser.speech;
-          // Optional: add rich messages for integrations (https://dialogflow.com/docs/rich-messages)
-          responseJson.data = responseToUser.data;
-          // Optional: add contexts (https://dialogflow.com/docs/contexts)
-          responseJson.contextOut = responseToUser.outputContexts;
-          console.log('Response to Dialogflow: ' + JSON.stringify(responseJson));
-          response.json(responseJson); // Send response to Dialogflow
-      }
-  };
+  
   function repeatProducts() {
       let myText = "Pas de probleme, je r\u00E9p\u00E8te: "
       //pas besoin de if car on l'appelle que quand on déclenche un intent qui doit obligatoirement suivre la recherche produits
@@ -1013,7 +799,6 @@ function processV1Request(request, response) {
       }
   }
    
-
   function previousProducts() {
       productIndex -= 1;
       if (productIndex < 0) {
@@ -1032,7 +817,6 @@ function processV1Request(request, response) {
       //    for (var i = 0; i < arrayProducts[productIndex].length; i++) {
       //        text = text + arrayProducts[productIndex][i];
       //    }
-
       //    if (requestSource === googleAssistantRequest) {
       //        sendGoogleResponse(text);
       //    } else {
@@ -1043,7 +827,6 @@ function processV1Request(request, response) {
           text = text + arrayProducts[productIndex];
           sendResponse(text);
       }
-
       return text;
   }
 
@@ -1134,8 +917,9 @@ const richResponsesV1 = {
     }
   }
 };
+
 /*
-* Function to handle v2 webhook requests from Dialogflow
+* Template pour gerer les requêtes V2 à terme
 */
 function processV2Request (request, response) {
   // An action is a string used to identify what needs to be done in fulfillment
