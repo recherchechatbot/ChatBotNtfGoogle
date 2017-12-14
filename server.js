@@ -9,9 +9,12 @@ const bodyParser = require('body-parser');
 const myApp = express();
 
 //Import modules
-const Mco = require("./mco_requests.js");
-const Fo = require('./fo_requests.js');
-const Rc = require("./rc_requests.js");
+const Mco = require("./mco_requests");
+console.log("Mco: " + Mco);
+const Fo = require('./fo_requests');
+console.log("Fo: " + Fo);
+const Rc = require("./rc_requests");
+console.log("Rc: " + Rc);
 const Other = require("./other_functions.js");
 
 //Global Vars
