@@ -2,7 +2,7 @@
 const express = require('express');
 const RC_URL = process.env.MCO_URL;
 
-module.exports = class Rc {
+class Rc {
     loginRC(email, mdp) {
         return new Promise((resolve, reject) => {
             request({
@@ -32,3 +32,6 @@ module.exports = class Rc {
 
 }
 }
+
+const RC_REQUESTS = new Rc();
+module.exports = RC_REQUESTS;

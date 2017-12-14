@@ -2,7 +2,7 @@
 const express = require('express');
 const MCO_URL = process.env.MCO_URL;
 
-module.exports = class Mco {
+class Mco {
     loginMCommerce(email, mdp, idrc) {
         return new Promise((resolve, reject) => {
             request({
@@ -137,3 +137,5 @@ module.exports = class Mco {
     }
 }
 
+const MCO_REQUESTS = new Mco();
+module.exports = MCO_REQUESTS;

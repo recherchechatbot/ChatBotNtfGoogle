@@ -3,7 +3,7 @@ const express = require('express');
 const FO_URL = process.env.MCO_URL;
 const Other = require("./other_functions.js");
 
-module.exports = class Fo {
+class Fo {
     addProductBasketFront(idProduit, cookie) {
         return new Promise((resolve, reject) => {
             request({
@@ -129,3 +129,6 @@ module.exports = class Fo {
         })
     }
 }
+
+const FO_REQUESTS = new Fo();
+module.exports = FO_REQUESTS;

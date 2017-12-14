@@ -1,4 +1,4 @@
-﻿module.exports = class Other {
+﻿class Other {
     parseCookies(cookiesString) {
         var list = {};
         cookiesString && cookiesString.split(';').forEach(function (c1) {
@@ -51,3 +51,5 @@
         return x;
     }
 }
+const OTHER_FUNCTIONS = new Other();
+module.exports = OTHER_FUNCTIONS;
