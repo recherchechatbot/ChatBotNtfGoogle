@@ -10,11 +10,11 @@ const myApp = express();
 
 //Import modules
 const Mco = require("./mco_requests");
-console.log("Mco: " + Mco);
+console.log("Mco: " + JSON.stringify(Mco));
 const Fo = require('./fo_requests');
-console.log("Fo: " + Fo);
+console.log("Fo: " + JSON.stringify(Fo));
 const Rc = require("./rc_requests");
-console.log("Rc: " + Rc);
+console.log("Rc: " + JSON.stringify(Rc));
 const Other = require("./other_functions.js");
 
 //Global Vars
