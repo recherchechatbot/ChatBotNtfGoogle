@@ -44,6 +44,7 @@ myApp.post('/login', function (req, res) {
     var resultat = JSONbig.parse(req.body);
     console.log("VALEUR DE BODY : " + JSON.stringify(req.body));
     var authCode = null;
+    console; log("resultat.email: " +resultat.email);
     Rc.loginRC(resultat.email, resultat.mdp)
         .then((rep) => {
             console.log("Res: " + JSON.stringify(rep));
