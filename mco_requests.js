@@ -137,5 +137,4 @@ class Mco {
     }
 }
 
-const MCO_REQUESTS = new Mco();
-module.exports = MCO_REQUESTS;
+module.exports = Mco;

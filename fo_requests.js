@@ -130,5 +130,4 @@ class Fo {
     }
 }
 
-const FO_REQUESTS = new Fo();
-module.exports = FO_REQUESTS;
+module.exports = Fo;

@@ -10,12 +10,17 @@ const myApp = express();
 
 //Import modules
 const Mco = require("./mco_requests");
-console.log("Mco: " + JSON.stringify(Mco));
+var mco = new Mco();
+console.log("Mco: " + JSON.stringify(mco));
 const Fo = require('./fo_requests');
-console.log("Fo: " + JSON.stringify(Fo));
+var fo = new Fo();
+console.log("Fo: " + JSON.stringify(fo));
 const Rc = require("./rc_requests");
-console.log("Rc: " + JSON.stringify(Rc));
+var rc = new Rc();
+console.log("Rc: " + JSON.stringify(rc));
 const Other = require("./other_functions.js");
+var other = new Other();
+console.log("other: " + JSON.stringify(other));
 
 //Global Vars
     //Memoire de la derniere recherche
@@ -45,11 +50,11 @@ myApp.post('/login', function (req, res) {
     console.log("VALEUR DE BODY : " + JSON.stringify(req.body));
     var authCode = null;
     console; log("resultat.email: " +resultat.email);
-    Rc.loginRC(resultat.email, resultat.mdp)
+    rc.loginRC(resultat.email, resultat.mdp)
         .then((rep) => {
             console.log("Res: " + JSON.stringify(rep));
             if (rep.id) {
-                Mco.loginMCommerce(resultat.email, resultat.mdp, rep.id)
+                mco.loginMCommerce(resultat.email, resultat.mdp, rep.id)
                     .then((r) => {
                         if (r.TokenAuthentification) {
                             console.log("le token a bien été récupéré");
@@ -63,7 +68,7 @@ myApp.post('/login', function (req, res) {
                                 .catch(err => {
                                     console.log("impossible de recuperer session id ASP");
                                 });
-                            Mco.getMcoUserInfo(myToken)
+                            mco.getMcoUserInfo(myToken)
                                 .then((u) => {
                                     userInfos = u;
                                 })
@@ -159,7 +164,7 @@ function processV1Request(request, response) {
         //Marche pas car timeout trop long
         'recherche.recette': () => {
             let myText = 'Voici quelques recettes pour toi: ';
-            Mco.getRecette('poulet', myToken)
+            mco.getRecette('poulet', myToken)
                 .then((r) => {
                     let listeRecettes = JSON.parse(r);
                     let len = listeRecettes.Recettes.length;
@@ -185,7 +190,7 @@ function processV1Request(request, response) {
             let myProduct = parameters.Nourriture;
             let myIdPdv = 1;
             let cookie = 'ASP.NET_SessionId=' + ASPSessionId + ';IdPdv=' + myIdPdv;
-            Fo.getProduit(myProduct, myIdPdv, cookie)
+            fo.getProduit(myProduct, myIdPdv, cookie)
                 .then((r) => {
                     arrayProducts = [];
                     arrayProductsFull = []
@@ -259,9 +264,9 @@ function processV1Request(request, response) {
             let myNumber = parameters.number;
             var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
             for (var i = 0; i < myNumber; i++) {
-                Fo.hitFO(cookieSession)
+                fo.hitFO(cookieSession)
                     .then(() => {
-                        Fo.addProductBasketFront(actualProduct[1], cookieSession)
+                        fo.addProductBasketFront(actualProduct[1], cookieSession)
                             .then((r) => {
                                 if (requestSource === googleAssistantRequest) {
                                     sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
@@ -283,7 +288,7 @@ function processV1Request(request, response) {
             else {
                 sexe = "Madame"
             }
-            Mco.getNamePdv(idPdvFavori)
+            mco.getNamePdv(idPdvFavori)
                 .then((fichePdv) => {
                     if (fichePdv.Site && fichePdv.HorairesLundi && fichePdv.HorairesDimanche) {
                         var horairesSemaine = fichePdv.HorairesLundi.replace(/\;/g, "");
@@ -306,7 +311,7 @@ function processV1Request(request, response) {
         },
         //TODO, faire une vraie reservation de créneau (avec annulation si necessaire), gérer les autres modes de retrait (uniquement le drive pour l'instant'), faire quelque chose si l'utilisateur met seulement un jour ou seulement une heure'
         'choix.creneau': () => {
-            Mco.getCreneaux(myToken)
+            mco.getCreneaux(myToken)
                 .then((responseChoixCreneau) => {
                     if (responseChoixCreneau) {
                         if (parameters.date && parameters.time) {
@@ -355,9 +360,9 @@ function processV1Request(request, response) {
         },
         'montant.panier': () => {
             var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
-            Fo.hitFO(cookieSession)
+            fo.hitFO(cookieSession)
                 .then(() => {
-                    Fo.getRecapPanier(cookieSession)
+                    fo.getRecapPanier(cookieSession)
                         .then((res) => {
                             let resParsed = JSON.parse(res);
                             if (requestSource === googleAssistantRequest) {
@@ -369,7 +374,7 @@ function processV1Request(request, response) {
                 })
         },
         'vider.panier.confirmation': () => {
-            Mco.emptyBasket(myToken)
+            mco.emptyBasket(myToken)
                 .then((r) => {
                     if (requestSource === googleAssistantRequest) {
                         sendGoogleResponse("Ton panier a bien été vidé");

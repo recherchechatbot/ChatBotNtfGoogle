@@ -33,5 +33,4 @@ class Rc {
 }
 }
 
-const RC_REQUESTS = new Rc();
-module.exports = RC_REQUESTS;
+module.exports = Rc;
