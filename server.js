@@ -10,8 +10,8 @@ const myApp = express();
 
 //Import modules
 const Mco = require("./mco_requests");
-var mco = new Mco();
-console.log("Mco: " + JSON.stringify(mco));
+
+console.log("Mco: " + JSON.stringify(Mco));
 const Fo = require('./fo_requests');
 var fo = new Fo();
 console.log("Fo: " + JSON.stringify(fo));
