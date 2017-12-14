@@ -51,5 +51,5 @@
         return x;
     }
 }
-const OTHER_FUNCTIONS = new Other();
-module.exports = OTHER_FUNCTIONS;
+
+module.exports = Other;
