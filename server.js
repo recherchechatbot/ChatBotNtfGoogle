@@ -2,34 +2,26 @@
 
 const express = require('express');
 const JSONbig = require('json-bigint');
-const request=require('request');
+const request = require('request');
 const DialogflowApp = require('actions-on-google').DialogflowApp; // Google Assistant helper library
 const REST_PORT = (process.env.PORT || 5000);
 const bodyParser = require('body-parser');
 const myApp = express();
-
-//Import modules
-
 //Global Vars
-    //Memoire de la derniere recherche
+//Memoire de la derniere recherche
 var arrayProducts = [];//array  avec le string qu'on veut renvoyer'
 var arrayProductsFull = [];//array de dimension 2: arrayProductsFull=[[r[i].Libelle, r[i].IdProduit]]
 var productIndex = 0;//curseur pour passer au produit suivant ou à celui d'avant'
 var actualProduct = [];//Produit actuel
-    //Vars authentification
+//Config vars, sont dans les configs d'heroku (dans settings->config vars)'
+
+//Vars authentification
 var email = "";
 var mdp = "";
 var myToken = "";
 var ASPSessionId = "";
 var userInfos = {};
 var myIdCreneau = 0;
-
-//Config vars, sont dans les configs d'heroku (dans settings->config vars)'
-const MCO_URL = process.env.MCO_URL;
-const RC_URL = process.env.RC_URL;
-const FO_URL = process.env.FO_URL;
-const MSQ_APP_RC = process.env.MSQ_APP_RC;
-const MSQ_JETON_APP_RC = process.env.MSQ_JETON_APP_RC;
 
 myApp.use(bodyParser.text({ type: 'application/json' }));
 //Process lancé quand l'utilisateur a rentré ses identifiants'
@@ -103,14 +95,12 @@ myApp.get('/authorize', function (req, res) {
     res.render('authorize', {
         accountLinkingToken: accountLinkingToken,
         redirectURI: redirectURI,
-        state:state
+        state: state
     });
 });
 //Webhook (échange dialogflow-appli par POST)
 myApp.post('/webhook', (request, response) => {
-    console.log('a priori on est dans le webhook');
     var body = JSON.parse(request.body);
-    console.log("le body recuperé dans le webhook: " + JSON.stringify(body));
     if (body) {
         processV1Request(request, response);//Toujours en V1, dialogflow va passer progressivement en V2 (beta pour l'instant), il faudra changer à ce moment là
     } else {
@@ -119,8 +109,65 @@ myApp.post('/webhook', (request, response) => {
     }
 });
 
-//myFunctions
-//MCO Requests
+function loginRC(email, mdp) {
+    return new Promise((resolve, reject) => {
+        request({
+            url: RC_URL + 'ReferentielClient/v1/login',
+            method: 'POST',
+            body: {
+                email: email,
+                mdp: mdp
+            },
+            headers: {
+                "Msq-Jeton-App": MSQ_JETON_APP_RC,
+                "Msq-App": MSQ_APP_RC
+            },
+            json: true
+        }, (error, response) => {
+            if (error) {
+                console.log('Erreur login Referentiel Client: ', error);
+                reject(error);
+            } else if (response.body.error) {
+                console.log('Error: ', response.body.error);
+                reject(new Error(response.body.error));
+            }
+
+            resolve(response.body);
+        });
+    });
+}
+
+function getAspNetSessionId(email, mdp) {
+    var options = {
+        method: 'POST',
+        uri: FO_URL + "Connexion",
+        body: {
+            txtEmail: email,
+            txtMotDePasse: mdp,
+            largeur: "800",
+            hauteur: "300",
+            resteConnecte: true,
+        },
+        json: true,
+        headers: {
+            referer: 'http://google.fr'
+        }
+    };
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+                console.log("getAspNetSessionId retourne : " + response.headers['set-cookie']);
+
+                resolve(parseCookies(response.headers['set-cookie'].toString()));
+            }
+            else {
+                console.log("getAspNetSessionId ERREUR" + error);
+                reject(error);
+            }
+        })
+    });
+}
+
 function loginMCommerce(email, mdp, idrc) {
     return new Promise((resolve, reject) => {
         request({
@@ -171,6 +218,30 @@ function getRecette(product, token) {
     );
 }
 
+function getProduit(produit, idPdv, c) {
+    var options = {
+        method: 'POST',
+        uri: "https://drive.intermarche.com/RechercheJs",
+        headers: {
+            Cookie: c,
+        },
+        body: {
+            mot: produit
+        },
+        json: true
+    };
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+                resolve(response.body);
+            }
+            else {
+                reject(error);
+            }
+        })
+    })
+}
+
 function getMcoUserInfo(token) {
     var options = {
         method: 'GET',
@@ -210,51 +281,17 @@ function getNamePdv(idPdv) {
     })
 }
 
-function getCreneaux(tok) {
-    var options = {
-        method: 'GET',
-        uri: MCO_URL + "api/v1/pdv/creneaux",
-        headers: {
-            'TokenAuthentification': tok
-        },
-        json: true
-    };
-    return new Promise((resolve, reject) => {
-        request(options, (error, response) => {
-            if (!error && response.statusCode == 200) {
-                console.log('reponse creneaux' + response.body);
-                resolve(response.body);
-            } else {
-                console.log('Error while getting creneaux ' + error);
-                reject(error);
-            }
+function parseCookies(cookiesString) {
+    var list = {};
+    cookiesString && cookiesString.split(';').forEach(function (c1) {
+        c1 && c1.split(',').forEach(function (cookie) {
+            var parts = cookie.split('=');
+            list[parts.shift().trim()] = decodeURI(parts.join('='));
         });
-    })
+    });
+    return list;
 }
 
-function emptyBasket(token) {
-    let options = {
-        method: "DELETE",
-        uri: MCO_URL + "api/v1/client/panier",
-        headers: {
-            "TokenAuthentification": token
-        },
-        json: true
-    }
-    return new Promise((resolve, reject) => {
-        request(options, (error, response) => {
-            if (!error && response.statusCode == 200) {
-                console.log("à priori le panier devrait être vidé");
-                resolve(response.body);
-            } else {
-                console.log("Il y a eu un problème lors du vidage du panier");
-                reject(error);
-            }
-        })
-    })
-}
-
-//FO Requests
 function addProductBasketFront(idProduit, cookie) {
     return new Promise((resolve, reject) => {
         request({
@@ -282,6 +319,8 @@ function addProductBasketFront(idProduit, cookie) {
         });
 
     });
+
+
 }
 
 function hitFO(cookie) {
@@ -304,122 +343,26 @@ function hitFO(cookie) {
     });
 }
 
-function getRecapPanier(c) {
+function getCreneaux(tok) {
     var options = {
-        method: 'POST',
-        uri: FO_URL + "AfficherPanier",
+        method: 'GET',
+        uri: MCO_URL + "api/v1/pdv/creneaux",
         headers: {
-            cookie: c
-        }
-    };
-    return new Promise((resolve, reject) => {
-        request(options, (error, response) => {
-            if (!error && response.statusCode == 200) {
-                console.log("On est dans le promise, et ya pas d'erreur");
-                resolve(response.body);
-            }
-            else {
-                reject(error);
-            }
-        })
-    });
-}
-
-function getAspNetSessionId(email, mdp) {
-    var options = {
-        method: 'POST',
-        uri: FO_URL + "Connexion",
-        body: {
-            txtEmail: email,
-            txtMotDePasse: mdp,
-            largeur: "800",
-            hauteur: "300",
-            resteConnecte: true,
-        },
-        json: true,
-        headers: {
-            referer: 'http://google.fr'
-        }
-    };
-    return new Promise((resolve, reject) => {
-        request(options, (error, response) => {
-            if (!error && response.statusCode == 200) {
-                console.log("getAspNetSessionId retourne : " + response.headers['set-cookie']);
-
-                resolve(parseCookies(response.headers['set-cookie'].toString()));
-            }
-            else {
-                console.log("getAspNetSessionId ERREUR" + error);
-                reject(error);
-            }
-        })
-    });
-}
-
-function getProduit(produit, idPdv, c) {
-    var options = {
-        method: 'POST',
-        uri: "https://drive.intermarche.com/RechercheJs",
-        headers: {
-            Cookie: c,
-        },
-        body: {
-            mot: produit
+            'TokenAuthentification': tok
         },
         json: true
     };
     return new Promise((resolve, reject) => {
         request(options, (error, response) => {
             if (!error && response.statusCode == 200) {
+                console.log('reponse creneaux' + response.body);
                 resolve(response.body);
-            }
-            else {
+            } else {
+                console.log('Error while getting creneaux ' + error);
                 reject(error);
             }
-        })
+        });
     })
-}
-
-//RC Requests
-function loginRC(email, mdp) {
-    return new Promise((resolve, reject) => {
-        request({
-            url: RC_URL + 'ReferentielClient/v1/login',
-            method: 'POST',
-            body: {
-                email: email,
-                mdp: mdp
-            },
-            headers: {
-                "Msq-Jeton-App": MSQ_JETON_APP_RC,
-                "Msq-App": MSQ_APP_RC
-            },
-            json: true
-        }, (error, response) => {
-            if (error) {
-                console.log('Erreur login Referentiel Client: ', error);
-                reject(error);
-            } else if (response.body.error) {
-                console.log('Error: ', response.body.error);
-                reject(new Error(response.body.error));
-            }
-
-            resolve(response.body);
-        });
-    });
-
-}
-
-//Other functions
-function parseCookies(cookiesString) {
-    var list = {};
-    cookiesString && cookiesString.split(';').forEach(function (c1) {
-        c1 && c1.split(',').forEach(function (cookie) {
-            var parts = cookie.split('=');
-            list[parts.shift().trim()] = decodeURI(parts.join('='));
-        });
-    });
-    return list;
 }
 
 function getMonth(n) {
@@ -463,13 +406,54 @@ function getMonth(n) {
     return x;
 }
 
+function getRecapPanier(c) {
+    var options = {
+        method: 'POST',
+        uri: FO_URL + "AfficherPanier",
+        headers: {
+            cookie: c
+        }
+    };
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+                console.log("On est dans le promise, et ya pas d'erreur");
+                resolve(response.body);
+            }
+            else {
+                reject(error);
+            }
+        })
+    });
+}
+
+function emptyBasket(token) {
+    let options = {
+        method: "DELETE",
+        uri: MCO_URL + "api/v1/client/panier",
+        headers: {
+            "TokenAuthentification": token
+        },
+        json: true
+    }
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+                console.log("à priori le panier devrait être vidé");
+                resolve(response.body);
+            } else {
+                console.log("Il y a eu un problème lors du vidage du panier");
+                reject(error);
+            }
+        })
+    })
+}
+
 /*
-   * Function qui gère les requêtes de type V1 de la part de dialogflow
-   */
+* Function qui gère les requêtes de type V1 de la part de dialogflow
+*/
 function processV1Request(request, response) {
-    console.log("on est dans le process de la request dialogflow");
     var body = JSON.parse(request.body);
-    console.log("et voilà le body qu'on reçoit: " + JSON.stringify(body));
     let action = body.result.action; // https://dialogflow.com/docs/actions-and-parameters
     let parameters = body.result.parameters; // https://dialogflow.com/docs/actions-and-parameters
     let inputContexts = body.result.contexts; // https://dialogflow.com/docs/contexts
@@ -871,28 +855,29 @@ function processV1Request(request, response) {
         }
     }
 }
-
 // Construct rich response for Google Assistant (v1 requests only)
 const app = new DialogflowApp();
 const googleRichResponse = app.buildRichResponse()
-  .addSimpleResponse('This is the first simple response for Google Assistant')
-  .addSuggestions(
+    .addSimpleResponse('This is the first simple response for Google Assistant')
+    .addSuggestions(
     ['Suggestion Chip', 'Another Suggestion Chip'])
     // Create a basic card and add it to the rich response
-  .addBasicCard(app.buildBasicCard(`This is a basic card.  Text in a
+    .addBasicCard(app.buildBasicCard(`This is a basic card.  Text in a
  basic card can include "quotes" and most other unicode characters
  including emoji ??.  Basic cards also support some markdown
  formatting like *emphasis* or _italics_, **strong** or __bold__,
  and ***bold itallic*** or ___strong emphasis___ as well as other things
  like line  \nbreaks`) // Note the two spaces before '\n' required for a
-                        // line break to be rendered in the card
-    .setSubtitle('This is a subtitle')
-    .setTitle('Title: this is a title')
-    .addButton('This is a button', 'https://assistant.google.com/')
-    .setImage('https://developers.google.com/actions/images/badges/XPM_BADGING_GoogleAssistant_VER.png',
-      'Image alternate text'))
-  .addSimpleResponse({ speech: 'This is another simple response',
-    displayText: 'This is the another simple response ??' });
+        // line break to be rendered in the card
+        .setSubtitle('This is a subtitle')
+        .setTitle('Title: this is a title')
+        .addButton('This is a button', 'https://assistant.google.com/')
+        .setImage('https://developers.google.com/actions/images/badges/XPM_BADGING_GoogleAssistant_VER.png',
+        'Image alternate text'))
+    .addSimpleResponse({
+        speech: 'This is another simple response',
+        displayText: 'This is the another simple response ??'
+    });
 // Rich responses for Slack and Facebook for v1 webhook requests
 const richResponsesV1 = {
     'slack': {
@@ -938,136 +923,135 @@ const richResponsesV1 = {
 /*
 * Template pour gerer les requêtes V2 à terme
 */
-function processV2Request (request, response) {
-  // An action is a string used to identify what needs to be done in fulfillment
-  let action = (request.body.queryResult.action) ? request.body.queryResult.action : 'default';
-  // Parameters are any entites that Dialogflow has extracted from the request.
-  let parameters = request.body.queryResult.parameters || {}; // https://dialogflow.com/docs/actions-and-parameters
-  // Contexts are objects used to track and store conversation state
-  let inputContexts = request.body.queryResult.contexts; // https://dialogflow.com/docs/contexts
-  // Get the request source (Google Assistant, Slack, API, etc)
-  let requestSource = (request.body.originalDetectIntentRequest) ? request.body.originalDetectIntentRequest.source : undefined;
-  // Get the session ID to differentiate calls from different users
-  let session = (request.body.session) ? request.body.session : undefined;
-  // Create handlers for Dialogflow actions as well as a 'default' handler
-  const actionHandlers = {
-    // The default welcome intent has been matched, welcome the user (https://dialogflow.com/docs/events#default_welcome_intent)
-    'input.welcome': () => {
-      sendResponse('Hello, Welcome to my Dialogflow agent!'); // Send simple response to user
-    },
-    // The default fallback intent has been matched, try to recover (https://dialogflow.com/docs/intents#fallback_intents)
-    'input.unknown': () => {
-      // Use the Actions on Google lib to respond to Google requests; for other requests use JSON
-      sendResponse('I\'m having trouble, can you try that again?'); // Send simple response to user
-    },
-    //'recherche.recette':()=>{
-    //    let myText='Voici quelques recettes pour toi: ';
-    //    console.log("myText:"+ myText);
-    //    Mco.getRecette('poulet','32e88d45-0f1a-4d39-b35b-a8469da5ad10')
-    //    .then((r)=>{
-    //        let listeRecettes=JSON.parse(r);
-    //        let len=listeRecettes.Recettes.length;
-    //        for (var i=0;i<len;i++){
-    //            myText=myText + listeRecettes.Recettes[i].Titre + ' ';
-    //        }
-    //        sendResponse(myText);
-    //    });
-        
-    //},
-    // Default handler for unknown or undefined actions
-    'default': () => {
-      let responseToUser = {
-        //fulfillmentMessages: richResponsesV2, // Optional, uncomment to enable
-        //outputContexts: [{ 'name': `${session}/contexts/weather`, 'lifespanCount': 2, 'parameters': {'city': 'Rome'} }], // Optional, uncomment to enable
-        fulfillmentText: 'This is from Dialogflow\'s Cloud Functions for Firebase editor! :-)' // displayed response
-      };
-      sendResponse(responseToUser);
+function processV2Request(request, response) {
+    // An action is a string used to identify what needs to be done in fulfillment
+    let action = (request.body.queryResult.action) ? request.body.queryResult.action : 'default';
+    // Parameters are any entites that Dialogflow has extracted from the request.
+    let parameters = request.body.queryResult.parameters || {}; // https://dialogflow.com/docs/actions-and-parameters
+    // Contexts are objects used to track and store conversation state
+    let inputContexts = request.body.queryResult.contexts; // https://dialogflow.com/docs/contexts
+    // Get the request source (Google Assistant, Slack, API, etc)
+    let requestSource = (request.body.originalDetectIntentRequest) ? request.body.originalDetectIntentRequest.source : undefined;
+    // Get the session ID to differentiate calls from different users
+    let session = (request.body.session) ? request.body.session : undefined;
+    // Create handlers for Dialogflow actions as well as a 'default' handler
+    const actionHandlers = {
+        // The default welcome intent has been matched, welcome the user (https://dialogflow.com/docs/events#default_welcome_intent)
+        'input.welcome': () => {
+            sendResponse('Hello, Welcome to my Dialogflow agent!'); // Send simple response to user
+        },
+        // The default fallback intent has been matched, try to recover (https://dialogflow.com/docs/intents#fallback_intents)
+        'input.unknown': () => {
+            // Use the Actions on Google lib to respond to Google requests; for other requests use JSON
+            sendResponse('I\'m having trouble, can you try that again?'); // Send simple response to user
+        },
+        //'recherche.recette':()=>{
+        //    let myText='Voici quelques recettes pour toi: ';
+        //    console.log("myText:"+ myText);
+        //    getRecette('poulet','32e88d45-0f1a-4d39-b35b-a8469da5ad10')
+        //    .then((r)=>{
+        //        let listeRecettes=JSON.parse(r);
+        //        let len=listeRecettes.Recettes.length;
+        //        for (var i=0;i<len;i++){
+        //            myText=myText + listeRecettes.Recettes[i].Titre + ' ';
+        //        }
+        //        sendResponse(myText);
+        //    });
+
+        //},
+        // Default handler for unknown or undefined actions
+        'default': () => {
+            let responseToUser = {
+                //fulfillmentMessages: richResponsesV2, // Optional, uncomment to enable
+                //outputContexts: [{ 'name': `${session}/contexts/weather`, 'lifespanCount': 2, 'parameters': {'city': 'Rome'} }], // Optional, uncomment to enable
+                fulfillmentText: 'This is from Dialogflow\'s Cloud Functions for Firebase editor! :-)' // displayed response
+            };
+            sendResponse(responseToUser);
+        }
+    };
+    // If undefined or unknown action use the default handler
+    if (!actionHandlers[action]) {
+        action = 'default';
     }
-  };
-  // If undefined or unknown action use the default handler
-  if (!actionHandlers[action]) {
-    action = 'default';
-  }
-  // Run the proper handler function to handle the request from Dialogflow
-  actionHandlers[action]();
-  // Function to send correctly formatted responses to Dialogflow which are then sent to the user
-  function sendResponse (responseToUser) {
-    // if the response is a string send it as a response to the user
-    if (typeof responseToUser === 'string') {
-      let responseJson = {fulfillmentText: responseToUser}; // displayed response
-      response.json(responseJson); // Send response to Dialogflow
-    } else {
-      // If the response to the user includes rich responses or contexts send them to Dialogflow
-      let responseJson = {};
-      // Define the text response
-      responseJson.fulfillmentText = responseToUser.fulfillmentText;
-      // Optional: add rich messages for integrations (https://dialogflow.com/docs/rich-messages)
-      if (responseToUser.fulfillmentMessages) {
-        responseJson.fulfillmentMessages = responseToUser.fulfillmentMessages;
-      }
-      // Optional: add contexts (https://dialogflow.com/docs/contexts)
-      if (responseToUser.outputContexts) {
-        responseJson.outputContexts = responseToUser.outputContexts;
-      }
-      // Send the response to Dialogflow
-      console.log('Response to Dialogflow: ' + JSON.stringify(responseJson));
-      response.json(responseJson);
+    // Run the proper handler function to handle the request from Dialogflow
+    actionHandlers[action]();
+    // Function to send correctly formatted responses to Dialogflow which are then sent to the user
+    function sendResponse(responseToUser) {
+        // if the response is a string send it as a response to the user
+        if (typeof responseToUser === 'string') {
+            let responseJson = { fulfillmentText: responseToUser }; // displayed response
+            response.json(responseJson); // Send response to Dialogflow
+        } else {
+            // If the response to the user includes rich responses or contexts send them to Dialogflow
+            let responseJson = {};
+            // Define the text response
+            responseJson.fulfillmentText = responseToUser.fulfillmentText;
+            // Optional: add rich messages for integrations (https://dialogflow.com/docs/rich-messages)
+            if (responseToUser.fulfillmentMessages) {
+                responseJson.fulfillmentMessages = responseToUser.fulfillmentMessages;
+            }
+            // Optional: add contexts (https://dialogflow.com/docs/contexts)
+            if (responseToUser.outputContexts) {
+                responseJson.outputContexts = responseToUser.outputContexts;
+            }
+            // Send the response to Dialogflow
+            console.log('Response to Dialogflow: ' + JSON.stringify(responseJson));
+            response.json(responseJson);
+        }
     }
-  }
 }
 const richResponseV2Card = {
-  'title': 'Title: this is a title',
-  'subtitle': 'This is an subtitle.  Text can include unicode characters including emoji ??.',
-  'imageUri': 'https://developers.google.com/actions/images/badges/XPM_BADGING_GoogleAssistant_VER.png',
-  'buttons': [
-    {
-      'text': 'This is a button',
-      'postback': 'https://assistant.google.com/'
-    }
-  ]
+    'title': 'Title: this is a title',
+    'subtitle': 'This is an subtitle.  Text can include unicode characters including emoji ??.',
+    'imageUri': 'https://developers.google.com/actions/images/badges/XPM_BADGING_GoogleAssistant_VER.png',
+    'buttons': [
+        {
+            'text': 'This is a button',
+            'postback': 'https://assistant.google.com/'
+        }
+    ]
 };
 const richResponsesV2 = [
-  {
-    'platform': 'ACTIONS_ON_GOOGLE',
-    'simple_responses': {
-      'simple_responses': [
-        {
-          'text_to_speech': 'Spoken simple response',
-          'display_text': 'Displayed simple response'
+    {
+        'platform': 'ACTIONS_ON_GOOGLE',
+        'simple_responses': {
+            'simple_responses': [
+                {
+                    'text_to_speech': 'Spoken simple response',
+                    'display_text': 'Displayed simple response'
+                }
+            ]
         }
-      ]
-    }
-  },
-  {
-    'platform': 'ACTIONS_ON_GOOGLE',
-    'basic_card': {
-      'title': 'Title: this is a title',
-      'subtitle': 'This is an subtitle.',
-      'formatted_text': 'Body text can include unicode characters including emoji ??.',
-      'image': {
-        'image_uri': 'https://developers.google.com/actions/images/badges/XPM_BADGING_GoogleAssistant_VER.png'
-      },
-      'buttons': [
-        {
-          'title': 'This is a button',
-          'open_uri_action': {
-            'uri': 'https://assistant.google.com/'
-          }
+    },
+    {
+        'platform': 'ACTIONS_ON_GOOGLE',
+        'basic_card': {
+            'title': 'Title: this is a title',
+            'subtitle': 'This is an subtitle.',
+            'formatted_text': 'Body text can include unicode characters including emoji ??.',
+            'image': {
+                'image_uri': 'https://developers.google.com/actions/images/badges/XPM_BADGING_GoogleAssistant_VER.png'
+            },
+            'buttons': [
+                {
+                    'title': 'This is a button',
+                    'open_uri_action': {
+                        'uri': 'https://assistant.google.com/'
+                    }
+                }
+            ]
         }
-      ]
+    },
+    {
+        'platform': 'FACEBOOK',
+        'card': richResponseV2Card
+    },
+    {
+        'platform': 'SLACK',
+        'card': richResponseV2Card
     }
-  },
-  {
-    'platform': 'FACEBOOK',
-    'card': richResponseV2Card
-  },
-  {
-    'platform': 'SLACK',
-    'card': richResponseV2Card
-  }
 ];
 
 myApp.listen(REST_PORT, () => {
     console.log('Rest service ready on port ' + REST_PORT);
 });
-
