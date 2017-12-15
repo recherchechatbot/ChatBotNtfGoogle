@@ -13,14 +13,14 @@ const Mco = require("./mco_requests");
 
 console.log("Mco: " + JSON.stringify(Mco));
 const Fo = require('./fo_requests');
-var fo = new Fo();
-console.log("Fo: " + JSON.stringify(fo));
+
+console.log("Fo: " + JSON.stringify(Fo));
 const Rc = require("./rc_requests");
-var rc = new Rc();
-console.log("Rc: " + JSON.stringify(rc));
+
+console.log("Rc: " + JSON.stringify(Rc));
 const Other = require("./other_functions");
-var other = new Other();
-console.log("other: " + JSON.stringify(other));
+
+console.log("other: " + JSON.stringify(Other));
 
 //Global Vars
     //Memoire de la derniere recherche
@@ -50,7 +50,7 @@ myApp.post('/login', function (req, res) {
     console.log("VALEUR DE BODY : " + JSON.stringify(req.body));
     var authCode = null;
     console.log("resultat.email: " +resultat.email);
-    rc.loginRC(resultat.email, resultat.mdp)
+    Rc.loginRC(resultat.email, resultat.mdp)
         .then((rep) => {
             console.log("Res: " + JSON.stringify(rep));
             if (rep.id) {
@@ -190,7 +190,7 @@ function processV1Request(request, response) {
             let myProduct = parameters.Nourriture;
             let myIdPdv = 1;
             let cookie = 'ASP.NET_SessionId=' + ASPSessionId + ';IdPdv=' + myIdPdv;
-            fo.getProduit(myProduct, myIdPdv, cookie)
+            Fo.getProduit(myProduct, myIdPdv, cookie)
                 .then((r) => {
                     arrayProducts = [];
                     arrayProductsFull = []
@@ -264,9 +264,9 @@ function processV1Request(request, response) {
             let myNumber = parameters.number;
             var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
             for (var i = 0; i < myNumber; i++) {
-                fo.hitFO(cookieSession)
+                Fo.hitFO(cookieSession)
                     .then(() => {
-                        fo.addProductBasketFront(actualProduct[1], cookieSession)
+                        Fo.addProductBasketFront(actualProduct[1], cookieSession)
                             .then((r) => {
                                 if (requestSource === googleAssistantRequest) {
                                     sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
@@ -360,9 +360,9 @@ function processV1Request(request, response) {
         },
         'montant.panier': () => {
             var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
-            fo.hitFO(cookieSession)
+            Fo.hitFO(cookieSession)
                 .then(() => {
-                    fo.getRecapPanier(cookieSession)
+                    Fo.getRecapPanier(cookieSession)
                         .then((res) => {
                             let resParsed = JSON.parse(res);
                             if (requestSource === googleAssistantRequest) {
