@@ -18,7 +18,7 @@ console.log("Fo: " + JSON.stringify(fo));
 const Rc = require("./rc_requests");
 var rc = new Rc();
 console.log("Rc: " + JSON.stringify(rc));
-const Other = require("./other_functions.js");
+const Other = require("./other_functions");
 var other = new Other();
 console.log("other: " + JSON.stringify(other));
 

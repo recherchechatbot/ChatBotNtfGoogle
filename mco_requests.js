@@ -3,7 +3,7 @@ const express = require('express');
 const MCO_URL = process.env.MCO_URL;
 
 
-exports.loginMCommerce = function loginMCommerce(email, mdp, idrc) {
+exports.loginMCommerce = function (email, mdp, idrc) {
     return new Promise((resolve, reject) => {
         request({
             url: MCO_URL + 'api/v1/loginRc',
@@ -28,7 +28,7 @@ exports.loginMCommerce = function loginMCommerce(email, mdp, idrc) {
     });
 }
 
-exports.getRecette = function getRecette(product, token) {
+exports.getRecette = function (product, token) {
     let url = "https://wsmcommerce.intermarche.com/api/v1/recherche/recette?mot=" + product;
     console.log("URRRRLL:" + url);
     var options = {
@@ -53,7 +53,7 @@ exports.getRecette = function getRecette(product, token) {
     );
 }
 
-exports.getMcoUserInfo = function getMcoUserInfo(token) {
+exports.getMcoUserInfo = function (token) {
     var options = {
         method: 'GET',
         uri: MCO_URL + "api/v1/clientRc",
@@ -74,7 +74,7 @@ exports.getMcoUserInfo = function getMcoUserInfo(token) {
     })
 }
 
-exports.getNamePdv = function getNamePdv(idPdv) {
+exports.getNamePdv = function (idPdv) {
     var options = {
         method: 'GET',
         uri: MCO_URL + "api/v1/pdv/fiche/" + idPdv,
@@ -92,7 +92,7 @@ exports.getNamePdv = function getNamePdv(idPdv) {
     })
 }
 
-exports.getCreneaux = function getCreneaux(tok) {
+exports.getCreneaux = function (tok) {
     var options = {
         method: 'GET',
         uri: MCO_URL + "api/v1/pdv/creneaux",
@@ -114,7 +114,7 @@ exports.getCreneaux = function getCreneaux(tok) {
     })
 }
 
-exports.emptyBasket = function emptyBasket(token) {
+exports.emptyBasket = function (token) {
     let options = {
         method: "DELETE",
         uri: MCO_URL + "api/v1/client/panier",
