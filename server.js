@@ -108,7 +108,9 @@ myApp.get('/authorize', function (req, res) {
 });
 //Webhook (échange dialogflow-appli par POST)
 myApp.post('/webhook', (request, response) => {
+    console.log('a priori on est dans le webhook');
     var body = JSON.parse(request.body);
+    console.log("le body recuperé dans le webhook: " + JSON.stringify(body));
     if (body) {
         processV1Request(request, response);//Toujours en V1, dialogflow va passer progressivement en V2 (beta pour l'instant), il faudra changer à ce moment là
     } else {
