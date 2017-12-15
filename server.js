@@ -344,7 +344,7 @@ function getAspNetSessionId(email, mdp) {
             if (!error && response.statusCode == 200) {
                 console.log("getAspNetSessionId retourne : " + response.headers['set-cookie']);
 
-                resolve(Other.parseCookies(response.headers['set-cookie'].toString()));
+                resolve(parseCookies(response.headers['set-cookie'].toString()));
             }
             else {
                 console.log("getAspNetSessionId ERREUR" + error);
@@ -660,7 +660,7 @@ function processV1Request(request, response) {
                                             if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].Statut === "Disponible") {
                                                 myIdCreneau = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].IdCreneau;
                                                 if (requestSource === googleAssistantRequest) {
-                                                    sendGoogleResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande le " + dateCreneau.slice(8, 10) + " " + Other.getMonth(dateCreneau.slice(5, 7)) + " entre " + responseChoixCreneau.Drive.CreneauxSemaine[i].HeureDebut + " et " + responseChoixCreneau.Drive.CreneauxSemaine[i].HeureFin);//TODO annulation & recap date et heure
+                                                    sendGoogleResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande le " + dateCreneau.slice(8, 10) + " " + getMonth(dateCreneau.slice(5, 7)) + " entre " + responseChoixCreneau.Drive.CreneauxSemaine[i].HeureDebut + " et " + responseChoixCreneau.Drive.CreneauxSemaine[i].HeureFin);//TODO annulation & recap date et heure
                                                 } else {
                                                     sendResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande \u00E0 ce moment l\u00E0");
                                                 }
