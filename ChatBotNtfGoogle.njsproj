@@ -28,18 +28,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="fo_requests.js">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="mco_requests.js">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="other_functions.js">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="rc_requests.js">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="server.js" />
     <Content Include="views\authoriz.Old.ejs" />
     <Content Include="views\authorize.ejs" />
