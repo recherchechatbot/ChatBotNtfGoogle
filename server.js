@@ -50,7 +50,7 @@ myApp.post('/login', function (req, res) {
     console.log("VALEUR DE BODY : " + JSON.stringify(req.body));
     var authCode = null;
     console.log("resultat.email: " +resultat.email);
-    Rc.loginRC(resultat.email, resultat.mdp)
+    setTimeout(Rc.loginRC(resultat.email, resultat.mdp), 3000);
         .then((rep) => {
             console.log("Res: " + JSON.stringify(rep));
             if (rep.id) {
