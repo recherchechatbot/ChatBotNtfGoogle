@@ -461,12 +461,13 @@ function getMonth(n) {
     return x;
 }
 
-
 /*
    * Function qui gère les requêtes de type V1 de la part de dialogflow
    */
 function processV1Request(request, response) {
+    console.log("on est dans le process de la request dialogflow");
     var body = JSON.parse(request.body);
+    console.log("et voilà le body qu'on reçoit: " + JSON.stringify(body));
     let action = body.result.action; // https://dialogflow.com/docs/actions-and-parameters
     let parameters = body.result.parameters; // https://dialogflow.com/docs/actions-and-parameters
     let inputContexts = body.result.contexts; // https://dialogflow.com/docs/contexts
