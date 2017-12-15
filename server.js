@@ -9,18 +9,6 @@ const bodyParser = require('body-parser');
 const myApp = express();
 
 //Import modules
-const Mco = require("./mco_requests");
-
-console.log("Mco: " + JSON.stringify(Mco));
-const Fo = require('./fo_requests');
-
-console.log("Fo: " + JSON.stringify(Fo));
-const Rc = require("./rc_requests");
-
-console.log("Rc: " + JSON.stringify(Rc));
-const Other = require("./other_functions");
-
-console.log("other: " + JSON.stringify(Other));
 
 //Global Vars
     //Memoire de la derniere recherche
@@ -49,8 +37,7 @@ myApp.post('/login', function (req, res) {
     var resultat = JSONbig.parse(req.body);
     console.log("VALEUR DE BODY : " + JSON.stringify(req.body));
     var authCode = null;
-    console.log("resultat.email: " +resultat.email);
-    setTimeout(Rc.loginRC(resultat.email, resultat.mdp), 3000)
+    Rc.loginRC(resultat.email, resultat.mdp)
         .then((rep) => {
             console.log("Res: " + JSON.stringify(rep));
             if (rep.id) {
@@ -129,6 +116,351 @@ myApp.post('/webhook', (request, response) => {
         return response.status(400).end('Invalid Webhook Request (expecting v1 or v2 webhook request)');
     }
 });
+
+//myFunctions
+//MCO Requests
+function loginMCommerce(email, mdp, idrc) {
+    return new Promise((resolve, reject) => {
+        request({
+            url: MCO_URL + 'api/v1/loginRc',
+            method: 'POST',
+            body: {
+                email: email,
+                motdepasse: mdp,
+                idrc: idrc,
+                veutcartefid: false
+            },
+            json: true
+        }, (error, response) => {
+            if (error) {
+                console.log('Erreur login mcommerce: ', error);
+                reject(error);
+            } else if (response.body.error) {
+                console.log('Error: ', response.body.error);
+                reject(new Error(response.body.error));
+            }
+            resolve(response.body);
+        });
+    });
+}
+
+function getRecette(product, token) {
+    let url = "https://wsmcommerce.intermarche.com/api/v1/recherche/recette?mot=" + product;
+    console.log("URRRRLL:" + url);
+    var options = {
+        method: 'GET',
+        uri: url,
+
+        headers: {
+            'TokenAuthentification': token
+        }
+    };
+    console.log("my Options:" + options);
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statuscode == 200) {
+                resolve(response.body);
+            }
+            else {
+                reject(error);
+            }
+        });
+    }
+    );
+}
+
+function getMcoUserInfo(token) {
+    var options = {
+        method: 'GET',
+        uri: MCO_URL + "api/v1/clientRc",
+        headers: {
+            'TokenAuthentification': token
+        },
+        json: true
+    };
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+                resolve(response.body);
+            } else {
+                console.log('Error while getting Mco user info: ' + error);
+                reject(error);
+            }
+        });
+    })
+}
+
+function getNamePdv(idPdv) {
+    var options = {
+        method: 'GET',
+        uri: MCO_URL + "api/v1/pdv/fiche/" + idPdv,
+        json: true
+    };
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+                resolve(response.body);
+            } else {
+                console.log('Error while getting name PDV: ' + error);
+                reject(error);
+            }
+        });
+    })
+}
+
+function getCreneaux(tok) {
+    var options = {
+        method: 'GET',
+        uri: MCO_URL + "api/v1/pdv/creneaux",
+        headers: {
+            'TokenAuthentification': tok
+        },
+        json: true
+    };
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+                console.log('reponse creneaux' + response.body);
+                resolve(response.body);
+            } else {
+                console.log('Error while getting creneaux ' + error);
+                reject(error);
+            }
+        });
+    })
+}
+
+function emptyBasket(token) {
+    let options = {
+        method: "DELETE",
+        uri: MCO_URL + "api/v1/client/panier",
+        headers: {
+            "TokenAuthentification": token
+        },
+        json: true
+    }
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+                console.log("à priori le panier devrait être vidé");
+                resolve(response.body);
+            } else {
+                console.log("Il y a eu un problème lors du vidage du panier");
+                reject(error);
+            }
+        })
+    })
+}
+
+//FO Requests
+function addProductBasketFront(idProduit, cookie) {
+    return new Promise((resolve, reject) => {
+        request({
+            url: FO_URL + 'Plus',
+            method: 'POST',
+            body: {
+                "idProduit": idProduit,
+                "trackingCode": null,
+                "idSource": null,
+                "idUniversProduitComplementaire": null
+            },
+            headers: {
+                'cookie': cookie
+            },
+            json: true
+        }, (error, response) => {
+            if (error) {
+                console.log('Erreur lors de l\'ajout du panier : ', error);
+                reject(error);
+            } else if (response.body.error) {
+                console.log('Error: ', response.body.error);
+                reject(new Error(response.body.error));
+            }
+            resolve(response.body);
+        });
+
+    });
+}
+
+function hitFO(cookie) {
+    return new Promise((resolve, reject) => {
+        request({
+            url: FO_URL,
+            method: 'GET',
+            headers: {
+                'cookie': cookie
+            }
+        }, (error, response) => {
+            if (error) {
+                reject(error);
+            } else if (response.body.error) {
+                reject(new Error(response.body.error));
+            }
+            console.log("HIT FO OK :");
+            resolve();
+        });
+    });
+}
+
+function getRecapPanier(c) {
+    var options = {
+        method: 'POST',
+        uri: FO_URL + "AfficherPanier",
+        headers: {
+            cookie: c
+        }
+    };
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+                console.log("On est dans le promise, et ya pas d'erreur");
+                resolve(response.body);
+            }
+            else {
+                reject(error);
+            }
+        })
+    });
+}
+
+function getAspNetSessionId(email, mdp) {
+    var options = {
+        method: 'POST',
+        uri: FO_URL + "Connexion",
+        body: {
+            txtEmail: email,
+            txtMotDePasse: mdp,
+            largeur: "800",
+            hauteur: "300",
+            resteConnecte: true,
+        },
+        json: true,
+        headers: {
+            referer: 'http://google.fr'
+        }
+    };
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+                console.log("getAspNetSessionId retourne : " + response.headers['set-cookie']);
+
+                resolve(Other.parseCookies(response.headers['set-cookie'].toString()));
+            }
+            else {
+                console.log("getAspNetSessionId ERREUR" + error);
+                reject(error);
+            }
+        })
+    });
+}
+
+function getProduit(produit, idPdv, c) {
+    var options = {
+        method: 'POST',
+        uri: "https://drive.intermarche.com/RechercheJs",
+        headers: {
+            Cookie: c,
+        },
+        body: {
+            mot: produit
+        },
+        json: true
+    };
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+                resolve(response.body);
+            }
+            else {
+                reject(error);
+            }
+        })
+    })
+}
+
+//RC Requests
+function loginRC(email, mdp) {
+    return new Promise((resolve, reject) => {
+        request({
+            url: RC_URL + 'ReferentielClient/v1/login',
+            method: 'POST',
+            body: {
+                email: email,
+                mdp: mdp
+            },
+            headers: {
+                "Msq-Jeton-App": MSQ_JETON_APP_RC,
+                "Msq-App": MSQ_APP_RC
+            },
+            json: true
+        }, (error, response) => {
+            if (error) {
+                console.log('Erreur login Referentiel Client: ', error);
+                reject(error);
+            } else if (response.body.error) {
+                console.log('Error: ', response.body.error);
+                reject(new Error(response.body.error));
+            }
+
+            resolve(response.body);
+        });
+    });
+
+}
+
+//Other functions
+function parseCookies(cookiesString) {
+    var list = {};
+    cookiesString && cookiesString.split(';').forEach(function (c1) {
+        c1 && c1.split(',').forEach(function (cookie) {
+            var parts = cookie.split('=');
+            list[parts.shift().trim()] = decodeURI(parts.join('='));
+        });
+    });
+    return list;
+}
+
+function getMonth(n) {
+    var x = "";
+    if (n === 1) {
+        x = "Janvier";
+    }
+    else if (n === 2) {
+        x === "F\u00E9vrier";
+    }
+    else if (n === 3) {
+        x === "Mars";
+    }
+    else if (n === 4) {
+        x === "Avril";
+    }
+    else if (n === 5) {
+        x === "Mai";
+    }
+    else if (n === 6) {
+        x === "Juin";
+    }
+    else if (n === 7) {
+        x === "Juillet";
+    }
+    else if (n === 8) {
+        x === "Ao\u00FBt";
+    }
+    else if (n === 9) {
+        x === "Septembre";
+    }
+    else if (n === 10) {
+        x === "Octobre";
+    }
+    else if (n === 11) {
+        x === "Novembre";
+    }
+    else if (n === 12) {
+        x === "D\u00E9cembre";
+    }
+    return x;
+}
+
 
 /*
    * Function qui gère les requêtes de type V1 de la part de dialogflow
