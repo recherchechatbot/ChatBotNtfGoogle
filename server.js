@@ -31,55 +31,19 @@ var responseChoixCreneau = {};
 myApp.use(bodyParser.text({ type: 'application/json' }));
 
 myApp.post('/login', function (req, res) {
-
     var resultat = JSONbig.parse(req.body);
-
-
-
     console.log("VALEUR DE BODY : " + JSON.stringify(req.body));
-
-    //const userLogin = UserStore.get(username);
-    //if (!userLogin || userLogin.password !== password) {
-    //    res.render('authorize', {
-    //        redirectURI,
-    //        username,
-    //        password,
-    //        errorMessage: !userLogin
-    //            ? 'Uh oh. That username doesn’t exist. Please use the demo account or try again.' // eslint-disable-line max-len
-    //            : 'Oops. Incorrect password',
-    //        errorInput: !userLogin ? 'username' : 'password',
-    //    });
-    //} else {
-    //    linkAccountToMessenger(res, userLogin.username, redirectURI);
-    //}
-
     var authCode = null;
-
     loginRC(resultat.email, resultat.mdp)
         .then((rep) => {
-            console.log("REPONSE du RCCCCCCCCCCCCCC");
-            console.log("Res: " + JSON.stringify(rep));
-            console.log("Res.id :" + rep.id);
-
             if (rep.id) {
                 loginMCommerce(resultat.email, resultat.mdp, rep.id)
                     .then((r) => {
-                        console.log("ICIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
-                        console.log("rrrrrrrrrrrrrrrrrrr" + JSON.stringify(r));
-
                         if (r.TokenAuthentification) {
-
                             email = resultat.email;
-
                             myToken = r.TokenAuthentification;
-                            console.log("State dans le login: " + resultat.state);
                             console.log("le token a bien été récupéré");
                             const redirectURISuccess = `${resultat.redirectURI}#access_token=${myToken}&token_type=bearer&state=${resultat.state}`;
-                            console.log("URL DE REDIRECTION: " + redirectURISuccess);
-
-                            console.log("on link le mco " + myToken + " avec l'email " + resultat.email);
-
-
                             getAspNetSessionId(resultat.email, resultat.mdp)
                                 .then((c) => {
                                     ASPSessionId = c["ASP.NET_SessionId"]
@@ -94,8 +58,6 @@ myApp.post('/login', function (req, res) {
                                 .catch(err => {
                                     console.log("impossible de récupérer idpdvfavori, erreur suivante: " + err);
                                 });
-
-
                             return res.json({
                                 EstEnErreur: false,
                                 urlRedirection: redirectURISuccess
@@ -124,39 +86,12 @@ myApp.post('/login', function (req, res) {
                 urlRedirection: ""
             });
         });
-
-
-
-
-
-    /*
-      The auth code can be any thing you can use to uniquely identify a user.
-      Once the redirect below happens, this bot will receive an account link
-      message containing this auth code allowing us to identify the user.
-      NOTE: It is considered best practice to use a unique id instead of
-      something guessable like a users username so that malicious
-      users cannot spoof a link.
-     */
-    //const authCode = uuid();
-
-    // set the messenger id of the user to the authCode.
-    // this will be replaced on successful account link
-    // with the users id.
-
-    // Redirect users to this URI on successful login
-
 });
 myApp.set('view engine', 'ejs');
 myApp.get('/authorize', function (req, res) {
     var accountLinkingToken = req.query.account_linking_token;
     var redirectURI = req.query.redirect_uri;
     var state = req.query.state;
-    console.log("STATE: " + state);
-
-
-
-    // Redirect users to this URI on successful login
-
     res.render('authorize', {
         accountLinkingToken: accountLinkingToken,
         redirectURI: redirectURI,
@@ -165,25 +100,8 @@ myApp.get('/authorize', function (req, res) {
 });
 
 myApp.post('/webhook', (request, response) => {
-
-    //console.log(request);
-    //console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + JSON.stringify(request.body));
-    //if (request.body.result) {
-    //    processV1Request(request, response);
-    //} else if (request.body.queryResult) {
-    //    processV2Request(request, response);
-    //} else {
-    //    console.log('Invalid Request');
-    //    return response.status(400).end('Invalid Webhook Request (expecting v1 or v2 webhook request)');
-    //}
-    console.log("avant toute chose dans le app.post");
     var body = JSON.parse(request.body);
-
-    console.log("On vient de definir le body");
-
     if (body) {
-        console.log("avant toute chose dans le app.post");
-        console.log("A priori le body existe quand on le big parse, le voici: " + JSON.stringify(body));
         processV1Request(request, response);
     } else {
         console.log('Invalid Request');
@@ -191,10 +109,10 @@ myApp.post('/webhook', (request, response) => {
     }
 });
 
+//Login referentiel client, permet de récupérer idRc'
 function loginRC(email, mdp) {
     console.log("Email : " + email);
     console.log("Mdp : " + mdp);
-
     return new Promise((resolve, reject) => {
         request({
             url: RC_URL + 'ReferentielClient/v1/login',
@@ -216,12 +134,11 @@ function loginRC(email, mdp) {
                 console.log('Error: ', response.body.error);
                 reject(new Error(response.body.error));
             }
-
             resolve(response.body);
         });
     });
 }
-
+//Recuperation cookie ASP session ID
 function getAspNetSessionId(email, mdp) {
     var options = {
         method: 'POST',
@@ -238,12 +155,10 @@ function getAspNetSessionId(email, mdp) {
             referer: 'http://google.fr'
         }
     };
-
     return new Promise((resolve, reject) => {
         request(options, (error, response) => {
             if (!error && response.statusCode == 200) {
                 console.log("getAspNetSessionId retourne : " + response.headers['set-cookie']);
-
                 resolve(parseCookies(response.headers['set-cookie'].toString()));
             }
             else {
@@ -253,11 +168,10 @@ function getAspNetSessionId(email, mdp) {
         })
     });
 }
-
+//Recuperation token d'authentification 
 function loginMCommerce(email, mdp, idrc) {
     console.log("Email : " + email);
     console.log("Mdp : " + mdp);
-
     return new Promise((resolve, reject) => {
         request({
             url: MCO_URL + 'api/v1/loginRc',
@@ -277,24 +191,21 @@ function loginMCommerce(email, mdp, idrc) {
                 console.log('Error: ', response.body.error);
                 reject(new Error(response.body.error));
             }
-
             resolve(response.body);
         });
     });
 }
-
+//Recherche recette sur mcommerce (too long pour l'instant pour dialogflow')
 function getRecette(product, token) {
     let url = "https://wsmcommerce.intermarche.com/api/v1/recherche/recette?mot=" + product;
     console.log("URRRRLL:" + url);
     var options = {
         method: 'GET',
         uri: url,
-
         headers: {
             'TokenAuthentification': token
         }
     };
-    console.log("my Options:" + options);
     return new Promise((resolve, reject) => {
         request(options, (error, response) => {
             if (!error && response.statuscode == 200) {
@@ -306,11 +217,9 @@ function getRecette(product, token) {
         });
     }
     );
-
 }
-
+//Recherche produit
 function getProduit(produit, idPdv, c) {
-    console.log("DEBUT getProduit");
     console.log("produit = " + produit);
     var options = {
         method: 'POST',
@@ -323,12 +232,9 @@ function getProduit(produit, idPdv, c) {
         },
         json: true
     };
-    console.log("FIN getProduit");
     return new Promise((resolve, reject) => {
         request(options, (error, response) => {
             if (!error && response.statusCode == 200) {
-                console.log("ON A UN RETOUR 200 !!!!!!!");
-                console.log("voila le body = " + response.body);
                 resolve(response.body);
             }
             else {
@@ -338,9 +244,8 @@ function getProduit(produit, idPdv, c) {
         })
     })
 }
-
+//Recuperation infos utilisateur (nom, prenom, id pdv favori etc...)
 function getMcoUserInfo(token) {
-    console.log("et ici, on rentre?");
     var options = {
         method: 'GET',
         uri: MCO_URL + "api/v1/clientRc",
@@ -349,13 +254,9 @@ function getMcoUserInfo(token) {
         },
         json: true
     };
-    console.log("myOptions" + JSON.stringify(options));
     return new Promise((resolve, reject) => {
-        console.log("dans le promise");
         request(options, (error, response) => {
-            console.log('dans le request');
             if (!error && response.statusCode == 200) {
-                console.log('Mco user info result : ' + response.body);
                 resolve(response.body);
             } else {
                 console.log('Error while getting Mco user info: ' + error);
@@ -364,9 +265,8 @@ function getMcoUserInfo(token) {
         });
     })
 }
-
+//Recuperation nom pdv quand on a juste son id
 function getNamePdv(idPdv) {
-    console.log("on est rentrés dans getNamePdv");
     var options = {
         method: 'GET',
         uri: MCO_URL + "api/v1/pdv/fiche/" + idPdv,
@@ -375,7 +275,6 @@ function getNamePdv(idPdv) {
     return new Promise((resolve, reject) => {
         request(options, (error, response) => {
             if (!error && response.statusCode == 200) {
-                console.log('Fiche PDV ' + response.body);
                 resolve(response.body);
             } else {
                 console.log('Error while getting name PDV: ' + error);
@@ -384,20 +283,18 @@ function getNamePdv(idPdv) {
         });
     })
 }
-
+//Parse les cookies pour les avoir dans un format utilisable
 function parseCookies(cookiesString) {
     var list = {};
-
     cookiesString && cookiesString.split(';').forEach(function (c1) {
         c1 && c1.split(',').forEach(function (cookie) {
             var parts = cookie.split('=');
             list[parts.shift().trim()] = decodeURI(parts.join('='));
         });
     });
-
     return list;
 }
-
+//Ajout panier
 function addProductBasketFront(idProduit, cookie) {
     return new Promise((resolve, reject) => {
         request({
@@ -421,15 +318,11 @@ function addProductBasketFront(idProduit, cookie) {
                 console.log('Error: ', response.body.error);
                 reject(new Error(response.body.error));
             }
-            //console.log("ceci est le body lorsqu'on essaye d'ajouter un truc au panier:" + JSON.stringify(response.body));
             resolve(response.body);
         });
-
     });
-
-
 }
-
+//Hit le front, obligatoire avant toute fonction qui recupere un cookie
 function hitFO(cookie) {
     return new Promise((resolve, reject) => {
         request({
@@ -444,13 +337,11 @@ function hitFO(cookie) {
             } else if (response.body.error) {
                 reject(new Error(response.body.error));
             }
-
-            console.log("HIT FO OK :");
             resolve();
         });
     });
 }
-
+//Recuperation créneaux livraison
 function getCreneaux(tok) {
     var options = {
         method: 'GET',
@@ -514,7 +405,7 @@ function getMonth(n) {
 
     return x;
 }
-
+//Recapitulatif panier
 function getRecapPanier(c) {
     var options = {
         method: 'POST',
@@ -537,7 +428,7 @@ function getRecapPanier(c) {
         })
     });
 }
-
+//Vider panier
 function emptyBasket(token) {
     let options = {
         method: "DELETE",
@@ -596,7 +487,6 @@ function processV1Request(request, response) {
         'recherche.recette': () => {
             let myText = 'Voici quelques recettes pour toi: ';
             console.log("myText:" + myText);
-            //sendResponse("Je fonctionne mais mcommerce c'est lent");
             getRecette('poulet', myToken)
                 .then((r) => {
                     console.log("Resultat de la requete http des recettes: " + r);
