@@ -500,7 +500,6 @@ function processV1Request(request, response) {
                     } else {
                         sendResponse(myText);
                     }
-
                 })
                 .catch((err) => {
                     if (requestSource === googleAssistantRequest) {
@@ -515,7 +514,6 @@ function processV1Request(request, response) {
             let myProduct = parameters.Nourriture;
             let myIdPdv = 1;
             let cookie = 'ASP.NET_SessionId=' + ASPSessionId + ';IdPdv=' + myIdPdv;
-
             getProduit(myProduct, myIdPdv, cookie)
                 .then((r) => {
                     arrayProducts = [];
