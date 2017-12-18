@@ -3,36 +3,22 @@
 const express = require('express');
 const JSONbig = require('json-bigint');
 const request = require('request');
-/*const functions = require('firebase-functions');*/ // Cloud Functions for Firebase library
-const DialogflowApp = require('actions-on-google').DialogflowApp; // Google Assistant helper library
-//exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, response) => {
-//  console.log('Dialogflow Request headers: ' + JSON.stringify(request.headers));
-//  console.log('Dialogflow Request body: ' + JSON.stringify(request.body));
-//  if (request.body.result) {
-//    processV1Request(request, response);
-//  } else if (request.body.queryResult) {
-//    processV2Request(request, response);
-//  } else {
-//    console.log('Invalid Request');
-//    return response.status(400).end('Invalid Webhook Request (expecting v1 or v2 webhook request)');
-//  }
-//});
+const DialogflowApp = require('actions-on-google').DialogflowApp; 
 const REST_PORT = (process.env.PORT || 5000);
 const bodyParser = require('body-parser');
 const myApp = express();
 
 //Memoire de la derniere recherche
-var arrayProducts = [];//array de dim2 avec les strings qu'on veut renvoyer, coupée tous les 5 produits'
-var arrayProductsFull = [];
-//Memoire du dernier groupe de 5 produits renvoyés
-var productIndex = 0;
-var actualProduct = [];
+var arrayProducts = [];//array qui contient les strings qu'on veut renvoyer'
+var arrayProductsFull = [];//[[libelle, id],...]
+var productIndex = 0;//Savoir où on est dans array products
+var actualProduct = [];//produit actuel
 //Config vars, TODO à cacher plus tard
-const MCO_URL = "https://wsmcommerce.intermarche.com/";
-const RC_URL = "https://api-vip-dmz.mousquetaires.com/";
-const FO_URL = "https://drive.intermarche.com/";
-const MSQ_APP_RC = "ecommerce";
-const MSQ_JETON_APP_RC = "9206b4da-b84f-4145-8473-a7b40d5ecd56";
+const MCO_URL = process.env.MCO_URL;
+const RC_URL = process.env.RC_URL;
+const FO_URL = process.env.FO_URL;
+const MSQ_APP_RC = process.env.MSQ_APP_RC;
+const MSQ_JETON_APP_RC = process.env.MSQ_JETON_APP_RC;
 //Vars authentification
 var email = "";
 var mdp = "";
@@ -643,36 +629,7 @@ function processV1Request(request, response) {
             getProduit(myProduct, myIdPdv, cookie)
                 .then((r) => {
                     arrayProducts = [];
-                    arrayProductsFull = []
-                    //Version avec 4 produits:
-                    //  let arrayTemp = [];
-                    //  let myText = 'Voici les produits que je peux te proposer: ';
-                    //  for (var i = 0; i < r.length; i++) {
-                    //      if (arrayTemp.length == 4 && sayProducts(myText).length < 640) {
-                    //          arrayProducts.push(arrayTemp);
-                    //          arrayTemp = [];
-                    //          arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
-                    //          arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
-                    //      }
-                    //      else if (arrayTemp.length == 4 && sayProducts(myText).length >= 640) {
-                    //          let popped = arrayTemps.pop();
-                    //          arrayProducts.push(arrayTemp);
-                    //          arrayTemp = [popped];
-                    //          arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
-                    //          arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
-                    //      }
-                    //      else {                          
-                    //          if (i == (r.length - 1) && arrayTemp.length < 3) {
-                    //            arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
-                    //            arrayProducts.push(arrayTemp);
-                    //            arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
-                    //        }
-                    //          else {
-                    //              arrayTemp.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
-                    //              arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
-                    //        }
-                    //    }
-                    //}
+                    arrayProductsFull = [];
                     var myText = "Je peux te proposer: ";
                     for (var i = 0; i < r.length; i++) {
                         if (r[i].StockEpuise == false) {
