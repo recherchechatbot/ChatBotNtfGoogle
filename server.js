@@ -451,8 +451,6 @@ function emptyBasket(token) {
     })
 }
 
-
-
 /*
 * Function to handle v1 webhook requests from Dialogflow
 */
@@ -536,8 +534,6 @@ function processV1Request(request, response) {
                     }
                     console.log("ERREUR:" + err);
                 })
-
-
         },
         'repeat.produit': () => {
             repeatProducts();
@@ -556,13 +552,9 @@ function processV1Request(request, response) {
                 myChoice = -1;
             }
             selectProduct(myChoice);
-
         },
         'choix.quantite.produit': () => {
-            console.log("on est bien dans le bon onglet \"action\" ")
-
             let myNumber = parameters.number;
-
             var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
             for (var i = 0; i < myNumber; i++) {
                 hitFO(cookieSession)
@@ -592,12 +584,6 @@ function processV1Request(request, response) {
             }
             getNamePdv(idPdvFavori)
                 .then((fichePdv) => {
-                    console.log("A priori on a une réponse puisqu'on est dans le then");
-                    console.log("ma fiche PDV: " + JSON.stringify(fichePdv));
-                    console.log("On veut que ces trois trucs soient defined: ");
-                    console.log("Site: " + fichePdv.Site);
-                    console.log("HorairesLundi: " + fichePdv.HorairesLundi);
-                    console.log("HorairesDimanche: " + fichePdv.HorairesDimanche);
                     if (fichePdv.Site && fichePdv.HorairesLundi && fichePdv.HorairesDimanche) {
                         console.log("on est dans le if youpi");
                         var horairesSemaine = fichePdv.HorairesLundi.replace(/\;/g, "");
@@ -606,68 +592,37 @@ function processV1Request(request, response) {
                         var horairesSemaineFermeture = horairesSemaine.slice(-5);//TODO PEUT ETRE SEPARER LE SAMEDI?
                         console.log("On vient de défnir les horaires de la semaine: " + horairesSemaineOuverture + " a " + horairesSemaineFermeture);
                         var horairesDim = fichePdv.HorairesLundi.replace(/\;/g, "");
-                        console.log("horaires dimanche avec le regex: " + horairesDim);
                         var horairesDimOuverture = horairesDim.slice(0, 5);
                         var horairesDimFermeture = horairesDim.slice(-5);
-                        console.log("On vient de défnir les horaires du dimanche: " + horairesDimOuverture + " a " + horairesDimFermeture);
                         var namePdvFavori = fichePdv.Site;
                         if (requestSource === googleAssistantRequest) {
-                            console.log("oN EST DANS LE IF GOOGLE");
-                            console.log("Voici toutes les choses qui doivent être définies: ");
-                            console.log("sexe: " + sexe);
-                            console.log("nomFamille: " + nomFamille);
-                            console.log("namePdvFavori: " + namePdvFavori);
                             sendGoogleResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture + ' et le Dimanche de ' + horairesDimOuverture + " a " + horairesDimFermeture);
                         } else {
-                            console.log("oN EST DANS LE IF  NON GOOGLE");
-                            console.log("Voici toutes les choses qui doivent être définies: ");
-                            console.log("sexe: " + sexe);
-                            console.log("nomFamille: " + nomFamille);
-                            console.log("namePdvFavori: " + namePdvFavori);
-                            console.log("horairesSemaine: " + horairesSemaine);
-                            console.log("horairesDimanche: " + HorairesDimanche);
                             sendResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture + ' et le Dimanche de ' + horairesDimOuverture + " a " + horairesDimFermeture);
                         }
                     }
-
                 })
                 .catch(err => {
                     console.log("Impossible de recuperer le nom du PDV");
                 })
         },
         'choix.creneau': () => {
-            //On récupère les créneaux dès la connexion pour l'instant parce que sinon trop long après (timeout maxi de 5s entre le moment ou dialogflow envoie quelque chose au webhook et ou il recoit la réponse, malheureusement heroku met trop de temps, TODO à CHANGER QUAND MEILLEURE SOLUTION D'HEBERGEMENT DE l'APP)'
             getCreneaux(myToken)
                 .then((responseChoixCreneau) => {
-                    console.log("my Choix Creneau: " + JSON.stringify(responseChoixCreneau));
-                    console.log("on est dans choix creneau, voila le body dans lequel on tape: " + responseChoixCreneau);
                     if (responseChoixCreneau) {
                         if (parameters.date && parameters.time) {
                             let heure = parameters.time.slice(0, -3);//Met heure de type 00:00:00 en format 00h00
-                            console.log("heure avant: " + heure);
                             heure = parseFloat(heure);
-                            console.log("HEURE  APRES" + heure);
                             let leni = responseChoixCreneau.Drive.CreneauxSemaine.length;
-                            console.log("ON A PASSE LA PREMIERE MENTION DE responseChoixCreneau, voilà leni: " + leni);
                             for (var i = 0; i < leni; i++) {
-                                console.log("ON RENTRE DANS LE FOR, itération numéro : " + i);
                                 let lenj = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires.length;
-                                console.log("voilà lenj: " + lenj);
                                 let truncHeureFin = parseFloat(responseChoixCreneau.Drive.CreneauxSemaine[i].HeureFin);
-                                console.log("ce quon compare avec heure: " + truncHeureFin);
                                 if (truncHeureFin == heure) {
-                                    console.log("ON RENTRE DANS LE PREMIER IF");
                                     for (var j = 0; j < lenj; j++) {
-                                        console.log("on RENTRE DANS LE DEUXIEME FOR, itération numero: " + j);
                                         let dateCreneau = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].DateCreneau;
-                                        console.log("Date creneau en question: " + dateCreneau);
                                         if (dateCreneau.startsWith(parameters.date)) {
-                                            console.log("ON RENTRE DANS LE DEUXIEME IF");
-                                            console.log("statut en question: " + responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].Statut);
                                             if (responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].Statut === "Disponible") {
-                                                console.log("ON RENTRE DANS LE TROISIEME IF");
                                                 myIdCreneau = responseChoixCreneau.Drive.CreneauxSemaine[i].CreneauxHoraires[j].IdCreneau;
-                                                console.log("Voici mon ID CRENEAU: " + myIdCreneau);
                                                 if (requestSource === googleAssistantRequest) {
                                                     sendGoogleResponse("C'est not\u00E9, tu pourras donc aller chercher ta commande le " + dateCreneau.slice(8, 10) + " " + getMonth(dateCreneau.slice(5, 7)) + " entre " + responseChoixCreneau.Drive.CreneauxSemaine[i].HeureDebut + " et " + responseChoixCreneau.Drive.CreneauxSemaine[i].HeureFin);//TODO annulation & recap date et heure
                                                 } else {
@@ -681,11 +636,11 @@ function processV1Request(request, response) {
                                                 }
                                             }
                                         } else {
-                                            console.log("PROBLEME DE COMPARAISON DE DATE");
+                                            console.log("ERREUR COMPARAISON DE DATE");
                                         }
                                     }
                                 } else {
-                                    console.log("PROBLEME DE COMPARAISON DHEURE");
+                                    console.log("ERREUR COMPARAISON DHEURE");
                                 }
                             }
                         }
@@ -697,42 +652,33 @@ function processV1Request(request, response) {
                             sendResponseFollowUp("Oups, je n'ai pas r\u00E9ussi");
                         }
                     }
-
                 })
             //TO DO, séparer si l'utilisateur met seulement un jour ou seulement une heure'
 
         },
-
         'montant.panier': () => {
             var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
-            console.log("Ceci est mon cookiesession pour le montant panier: " + cookieSession);
             hitFO(cookieSession)
                 .then(() => {
                     getRecapPanier(cookieSession)
                         .then((res) => {
                             let resParsed = JSON.parse(res);
-                            console.log("constate le body qu'on recoit: " + JSON.stringify(res));
                             if (requestSource === googleAssistantRequest) {
-                                console.log("On est actuellement dans le if google");
                                 sendGoogleResponse("Le montant total de ton panier s\'\u00E9l\u00E8ve \u00E0 " + resParsed.Total);
                             } else {
-                                console.log("On est actuellement dans le if qui est pas google");
                                 sendResponse("Le montant total de ton panier s\'\u00E9l\u00E8ve \u00E0 " + resParsed.Total);
                             }
 
                         })
                 })
-
         },
 
         'vider.panier.confirmation': () => {
             emptyBasket(myToken)
                 .then((r) => {
                     if (requestSource === googleAssistantRequest) {
-                        console.log("Le panier a bien été vidé");
                         sendGoogleResponse("Le panier a bien été vidé");
                     } else {
-                        console.log("Le panier a bien été vidé");
                         sendResponse("Le panier a bien été vidé");
                     }
                 })
@@ -834,6 +780,7 @@ function processV1Request(request, response) {
             response.json(responseJson); // Send response to Dialogflow
         }
     };
+    //Fonctions pour se balader dans l'array products'
     function repeatProducts() {
         let myText = "Pas de probleme, je r\u00E9p\u00E8te: "
         //pas besoin de if car on l'appelle que quand on déclenche un intent qui doit obligatoirement suivre la recherche produits
@@ -843,8 +790,6 @@ function processV1Request(request, response) {
     function nextProducts() {
         productIndex += 1;
         if (arrayProducts[productIndex]) {
-            //Version 4 produits
-            //let myText = "Voici les produits suivants: ";
             let myText = "Voici le produit suivant: ";
             sayProducts(myText);
         }
@@ -857,7 +802,6 @@ function processV1Request(request, response) {
             }
         }
     }
-
 
     function previousProducts() {
         productIndex -= 1;
@@ -872,34 +816,14 @@ function processV1Request(request, response) {
     }
 
     function sayProducts(text) {
-        //Version 4 produits
-        //if (arrayProducts[productIndex]) {
-        //    for (var i = 0; i < arrayProducts[productIndex].length; i++) {
-        //        text = text + arrayProducts[productIndex][i];
-        //    }
-
-        //    if (requestSource === googleAssistantRequest) {
-        //        sendGoogleResponse(text);
-        //    } else {
-        //        sendResponse(text);
-        //    }
-        //}
         if (arrayProducts) {
             text = text + arrayProducts[productIndex];
             sendResponse(text);
         }
-
         return text;
     }
 
     function selectProduct(number) {
-        //Version 4 produits
-        //if (requestSource === googleAssistantRequest) {
-        //    sendGoogleResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[(number - 1)][0] + ". C'est bien cela? Si oui combien en veux-tu?");
-        //} else {
-        //    sendResponse("Tu as choisi le num\u00E9ro: " + arrayProductsFull[(number - 1)][0] + ". C'est bien cela? Si oui combien en veux-tu?");
-        //}
-        //actualProduct = arrayProductsFull[(number - 1)];// produit actuel pour pouvoir le citer après
         if (number == -1) {
             if (requestSource === googleAssistantRequest) {
                 sendGoogleResponse("Tu as choisi " + arrayProductsFull[productIndex][0] + ". C'est bien cela? Si oui combien en veux-tu?");
@@ -1006,20 +930,6 @@ function processV2Request(request, response) {
             // Use the Actions on Google lib to respond to Google requests; for other requests use JSON
             sendResponse('I\'m having trouble, can you try that again?'); // Send simple response to user
         },
-        //'recherche.recette':()=>{
-        //    let myText='Voici quelques recettes pour toi: ';
-        //    console.log("myText:"+ myText);
-        //    getRecette('poulet','32e88d45-0f1a-4d39-b35b-a8469da5ad10')
-        //    .then((r)=>{
-        //        let listeRecettes=JSON.parse(r);
-        //        let len=listeRecettes.Recettes.length;
-        //        for (var i=0;i<len;i++){
-        //            myText=myText + listeRecettes.Recettes[i].Titre + ' ';
-        //        }
-        //        sendResponse(myText);
-        //    });
-
-        //},
         // Default handler for unknown or undefined actions
         'default': () => {
             let responseToUser = {
