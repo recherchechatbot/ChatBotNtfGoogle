@@ -108,7 +108,6 @@ myApp.post('/webhook', (request, response) => {
         return response.status(400).end('Invalid Webhook Request (expecting v1 or v2 webhook request)');
     }
 });
-
 //Login referentiel client, permet de récupérer idRc'
 function loginRC(email, mdp) {
     console.log("Email : " + email);
