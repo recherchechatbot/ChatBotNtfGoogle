@@ -824,6 +824,7 @@ function processV1Request(request, response) {
 
     function selectProduct(number) {
         if (number == -1) {
+            console.log("c'est bieng");
             if (requestSource === googleAssistantRequest) {
                 sendGoogleResponse("Tu as choisi " + arrayProductsFull[productIndex][0] + ". C'est bien cela? Si oui combien en veux-tu?");
             } else {
@@ -831,6 +832,7 @@ function processV1Request(request, response) {
             }
             actualProduct = arrayProductsFull[productIndex];// produit actuel pour pouvoir le citer après
         } else {
+            console.log("c'est pas bieng");
             if (requestSource === googleAssistantRequest) {
                 sendGoogleResponse("Tu as choisi " + arrayProductsFull[number - 1][0] + ". C'est bien cela? Si oui combien en veux-tu?");
             } else {
