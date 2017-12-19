@@ -1025,3 +1025,4 @@ const richResponsesV2 = [
 myApp.listen(REST_PORT, () => {
     console.log('Rest service ready on port ' + REST_PORT);
 });
+//bonjour
