@@ -546,7 +546,7 @@ function processV1Request(request, response) {
         'choix.produit': () => {
             console.log("my parameter number: " + parameters.number);
             let myChoice = 0;
-            if (parameters.number = 1) {
+            if (parameters.number >= 1) {
                 myChoice = parameters.number;
             } else {
                 myChoice = -1;
