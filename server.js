@@ -10,7 +10,7 @@ const myApp = express();
 
 //Memoire de la derniere recherche
 var arrayProducts = [];//array qui contient les strings qu'on veut renvoyer'
-var arrayProductsFull = [];//[[libelle, id],...]
+var arrayProductsFull = [];//[[libelle, id, stock],...]
 var productIndex = 0;//Savoir où on est dans array products
 var actualProduct = [];//produit actuel
 //Config vars, TODO à cacher plus tard
@@ -520,7 +520,7 @@ function processV1Request(request, response) {
                     for (var i = 0; i < r.length; i++) {
                         if (r[i].StockEpuise == false) {
                             arrayProducts.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
-                            arrayProductsFull.push([r[i].Libelle, r[i].IdProduit]);
+                            arrayProductsFull.push([r[i].Libelle, r[i].IdProduit, r[i].Stock]);
                         }
                     }
                     sayProducts(myText);
@@ -556,19 +556,29 @@ function processV1Request(request, response) {
         'choix.quantite.produit': () => {
             let myNumber = parameters.number;
             var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
-            for (var i = 0; i < myNumber; i++) {
-                hitFO(cookieSession)
-                    .then(() => {
-                        addProductBasketFront(actualProduct[1], cookieSession)
-                            .then((r) => {
-                                if (requestSource === googleAssistantRequest) {
-                                    sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
-                                } else {
-                                    sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
-                                }
-                            })
-                    })
+            if (actualProduct[2] > myNumber) {
+                for (var i = 0; i < myNumber; i++) {
+                    hitFO(cookieSession)
+                        .then(() => {
+                            addProductBasketFront(actualProduct[1], cookieSession)
+                                .then((r) => {
+                                    if (requestSource === googleAssistantRequest) {
+                                        sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
+                                    } else {
+                                        sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
+                                    }
+                                })
+                        })
+                }
+            } 
+            else {
+                if (requestSource === googleAssistantRequest) {
+                    sendGoogleResponse('Désolé il ne me reste que ' + actualProduct[2] + ' ' + actualProduct[0] + ' en stock, cela vous va?');//TODO suite
+                } else {
+                    sendResponse('Désolé il ne me reste que ' + actualProduct[2] + ' ' + actualProduct[0] + ' en stock, cela vous va?');
+                }
             }
+            
         },
         'horaires.pdv': () => {
             console.log("MYUSER INFOS:" + userInfos);
