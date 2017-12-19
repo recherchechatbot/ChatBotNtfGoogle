@@ -508,6 +508,7 @@ function processV1Request(request, response) {
                 })
         },
         'recherche.produit': () => {
+            productIndex = 0;
             let myProduct = parameters.Nourriture;
             let myIdPdv = 1;
             let cookie = 'ASP.NET_SessionId=' + ASPSessionId + ';IdPdv=' + myIdPdv;
@@ -523,7 +524,6 @@ function processV1Request(request, response) {
                         }
                     }
                     sayProducts(myText);
-                    productIndex = 0;
                 })
                 .catch((err) => {
                     if (requestSource === googleAssistantRequest) {
@@ -1025,4 +1025,3 @@ const richResponsesV2 = [
 myApp.listen(REST_PORT, () => {
     console.log('Rest service ready on port ' + REST_PORT);
 });
-//bonjour
