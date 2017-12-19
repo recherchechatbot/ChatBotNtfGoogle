@@ -544,6 +544,7 @@ function processV1Request(request, response) {
             previousProducts();
         },
         'choix.produit': () => {
+            console.log("my parameter number: " + parameters.number);
             let myChoice = 0;
             if (parameters.number = 1) {
                 myChoice = parameters.number;
