@@ -583,16 +583,13 @@ function processV1Request(request, response) {
             }
         },
         'choix.quantite.produit.outofstock': () => {
-            console.log("indicateur: " + indicateurOutOfStock);
             if (indicateurOutOfStock < 1) {
-                console.log("c'est pas bien");
                 if (requestSource === googleAssistantRequest) {
                     sendGoogleResponse("Ne t\'inquiète pas c'est déjà fait. As-tu besoin de quelque chose d'autre?");
                 } else {
                     sendResponse("Ne t\'inquiète pas c'est déjà fait. As-tu besoin de quelque chose d'autre?");
                 }
             } else {
-                console.log("c'est bien");
             let myNumber = parameters.number;
             var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
                 indicateurOutOfStock = 0;
@@ -608,11 +605,6 @@ function processV1Request(request, response) {
                                     }
                                 })
                         })
-                }
-                if (requestSource === googleAssistantRequest) {
-                    sendGoogleResponse("Ne t\'inquiète pas c'est déjà fait. As-tu besoin de quelque chose d'autre?");
-                } else {
-                    sendResponse("Ne t\'inquiète pas c'est déjà fait. As-tu besoin de quelque chose d'autre?");
                 }
             }
         },
