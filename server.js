@@ -783,7 +783,15 @@ function processV1Request(request, response) {
     }
     function endGoogleSession(responseToUser) {
         if (typeof responseToUser === 'string') {
-            app.ask(responseToUser); // Google Assistant response
+            let googleResponse = {
+                "speech": responseToUser,
+                "data": {
+                    "google": {
+                        "expect_user_response": false
+                    }
+                }
+            }
+            app.ask(googleResponse);    
         } else {
             // If speech or displayText is defined use it to respond
             let googleResponse = app.buildRichResponse().addSimpleResponse({
