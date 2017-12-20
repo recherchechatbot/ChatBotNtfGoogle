@@ -783,7 +783,7 @@ function processV1Request(request, response) {
     }
     function endGoogleSession(responseToUser) {
         if (typeof responseToUser === 'string') {
-            console.log("on est au bon endroit")
+            console.log("on est au bon endroit");
             let googleResponse = app.buildRichResponse().addSimpleResponse({
                 speech: responseToUser,
                 displayText: responseToUser,
@@ -793,6 +793,7 @@ function processV1Request(request, response) {
                     }
                 }
             });
+            console.log("le json qu'on envoie :" + googleResponse);
             app.ask(googleResponse);    
         } else {
             // If speech or displayText is defined use it to respond
@@ -928,6 +929,7 @@ function processV1Request(request, response) {
 }
 // Construct rich response for Google Assistant (v1 requests only)
 const app = new DialogflowApp();
+console.log("PAR ICIIIIIIIIIII: " + app);
 const googleRichResponse = app.buildRichResponse()
     .addSimpleResponse('This is the first simple response for Google Assistant')
     .addSuggestions(
