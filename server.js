@@ -799,12 +799,7 @@ function processV1Request(request, response) {
             // If speech or displayText is defined use it to respond
             let googleResponse = app.buildRichResponse().addSimpleResponse({
                 speech: responseToUser.speech || responseToUser.displayText,
-                displayText: responseToUser.displayText || responseToUser.speech,
-                data: {
-                    google: {
-                        expect_user_response: false
-                    }
-                }
+                displayText: responseToUser.displayText || responseToUser.speech
             });
             // Optional: Overwrite previous response with rich response
             if (responseToUser.googleRichResponse) {
