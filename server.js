@@ -583,7 +583,8 @@ function processV1Request(request, response) {
             }
         },
         'choix.quantite.produit.outofstock': () => {
-            if (indicateurOutOfStock == 0) {
+            console.log("indicateur: " + indicateurOutOfStock);
+            if (indicateurOutOfStock === 0) {
                 if (requestSource === googleAssistantRequest) {
                     sendGoogleResponse("Ne t\'inquiète pas c'est déjà fait. As-tu besoin de quelque chose d'autre?");
                 } else {
