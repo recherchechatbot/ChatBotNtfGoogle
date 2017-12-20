@@ -794,7 +794,7 @@ function processV1Request(request, response) {
             googleResponse.data.google.expect_user_response = false;
             
             console.log("le json qu'on envoie :" + JSON.stringify(googleResponse));
-            app.ask(googleResponse);    
+            response.json(googleResponse);    
         } else {
             // If speech or displayText is defined use it to respond
             let googleResponse = app.buildRichResponse().addSimpleResponse({
