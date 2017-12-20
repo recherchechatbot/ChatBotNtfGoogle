@@ -462,8 +462,8 @@ function processV1Request(request, response) {
     let requestSource = (body.originalRequest) ? body.originalRequest.source : undefined;
     const googleAssistantRequest = 'google'; // Constant to identify Google Assistant requests
     const app = new DialogflowApp({ request: request, response: response });
-    console.log("ou laaaaaaaaaaaaaaaaa:" + JSON.stringify(app));
-    console.log("ICIIIIIIIIIIIIIIII: " + JSON.stringify(app.ask));
+    console.log("ou laaaaaaaaaaaaaaaaa:" + app);
+    console.log("ICIIIIIIIIIIIIIIII: " + app.ask);
     // Create handlers for Dialogflow actions as well as a 'default' handler
     const actionHandlers = {
         // The default welcome intent has been matched, welcome the user (https://dialogflow.com/docs/events#default_welcome_intent)
