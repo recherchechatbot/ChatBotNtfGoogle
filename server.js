@@ -786,15 +786,11 @@ function processV1Request(request, response) {
     function endGoogleSession(responseToUser) {
         if (typeof responseToUser === 'string') {
             console.log("on est au bon endroit");
-            let googleResponse = {
-                speech: responseToUser,
-                displayText: responseToUser,
-                data: {
-                    google: {
-                        expect_user_response: false
-                    }
-                }
-            };
+            let googleResponse = {}
+            googleResponse.speech = responseToUser;
+            googleResponse.displayText = responseToUser;
+            googleResponse.data.google.expect_user_response = false;
+            
             console.log("le json qu'on envoie :" + googleResponse);
             app.ask(googleResponse);    
         } else {
