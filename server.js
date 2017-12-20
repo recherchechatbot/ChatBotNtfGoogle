@@ -803,8 +803,8 @@ function processV1Request(request, response) {
     //    }
     //}
     function basicCard(responseToUser) {
-        const app = new ActionsSdkApp({ request, response });
-        app.ask(app.buildRichResponse()
+        const app2 = new DialogflowApp();
+        app2.ask(app2.buildRichResponse()
             // Create a basic card and add it to the rich response
             .addSimpleResponse(responseToUser.simpleResponse)
             .addBasicCard(app.buildBasicCard(responseToUser.cardElements.text)
