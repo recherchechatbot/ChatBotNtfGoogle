@@ -10,7 +10,7 @@ const myApp = express();
 
 //Memoire de la derniere recherche
 var arrayProducts = [];//array qui contient les strings qu'on veut renvoyer'
-var arrayProductsFull = [];//[[libelle, id, stock],...]
+var arrayProductsFull = [];//[[libelle, id, stock,image],...]
 var productIndex = 0;//Savoir où on est dans array products
 var actualProduct = [];//produit actuel
 var indicateurOutOfStock = 0;//indicateur séparateur de l'intent de confirmation de produit'
@@ -523,7 +523,7 @@ function processV1Request(request, response) {
                     for (var i = 0; i < r.length; i++) {
                         if (r[i].StockEpuise == false) {
                             arrayProducts.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
-                            arrayProductsFull.push([r[i].Libelle, r[i].IdProduit, r[i].Stock]);
+                            arrayProductsFull.push([r[i].Libelle, r[i].IdProduit, r[i].Stock,r[i].NomImage]);
                         }
                     }
                     sayProducts(myText);
@@ -783,35 +783,36 @@ function processV1Request(request, response) {
             app.ask(googleResponse); // Send response to Dialogflow and Google Assistant
         }
     }
+    //Uniquement pour mon intent de fin
     function endGoogleSession(responseToUser) {
-        if (typeof responseToUser === 'string') {
-            console.log("on est au bon endroit");
-            let googleResponse = {}
-            googleResponse.speech = responseToUser;
-            googleResponse.displayText = responseToUser;
-            googleResponse.data = {};
-            googleResponse.data.google = {};
-            googleResponse.data.google.expect_user_response = false;
-            
-            console.log("le json qu'on envoie :" + JSON.stringify(googleResponse));
-            response.json(googleResponse);    
-        } else {
-            // If speech or displayText is defined use it to respond
-            let googleResponse = app.buildRichResponse().addSimpleResponse({
-                speech: responseToUser.speech || responseToUser.displayText,
-                displayText: responseToUser.displayText || responseToUser.speech
-            });
-            // Optional: Overwrite previous response with rich response
-            if (responseToUser.googleRichResponse) {
-                googleResponse = responseToUser.googleRichResponse;
-            }
-            // Optional: add contexts (https://dialogflow.com/docs/contexts)
-            if (responseToUser.googleOutputContexts) {
-                app.setContext(...responseToUser.googleOutputContexts);
-            }
-            console.log('Response to Dialogflow (AoG): ' + JSON.stringify(googleResponse));
-            app.ask(googleResponse); // Send response to Dialogflow and Google Assistant
-        }
+        let googleResponse = {}
+        googleResponse.speech = responseToUser;
+        googleResponse.displayText = responseToUser;
+        googleResponse.data = {};
+        googleResponse.data.google = {};
+        googleResponse.data.google.expect_user_response = false;
+        response.json(googleResponse);
+    }
+    //Envoi de carte. Prend un JSON en argument de la forme suivante: 
+    //{
+    //    simpleResponse: "myText",//Le texte qui sera lu par l'assitant'
+    //    cardElements: {
+    //        title: "myTitle",
+    //        text:"myTextInsideTheCard",
+    //        image:"myImageUrl"
+    //    }
+    //}
+    function basicCard(responseToUser) {
+        const app = new ActionsSdkApp({ request, response });
+        app.ask(app.buildRichResponse()
+            // Create a basic card and add it to the rich response
+            .addSimpleResponse(responseToUser.simpleResponse)
+            .addBasicCard(app.buildBasicCard(responseToUser.cardElements.text)
+                .setTitle(responseToUser.cardElements.title)
+                .setImage(responseToUser.cardElements.image)
+                .setImageDisplay('CROPPED')
+            )
+        );
     }
     // Function to send correctly formatted responses to Dialogflow which are then sent to the user
     function sendResponse(responseToUser) {
@@ -897,14 +898,19 @@ function processV1Request(request, response) {
     function sayProducts(text) {
         if (arrayProducts) {
             text = text + arrayProducts[productIndex];
-            sendResponse(text);
+            let myJson = {};
+            myJson.simpleResponse = text;
+            myJson.cardElements = {};
+            myJson.cardElements.title = arrayProductsFull[productIndex][0];
+            myJson.cardElements.text = text;
+            myJson.cardElements.image = arrayProductsFull[productIndex][3]
+            basicCard(myJson);
         }
         return text;
     }
 
     function selectProduct(number) {
         if (number == -1) {
-            console.log("c'est bieng");
             if (requestSource === googleAssistantRequest) {
                 sendGoogleResponse("Tu as choisi " + arrayProductsFull[productIndex][0] + ". C'est bien cela? Si oui combien en veux-tu?");
             } else {
@@ -912,7 +918,6 @@ function processV1Request(request, response) {
             }
             actualProduct = arrayProductsFull[productIndex];// produit actuel pour pouvoir le citer après
         } else {
-            console.log("c'est pas bieng");
             if (requestSource === googleAssistantRequest) {
                 sendGoogleResponse("Tu as choisi " + arrayProductsFull[number - 1][0] + ". C'est bien cela? Si oui combien en veux-tu?");
             } else {
