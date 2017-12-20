@@ -929,7 +929,7 @@ function processV1Request(request, response) {
 }
 // Construct rich response for Google Assistant (v1 requests only)
 const app = new DialogflowApp();
-console.log("PAR ICIIIIIIIIIII: " + app);
+console.log("PAR ICIIIIIIIIIII: " + JSON.stringify(app));
 const googleRichResponse = app.buildRichResponse()
     .addSimpleResponse('This is the first simple response for Google Assistant')
     .addSuggestions(
