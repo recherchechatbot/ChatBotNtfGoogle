@@ -454,6 +454,7 @@ function emptyBasket(token) {
 * Function to handle v1 webhook requests from Dialogflow
 */
 function processV1Request(request, response) {
+    var indicateurOutOfStock = 0;
     var body = JSON.parse(request.body);
     let action = body.result.action; // https://dialogflow.com/docs/actions-and-parameters
     let parameters = body.result.parameters; // https://dialogflow.com/docs/actions-and-parameters
@@ -557,6 +558,7 @@ function processV1Request(request, response) {
             let myNumber = parameters.number;
             var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
             if (actualProduct[2] > myNumber) {
+                indicateurOutOfStock = 0;
                 for (var i = 0; i < myNumber; i++) {
                     hitFO(cookieSession)
                         .then(() => {
@@ -572,13 +574,44 @@ function processV1Request(request, response) {
                 }
             } 
             else {
+                indicateurOutOfStock = 1;
                 if (requestSource === googleAssistantRequest) {
-                    sendGoogleResponse('Désolé il ne me reste que ' + actualProduct[2] + ' ' + actualProduct[0] + ' en stock, cela vous va?');//TODO suite
+                    sendGoogleResponse('Désolé il ne me reste que ' + actualProduct[2] + ' ' + actualProduct[0] + ' en stock, combien en veux-tu?');
                 } else {
-                    sendResponse('Désolé il ne me reste que ' + actualProduct[2] + ' ' + actualProduct[0] + ' en stock, cela vous va?');
+                    sendResponse('Désolé il ne me reste que ' + actualProduct[2] + ' ' + actualProduct[0] + ' en stock, combien en veux-tu?');
                 }
             }
-            
+        },
+        'choix.quantite.produit.outofstock': () => {
+            if (indicateurOutOfStock == 0) {
+                if (requestSource === googleAssistantRequest) {
+                    sendGoogleResponse("Ne t\'inquiète pas c'est déjà fait. As-tu besoin de quelque chose d'autre?");
+                } else {
+                    sendResponse("Ne t\'inquiète pas c'est déjà fait. As-tu besoin de quelque chose d'autre?");
+                }
+            } else {
+            let myNumber = parameters.number;
+            var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
+                indicateurOutOfStock = 0;
+                for (var i = 0; i < myNumber; i++) {
+                    hitFO(cookieSession)
+                        .then(() => {
+                            addProductBasketFront(actualProduct[1], cookieSession)
+                                .then((r) => {
+                                    if (requestSource === googleAssistantRequest) {
+                                        sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
+                                    } else {
+                                        sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
+                                    }
+                                })
+                        })
+                }
+                if (requestSource === googleAssistantRequest) {
+                    sendGoogleResponse("Ne t\'inquiète pas c'est déjà fait. As-tu besoin de quelque chose d'autre?");
+                } else {
+                    sendResponse("Ne t\'inquiète pas c'est déjà fait. As-tu besoin de quelque chose d'autre?");
+                }
+            }
         },
         'horaires.pdv': () => {
             console.log("MYUSER INFOS:" + userInfos);
