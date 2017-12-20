@@ -783,11 +783,12 @@ function processV1Request(request, response) {
     }
     function endGoogleSession(responseToUser) {
         if (typeof responseToUser === 'string') {
+            console.log("on est au bon endroit")
             let googleResponse = {
-                "speech": responseToUser,
-                "data": {
-                    "google": {
-                        "expect_user_response": false
+                speech: responseToUser,
+                data: {
+                    google: {
+                        expect_user_response: false
                     }
                 }
             }
