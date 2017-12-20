@@ -722,10 +722,13 @@ function processV1Request(request, response) {
                 })
         },
         'goodbye': () => {
+            console.log("dans le bon action");
             if (requestSource === googleAssistantRequest) {
-                sendGoogleResponse("Au revoir " + userInfos.AdresseDeFacturation.Prenom + ", à bientôt !");
+                endGoogleSession("Au revoir " + userInfos.AdresseDeFacturation.Prenom + ", à bientôt !");
+                console.log("dans google");
             } else {
                 sendResponse("Au revoir " + userInfos.AdresseDeFacturation.Prenom + ", à bientôt !");
+                console.log("pas dans google");
             }
         },
         // Default handler for unknown or undefined actions
