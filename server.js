@@ -786,7 +786,7 @@ function processV1Request(request, response) {
     function endGoogleSession(responseToUser) {
         if (typeof responseToUser === 'string') {
             console.log("on est au bon endroit");
-            let googleResponse = app.buildRichResponse().addSimpleResponse({
+            let googleResponse = {
                 speech: responseToUser,
                 displayText: responseToUser,
                 data: {
@@ -794,7 +794,7 @@ function processV1Request(request, response) {
                         expect_user_response: false
                     }
                 }
-            });
+            };
             console.log("le json qu'on envoie :" + googleResponse);
             app.ask(googleResponse);    
         } else {
