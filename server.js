@@ -13,6 +13,7 @@ var arrayProducts = [];//array qui contient les strings qu'on veut renvoyer'
 var arrayProductsFull = [];//[[libelle, id, stock],...]
 var productIndex = 0;//Savoir où on est dans array products
 var actualProduct = [];//produit actuel
+var indicateurOutOfStock = 0;//indicateur séparateur de l'intent de confirmation de produit'
 //Config vars, TODO à cacher plus tard
 const MCO_URL = process.env.MCO_URL;
 const RC_URL = process.env.RC_URL;
@@ -454,7 +455,6 @@ function emptyBasket(token) {
 * Function to handle v1 webhook requests from Dialogflow
 */
 function processV1Request(request, response) {
-    var indicateurOutOfStock = 0;
     var body = JSON.parse(request.body);
     let action = body.result.action; // https://dialogflow.com/docs/actions-and-parameters
     let parameters = body.result.parameters; // https://dialogflow.com/docs/actions-and-parameters
@@ -728,9 +728,9 @@ function processV1Request(request, response) {
         },
         'goodbye': () => {
             if (requestSource === googleAssistantRequest) {
-                sendGoogleResponse("Au revoir " + userInfos.prenom + ", à bientôt !");
+                sendGoogleResponse("Au revoir " + userInfos.AdresseDeFacturation.Prenom + ", à bientôt !");
             } else {
-                sendResponse("Au revoir " + userInfos.prenom + ", à bientôt !");
+                sendResponse("Au revoir " + userInfos.AdresseDeFacturation.Prenom + ", à bientôt !");
             }
         },
         // Default handler for unknown or undefined actions
