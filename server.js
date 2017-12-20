@@ -784,14 +784,15 @@ function processV1Request(request, response) {
     function endGoogleSession(responseToUser) {
         if (typeof responseToUser === 'string') {
             console.log("on est au bon endroit")
-            let googleResponse = {
+            let googleResponse = app.buildRichResponse().addSimpleResponse({
                 speech: responseToUser,
+                displayText: responseToUser,
                 data: {
                     google: {
                         expect_user_response: false
                     }
                 }
-            }
+            });
             app.ask(googleResponse);    
         } else {
             // If speech or displayText is defined use it to respond
