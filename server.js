@@ -790,7 +790,8 @@ function processV1Request(request, response) {
             googleResponse.speech = responseToUser;
             googleResponse.displayText = responseToUser;
             googleResponse.data = {};
-            googleResponse.data.google.expect_user_response = false;
+            googleResponse.data.google = {};
+            googleReponse.data.google.expect_user_response = false;
             
             console.log("le json qu'on envoie :" + googleResponse);
             app.ask(googleResponse);    
