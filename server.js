@@ -584,7 +584,7 @@ function processV1Request(request, response) {
         },
         'choix.quantite.produit.outofstock': () => {
             console.log("indicateur: " + indicateurOutOfStock);
-            if (indicateurOutOfStock > 0) {
+            if (indicateurOutOfStock < 1) {
                 console.log("c'est pas bien");
                 if (requestSource === googleAssistantRequest) {
                     sendGoogleResponse("Ne t\'inquiète pas c'est déjà fait. As-tu besoin de quelque chose d'autre?");
