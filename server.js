@@ -726,7 +726,13 @@ function processV1Request(request, response) {
                     }
                 })
         },
-
+        'goodbye': () => {
+            if (requestSource === googleAssistantRequest) {
+                sendGoogleResponse("Au revoir " + userInfos.prenom + ", à bientôt !");
+            } else {
+                sendResponse("Au revoir " + userInfos.prenom + ", à bientôt !");
+            }
+        },
         // Default handler for unknown or undefined actions
         'default': () => {
             // Use the Actions on Google lib to respond to Google requests; for other requests use JSON
