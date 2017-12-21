@@ -882,7 +882,7 @@ function processV1Request(request, response) {
                 .addSimpleResponse(text)
                 .addBasicCard(app.buildBasicCard(text)
                     .setTitle(arrayProductsFull[productIndex][0])
-                    .setImage(arrayProductsFull[productIndex][3]))
+                    .setImage(arrayProductsFull[productIndex][3],'ok'))
             console.log("ma carte: " + JSON.stringify(myCard));
             sendGoogleResponse(myCard);
         }
