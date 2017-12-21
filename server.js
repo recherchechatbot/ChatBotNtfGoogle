@@ -28,6 +28,8 @@ var ASPSessionId = "";
 var userInfos = {};
 var myIdCreneau = 0;
 var responseChoixCreneau = {};
+var produitsFavoris = {};
+var matchFavori = [];//Array qui contient les produits qui sont aussi dans les favoris [[Libelle,Id,Stock,Marque]]
 
 myApp.use(bodyParser.text({ type: 'application/json' }));
 
@@ -48,6 +50,14 @@ myApp.post('/login', function (req, res) {
                             getAspNetSessionId(resultat.email, resultat.mdp)
                                 .then((c) => {
                                     ASPSessionId = c["ASP.NET_SessionId"]
+                                    var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
+                                    hitFO(cookieSession)
+                                        .then(() => {
+                                            getProduitsFavoris(cookieSession)
+                                                .then((r) => {
+                                                    produitsFavoris = r.Produits;
+                                                })
+                                        })
                                 })
                                 .catch(err => {
                                     console.log("impossible de recuperer session id ASP");
@@ -450,6 +460,31 @@ function emptyBasket(token) {
         })
     })
 }
+//Récupération produits favoris
+function getProduitsFavoris(c) {
+    var options = {
+        method: 'POST',
+        uri: FO_URL + "ChargerFavoris",
+        body: {
+            "idOnglet": "1"
+        },
+        headers: {
+            "Accept": "application/json",
+            "Cookie":c
+        },
+        json: true
+    };
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (!error && response.statusCode == 200) {
+                resolve(response.body);
+            } else {
+                console.log('Error while getting favourite products: ' + error);
+                reject(error);
+            }
+        });
+    })
+}
 
 /*
 * Function to handle v1 webhook requests from Dialogflow
@@ -519,14 +554,30 @@ function processV1Request(request, response) {
                 .then((r) => {
                     arrayProducts = [];
                     arrayProductsFull = [];
+                    matchFavori = [];
                     var myText = "Je peux te proposer: ";
                     for (var i = 0; i < r.length; i++) {
                         if (r[i].StockEpuise == false) {
-                            arrayProducts.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');
+                            //Comparaison avec les produits favoris
+                            for (var j = 0; j < produitsFavoris.length; j++) {
+                                if (r[i].IdProduit === produitsFavoris[j].IdProduit) {
+                                    matchFavori.push([produitsFavoris[j].Libelle, produitsFavoris[j].IdProduit, r[i].Stock, produitsFavoris[j].Marque);
+                                }
+                            }
+                            arrayProducts.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');//Todo, construire la phrase dans le sayproducts
                             arrayProductsFull.push([r[i].Libelle, r[i].IdProduit, r[i].Stock,r[i].NomImage]);
                         }
                     }
-                    sayProducts(myText);
+                    if (matchFavori.length>0) {
+                        if (requestSource === googleAssistantRequest) {
+                            sendGoogleResponse(matchFavori[0][0] + " de " + matchFavori[0][3] + " comme d'habitude?");
+                        } else {
+                            sendResponse(matchFavori[0][0] + " de " + matchFavori[0][3] + " comme d'habitude?");
+                        }
+                    } else {
+                        sayProducts(myText);
+                    }
+                   
                 })
                 .catch((err) => {
                     if (requestSource === googleAssistantRequest) {
@@ -816,6 +867,7 @@ function processV1Request(request, response) {
     }
 
     function nextProducts() {
+        matchFavori = [];
         productIndex += 1;
         if (arrayProducts[productIndex]) {
             let myText = "Voici le produit suivant: ";
@@ -860,11 +912,21 @@ function processV1Request(request, response) {
 
     function selectProduct(number) {
         if (number == -1) {
-            if (requestSource === googleAssistantRequest) {
-                sendGoogleResponse("Tu as choisi " + arrayProductsFull[productIndex][0] + ". C'est bien cela? Si oui combien en veux-tu?");
-            } else {
-                sendResponse("Tu as choisi " + arrayProductsFull[productIndex][0] + ". C'est bien cela? Si oui combien en veux-tu?");
+            if (matchFavori.length > 0) {
+                if (requestSource === googleAssistantRequest) {
+                    sendGoogleResponse("Tu as choisi " + matchFavori[0][0] + ". C'est bien cela? Si oui combien en veux-tu?");
+                } else {
+                    sendResponse("Tu as choisi " + matchFavori[0][0] + ". C'est bien cela? Si oui combien en veux-tu?");
+                }
             }
+            else {
+                if (requestSource === googleAssistantRequest) {
+                    sendGoogleResponse("Tu as choisi " + arrayProductsFull[productIndex][0] + ". C'est bien cela? Si oui combien en veux-tu?");
+                } else {
+                    sendResponse("Tu as choisi " + arrayProductsFull[productIndex][0] + ". C'est bien cela? Si oui combien en veux-tu?");
+                }
+            }
+            
             actualProduct = arrayProductsFull[productIndex];// produit actuel pour pouvoir le citer après
         } else {
             if (requestSource === googleAssistantRequest) {
