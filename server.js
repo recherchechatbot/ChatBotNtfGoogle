@@ -883,7 +883,7 @@ function processV1Request(request, response) {
                 .addBasicCard(app.buildBasicCard(text)
                     .setTitle(arrayProductsFull[productIndex][0])
                     .setImage(arrayProductsFull[productIndex][3]))
-            console.log("ma carte: " + myCard);
+            console.log("ma carte: " + JSON.stringify(myCard));
             sendGoogleResponse(myCard);
         }
         return text;
