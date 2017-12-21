@@ -463,7 +463,7 @@ function processV1Request(request, response) {
     const googleAssistantRequest = 'google'; // Constant to identify Google Assistant requests
     const app = new DialogflowApp({ request: request, response: response });
     console.log("ou laaaaaaaaaaaaaaaaa:" + app);
-    console.log("ICIIIIIIIIIIIIIIII: " + app.ask);
+    console.log("ICIIIIIIIIIIIIIIII: " + app.buildRichResponse);
     // Create handlers for Dialogflow actions as well as a 'default' handler
     const actionHandlers = {
         // The default welcome intent has been matched, welcome the user (https://dialogflow.com/docs/events#default_welcome_intent)
@@ -793,27 +793,7 @@ function processV1Request(request, response) {
         googleResponse.data.google.expect_user_response = false;
         response.json(googleResponse);
     }
-    //Envoi de carte. Prend un JSON en argument de la forme suivante: 
-    //{
-    //    simpleResponse: "myText",//Le texte qui sera lu par l'assitant'
-    //    cardElements: {
-    //        title: "myTitle",
-    //        text:"myTextInsideTheCard",
-    //        image:"myImageUrl"
-    //    }
-    //}
-    function basicCard(responseToUser) {
-        const app2 = new DialogflowApp();
-        app2.ask(app2.buildRichResponse()
-            // Create a basic card and add it to the rich response
-            .addSimpleResponse(responseToUser.simpleResponse)
-            .addBasicCard(app.buildBasicCard(responseToUser.cardElements.text)
-                .setTitle(responseToUser.cardElements.title)
-                .setImage(responseToUser.cardElements.image)
-                .setImageDisplay('CROPPED')
-            )
-        );
-    }
+  
     // Function to send correctly formatted responses to Dialogflow which are then sent to the user
     function sendResponse(responseToUser) {
         // if the response is a string send it as a response to the user
@@ -898,13 +878,13 @@ function processV1Request(request, response) {
     function sayProducts(text) {
         if (arrayProducts) {
             text = text + arrayProducts[productIndex];
-            let myJson = {};
-            myJson.simpleResponse = text;
-            myJson.cardElements = {};
-            myJson.cardElements.title = arrayProductsFull[productIndex][0];
-            myJson.cardElements.text = text;
-            myJson.cardElements.image = arrayProductsFull[productIndex][3]
-            basicCard(myJson);
+            const myCard = app.buildRichResponse()
+                .addSimpleResponse(text)
+                .addBasicCard(app.buildBasicCard(text)
+                    .setTitle(arrayProductsFull[productIndex][0])
+                    .setImage(arrayProductsFull[productIndex][3]))
+            console.log("ma carte: " + myCard);
+            sendGoogleResponse(myCard);
         }
         return text;
     }
