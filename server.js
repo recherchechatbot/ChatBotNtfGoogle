@@ -470,9 +470,9 @@ function processV1Request(request, response) {
         'input.welcome': () => {
             // Use the Actions on Google lib to respond to Google requests; for other requests use JSON
             if (requestSource === googleAssistantRequest) {
-                sendGoogleResponse('Salut ' + userInfos.AdresseDeFacturation.Prenom + '! Je suis Jacques Bobin ton assistant intermarch\u00E9. Demande moi ce que je sais faire!'); // Send simple response to user
+                sendGoogleResponse('Salut ' + userInfos.AdresseDeFacturation.Prenom + '! Je suis Porthos ton assistant intermarch\u00E9. Demande moi ce que je sais faire!'); // Send simple response to user
             } else {
-                sendResponse('Salut ' + userInfos.AdresseDeFacturation.Prenom + '! Je suis Jacques Bobin ton conseiller intermarch\u00E9. Demande moi ce que je sais faire!');
+                sendResponse('Salut ' + userInfos.AdresseDeFacturation.Prenom + '! Je suis Porthos ton conseiller intermarch\u00E9. Demande moi ce que je sais faire!');
             }
         },
         // The default fallback intent has been matched, try to recover (https://dialogflow.com/docs/intents#fallback_intents)
