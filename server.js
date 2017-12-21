@@ -884,7 +884,7 @@ function processV1Request(request, response) {
                     .setTitle(arrayProductsFull[productIndex][0])
                     .setImage(arrayProductsFull[productIndex][3],'ok'))
             console.log("ma carte: " + JSON.stringify(myCard));
-            sendGoogleResponse(myCard);
+            app.ask(myCard);
         }
         return text;
     }
