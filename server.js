@@ -611,17 +611,8 @@ function processV1Request(request, response) {
             }
         },
         'horaires.pdv': () => {
-            console.log("MYUSER INFOS:" + userInfos);
-            var nomFamille = userInfos.AdresseDeFacturation.Nom;
             var prenom = userInfos.AdresseDeFacturation.Prenom;
             var idPdvFavori = userInfos.IdPdv;
-            var sexe = "";
-            if (userInfos.AdresseDeFacturation.IdCivilite == 1) {
-                sexe = "Monsieur";
-            }
-            else {
-                sexe = "Madame"
-            }
             getNamePdv(idPdvFavori)
                 .then((fichePdv) => {
                     if (fichePdv.Site && fichePdv.HorairesLundi && fichePdv.HorairesDimanche) {
@@ -636,9 +627,9 @@ function processV1Request(request, response) {
                         var horairesDimFermeture = horairesDim.slice(-5);
                         var namePdvFavori = fichePdv.Site;
                         if (requestSource === googleAssistantRequest) {
-                            sendGoogleResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture + ' et le Dimanche de ' + horairesDimOuverture + " a " + horairesDimFermeture);
+                            sendGoogleResponse(prenom + ', ' + 'ton magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture + ' et le Dimanche de ' + horairesDimOuverture + " a " + horairesDimFermeture);
                         } else {
-                            sendResponse(sexe + ' ' + nomFamille + ', ' + 'votre magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture + ' et le Dimanche de ' + horairesDimOuverture + " a " + horairesDimFermeture);
+                            sendResponse(prenom + ', ' + 'ton magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture + ' et le Dimanche de ' + horairesDimOuverture + " a " + horairesDimFermeture);
                         }
                     }
                 })
