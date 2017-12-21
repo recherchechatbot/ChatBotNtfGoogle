@@ -816,30 +816,7 @@ function processV1Request(request, response) {
             response.json(responseJson); // Send response to Dialogflow
         }
     };
-    function sendResponseFollowUp(responseToUser, followUpName) {
-        // if the response is a string send it as a response to the user
-        if (typeof responseToUser === 'string') {
-            let responseJson = {};
-            responseJson.speech = responseToUser; // spoken response
-            responseJson.displayText = responseToUser; // displayed response
-            responseJson.followupEvent = {
-                "name": followUpName
-            }
-            response.json(responseJson); // Send response to Dialogflow
-        } else {
-            // If the response to the user includes rich responses or contexts send them to Dialogflow
-            let responseJson = {};
-            // If speech or displayText is defined, use it to respond (if one isn't defined use the other's value)
-            responseJson.speech = responseToUser.speech || responseToUser.displayText;
-            responseJson.displayText = responseToUser.displayText || responseToUser.speech;
-            // Optional: add rich messages for integrations (https://dialogflow.com/docs/rich-messages)
-            responseJson.data = responseToUser.data;
-            // Optional: add contexts (https://dialogflow.com/docs/contexts)
-            responseJson.contextOut = responseToUser.outputContexts;
-            console.log('Response to Dialogflow: ' + JSON.stringify(responseJson));
-            response.json(responseJson); // Send response to Dialogflow
-        }
-    };
+   
     //Fonctions pour se balader dans l'array products'
     function repeatProducts() {
         let myText = "Pas de probleme, je r\u00E9p\u00E8te: "
@@ -878,13 +855,14 @@ function processV1Request(request, response) {
     function sayProducts(text) {
         if (arrayProducts) {
             text = text + arrayProducts[productIndex];
-            const myCard = app.buildRichResponse()
-                .addSimpleResponse(text)
-                .addBasicCard(app.buildBasicCard(text)
-                    .setTitle(arrayProductsFull[productIndex][0])
-                    .setImage(arrayProductsFull[productIndex][3],'ok'))
-            console.log("ma carte: " + JSON.stringify(myCard));
-            app.ask(myCard);
+            //const myCard = app.buildRichResponse()
+            //    .addSimpleResponse(text)
+            //    .addBasicCard(app.buildBasicCard(text)
+            //        .setTitle(arrayProductsFull[productIndex][0])
+            //        .setImage(arrayProductsFull[productIndex][3],'ok'))
+            //console.log("ma carte: " + JSON.stringify(myCard));
+            //app.ask(myCard);
+            sendGoogleResponse(text);
         }
         return text;
     }
