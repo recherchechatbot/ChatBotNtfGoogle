@@ -548,7 +548,6 @@ function processV1Request(request, response) {
                 })
         },
         'recherche.produit': () => {
-            numberProduct = 0;
             let myProduct = parameters.Nourriture;
             let myIdPdv = 1;
             let cookie = 'ASP.NET_SessionId=' + ASPSessionId + ';IdPdv=' + myIdPdv;
