@@ -910,6 +910,7 @@ function processV1Request(request, response) {
     }
 
     function selectProduct() {
+        var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
         actualProduct = arrayProductsFull[productIndex];// produit actuel pour pouvoir le citer après
         //Si l'utilisateur a rentré une quantité au moment de la recherche produit
         if (numberProduct > 0) {
