@@ -14,6 +14,8 @@ var arrayProductsFull = [];//[[libelle, id, stock,image],...]
 var productIndex = 0;//Savoir où on est dans array products
 var actualProduct = [];//produit actuel
 var indicateurOutOfStock = 0;//indicateur séparateur de l'intent de confirmation de produit'
+var matchFavori = [];//Array qui contient les produits qui sont aussi dans les favoris [[Libelle,Id,Stock,Marque]]
+var numberProduct = 0;//Quantité produit si fournie au moment de la recherche produit de l'utilisateur (ex: si l'utilisateur dit "je veux acheter 5 boites de sardines"')'
 //Config vars, TODO à cacher plus tard
 const MCO_URL = process.env.MCO_URL;
 const RC_URL = process.env.RC_URL;
@@ -29,7 +31,7 @@ var userInfos = {};
 var myIdCreneau = 0;
 var responseChoixCreneau = {};
 var produitsFavoris = {};
-var matchFavori = [];//Array qui contient les produits qui sont aussi dans les favoris [[Libelle,Id,Stock,Marque]]
+
 
 myApp.use(bodyParser.text({ type: 'application/json' }));
 
@@ -550,6 +552,10 @@ function processV1Request(request, response) {
             let myProduct = parameters.Nourriture;
             let myIdPdv = 1;
             let cookie = 'ASP.NET_SessionId=' + ASPSessionId + ';IdPdv=' + myIdPdv;
+            //IF l'user rentre une quantité'
+            if (parameters.number.length > 0) {
+                numberProduct = parseInt(parameters.number);
+            }
             getProduit(myProduct, myIdPdv, cookie)
                 .then((r) => {
                     arrayProducts = [];
@@ -598,14 +604,7 @@ function processV1Request(request, response) {
             previousProducts();
         },
         'choix.produit': () => {
-            console.log("my parameter number: " + parameters.number);
-            let myChoice = 0;
-            if (parameters.number >= 1) {
-                myChoice = parameters.number;
-            } else {
-                myChoice = -1;
-            }
-            selectProduct(myChoice);
+            selectProduct();
         },
         'choix.quantite.produit': () => {
             let myNumber = parameters.number;
@@ -625,7 +624,7 @@ function processV1Request(request, response) {
                                 })
                         })
                 }
-            } 
+            }
             else {
                 indicateurOutOfStock = 1;
                 if (requestSource === googleAssistantRequest) {
@@ -910,8 +909,71 @@ function processV1Request(request, response) {
         return text;
     }
 
-    function selectProduct(number) {
-        if (number == -1) {
+    function selectProduct() {
+        actualProduct = arrayProductsFull[productIndex];// produit actuel pour pouvoir le citer après
+        //Si l'utilisateur a rentré une quantité au moment de la recherche produit
+        if (numberProduct > 0) {
+            //Si il ya un produit favori dans les resultats de la recherche
+            if (matchFavori.length > 0) {
+                //si il y a assez de stock 
+                if (matchFavori[0][2] > numberProduct) {
+                    indicateurOutOfStock = 0;
+                    for (var i = 0; i < numberProduct; i++) {
+                        hitFO(cookieSession)
+                            .then(() => {
+                                //On ajoute directement au panier
+                                addProductBasketFront(matchFavori[0][1], cookieSession)
+                                    .then((r) => {
+                                        if (requestSource === googleAssistantRequest) {
+                                            sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + numberProduct + ' ' + matchFavori[0][0] + ' \u00E0 ton panier');
+                                        } else {
+                                            sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + numberProduct + ' ' + actualProduct[0][0] + ' \u00E0 ton panier');
+                                        }
+                                    })
+                            })
+                    }
+                }
+                //Si pas assez de stock 
+                else {
+                    indicateurOutOfStock = 1;
+                    if (requestSource === googleAssistantRequest) {
+                        sendGoogleResponse('Désolé il ne me reste que ' + matchFavori[0][2] + ' ' + matchFavori[0][0] + ' en stock, combien en veux-tu?');
+                    } else {
+                        sendResponse('Désolé il ne me reste que ' + matchFavori[0][2] + ' ' + matchFavori[0][0] + ' en stock, combien en veux-tu?');
+                    }
+                }
+            }
+            //Si il n'y a pas de favori dans les resultats
+            else {
+                //si il y a assez de stock 
+                if (actualProduct[2] > numberProduct) {
+                    indicateurOutOfStock = 0;
+                    for (var i = 0; i < myNumber; i++) {
+                        hitFO(cookieSession)
+                            .then(() => {
+                                addProductBasketFront(actualProduct[1], cookieSession)
+                                    .then((r) => {
+                                        if (requestSource === googleAssistantRequest) {
+                                            sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + numberProduct + ' ' + actualProduct[0] + ' \u00E0 ton panier');
+                                        } else {
+                                            sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + numberProduct + ' ' + actualProduct[0] + ' \u00E0 ton panier');
+                                        }
+                                    })
+                            })
+                    }
+                }
+                else {
+                    indicateurOutOfStock = 1;
+                    if (requestSource === googleAssistantRequest) {
+                        sendGoogleResponse('Désolé il ne me reste que ' + actualProduct[2] + ' ' + actualProduct[0] + ' en stock, combien en veux-tu?');
+                    } else {
+                        sendResponse('Désolé il ne me reste que ' + actualProduct[2] + ' ' + actualProduct[0] + ' en stock, combien en veux-tu?');
+                    }
+                }
+            }
+        }
+        //Si l'user n'a pas encore rentré de quantité:
+        else {
             if (matchFavori.length > 0) {
                 if (requestSource === googleAssistantRequest) {
                     sendGoogleResponse("Tu as choisi " + matchFavori[0][0] + ". C'est bien cela? Si oui combien en veux-tu?");
@@ -926,18 +988,13 @@ function processV1Request(request, response) {
                     sendResponse("Tu as choisi " + arrayProductsFull[productIndex][0] + ". C'est bien cela? Si oui combien en veux-tu?");
                 }
             }
-            
-            actualProduct = arrayProductsFull[productIndex];// produit actuel pour pouvoir le citer après
-        } else {
-            if (requestSource === googleAssistantRequest) {
-                sendGoogleResponse("Tu as choisi " + arrayProductsFull[number - 1][0] + ". C'est bien cela? Si oui combien en veux-tu?");
-            } else {
-                sendResponse("Tu as choisi " + arrayProductsFull[number - 1][0] + ". C'est bien cela? Si oui combien en veux-tu?");
-            }
-            actualProduct = arrayProductsFull[number - 1];// produit actuel pour pouvoir le citer après
         }
+        
+            
+        
+        
     }
-}
+
 // Construct rich response for Google Assistant (v1 requests only)
 const app = new DialogflowApp();
 console.log("PAR ICIIIIIIIIIII: " + JSON.stringify(app.ask));
