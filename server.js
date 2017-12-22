@@ -948,7 +948,7 @@ function processV1Request(request, response) {
                 //si il y a assez de stock 
                 if (actualProduct[2] > numberProduct) {
                     indicateurOutOfStock = 0;
-                    for (var i = 0; i < myNumber; i++) {
+                    for (var i = 0; i < numberProduct; i++) {
                         hitFO(cookieSession)
                             .then(() => {
                                 addProductBasketFront(actualProduct[1], cookieSession)
@@ -989,10 +989,6 @@ function processV1Request(request, response) {
                 }
             }
         }
-
-
-
-
     }
 }
 
