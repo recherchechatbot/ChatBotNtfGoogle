@@ -548,13 +548,16 @@ function processV1Request(request, response) {
                 })
         },
         'recherche.produit': () => {
-            productIndex = 0;
+            numberProduct = 0;
             let myProduct = parameters.Nourriture;
             let myIdPdv = 1;
             let cookie = 'ASP.NET_SessionId=' + ASPSessionId + ';IdPdv=' + myIdPdv;
             //IF l'user rentre une quantité'
             if (parameters.number.length > 0) {
                 numberProduct = parseInt(parameters.number);
+            }
+            else {
+                productIndex = 0;
             }
             getProduit(myProduct, myIdPdv, cookie)
                 .then((r) => {
