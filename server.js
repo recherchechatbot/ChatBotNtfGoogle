@@ -572,7 +572,7 @@ function processV1Request(request, response) {
                                     matchFavori.push([produitsFavoris[j].Libelle, produitsFavoris[j].IdProduit, r[i].Stock, produitsFavoris[j].Marque]);
                                 }
                             }
-                            arrayProducts.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');//Todo, construire la phrase dans le sayproducts
+                            arrayProducts.push(' \n'+ r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');//Todo, construire la phrase dans le sayproducts
                             arrayProductsFull.push([r[i].Libelle, r[i].IdProduit, r[i].Stock, r[i].NomImage]);
                         }
                     }
