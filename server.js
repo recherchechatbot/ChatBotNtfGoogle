@@ -571,10 +571,10 @@ function processV1Request(request, response) {
                                 }
                             }
                             arrayProducts.push(' \n' + (i + 1) + ') ' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');//Todo, construire la phrase dans le sayproducts
-                            arrayProductsFull.push([r[i].Libelle, r[i].IdProduit, r[i].Stock,r[i].NomImage]);
+                            arrayProductsFull.push([r[i].Libelle, r[i].IdProduit, r[i].Stock, r[i].NomImage]);
                         }
                     }
-                    if (matchFavori.length>0) {
+                    if (matchFavori.length > 0) {
                         if (requestSource === googleAssistantRequest) {
                             sendGoogleResponse(matchFavori[0][0] + " de " + matchFavori[0][3] + " comme d'habitude?");
                         } else {
@@ -583,7 +583,7 @@ function processV1Request(request, response) {
                     } else {
                         sayProducts(myText);
                     }
-                   
+
                 })
                 .catch((err) => {
                     if (requestSource === googleAssistantRequest) {
@@ -642,8 +642,8 @@ function processV1Request(request, response) {
                     sendResponse("Ne t\'inquiète pas c'est déjà fait. As-tu besoin de quelque chose d'autre?");
                 }
             } else {
-            let myNumber = parameters.number;
-            var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
+                let myNumber = parameters.number;
+                var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
                 indicateurOutOfStock = 0;
                 for (var i = 0; i < myNumber; i++) {
                     hitFO(cookieSession)
@@ -834,7 +834,7 @@ function processV1Request(request, response) {
         googleResponse.data.google.expect_user_response = false;
         response.json(googleResponse);
     }
-  
+
     // Function to send correctly formatted responses to Dialogflow which are then sent to the user
     function sendResponse(responseToUser) {
         // if the response is a string send it as a response to the user
@@ -857,7 +857,7 @@ function processV1Request(request, response) {
             response.json(responseJson); // Send response to Dialogflow
         }
     };
-   
+
     //Fonctions pour se balader dans l'array products'
     function repeatProducts() {
         let myText = "Pas de probleme, je r\u00E9p\u00E8te: "
@@ -989,11 +989,12 @@ function processV1Request(request, response) {
                 }
             }
         }
-        
-            
-        
-        
+
+
+
+
     }
+}
 
 // Construct rich response for Google Assistant (v1 requests only)
 const app = new DialogflowApp();
