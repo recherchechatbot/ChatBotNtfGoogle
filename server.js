@@ -557,7 +557,7 @@ function processV1Request(request, response) {
                 numberProduct = parseInt(parameters.number);
             }
             else {
-                productIndex = 0;
+                numberProduct = 0;
             }
             getProduit(myProduct, myIdPdv, cookie)
                 .then((r) => {
