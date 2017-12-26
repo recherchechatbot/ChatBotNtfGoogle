@@ -805,6 +805,7 @@ function processV1Request(request, response) {
             let responseToUser = {
                 googleRichResponse: googleRichResponse
             }
+            sendResponse(responseToUser);
         }
     };
     // If undefined or unknown action use the default handler
