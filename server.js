@@ -1043,7 +1043,7 @@ const googleRichResponse = app.buildRichResponse()
         speech: 'This is another simple response',
         displayText: 'This is the another simple response ??'
     });
-console.log("mon google rich response generique tout pourri: " + googleRichResponse);
+console.log("mon google rich response generique tout pourri: " + JSON.stringify(googleRichResponse));
 // Rich responses for Slack and Facebook for v1 webhook requests
 const richResponsesV1 = {
     'slack': {
