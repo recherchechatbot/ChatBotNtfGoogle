@@ -806,6 +806,20 @@ function processV1Request(request, response) {
                 googleRichResponse: googleRichResponse
             }   
             sendGoogleResponse(responseToUser);
+            app.ask(app.buildRichResponse()
+                // Create a basic card and add it to the rich response
+                .addSimpleResponse('Math and prime numbers it is!')
+                .addBasicCard(app.buildBasicCard('42 is an even composite number. It' +
+                    'is composed of three distinct prime numbers multiplied together. It' +
+                    'has a total of eight divisors. 42 is an abundant number, because the' +
+                    'sum of its proper divisors 54 is greater than itself. To count from' +
+                    '1 to 42 would take you about twenty-one…')
+                    .setTitle('Math & prime numbers')
+                    .addButton('Read more', 'https://example.google.com/mathandprimes')
+                    .setImage('https://developers.google.com/actions/images/badges/XPM_BADGING_GoogleAssistant_VER.png', 'Image alternate text')
+                    .setImageDisplay('CROPPED')
+                )
+            );
         }
     };
     // If undefined or unknown action use the default handler
@@ -817,7 +831,7 @@ function processV1Request(request, response) {
     // Function to send correctly formatted Google Assistant responses to Dialogflow which are then sent to the user
     function sendGoogleResponse(responseToUser) {
         if (typeof responseToUser === 'string') {
-            app.tell(responseToUser); // Google Assistant response
+            app.ask(responseToUser); // Google Assistant response
             
         } else {
             // If speech or displayText is defined use it to respond
