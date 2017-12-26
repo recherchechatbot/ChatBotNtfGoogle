@@ -907,6 +907,7 @@ function processV1Request(request, response) {
     }
 
     function sayProducts(text) {
+        console.log("voici l'array du produit actuel :" + JSON.Stringify(arrayProductsFull[productIndex]));
         //Si le produit est un favori
         if (arrayProductsFull[productIndex][7] === "favori") {
         console.log("on est dans le cas où on doit prononcer un favori");
