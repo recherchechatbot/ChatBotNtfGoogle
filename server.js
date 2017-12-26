@@ -802,10 +802,10 @@ function processV1Request(request, response) {
             }
         },
         'google.rich.responses': () => {
-            let responseToUser = {
-                googleRichResponse: googleRichResponse
-            }   
-            sendGoogleResponse(responseToUser);
+            //let responseToUser = {
+            //    googleRichResponse: googleRichResponse
+            //}   
+            //sendGoogleResponse(responseToUser);
             app.ask(app.buildRichResponse()
                 // Create a basic card and add it to the rich response
                 .addSimpleResponse('Math and prime numbers it is!')
