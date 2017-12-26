@@ -905,7 +905,6 @@ function processV1Request(request, response) {
 
     function sayProducts(text) {
         if (arrayProductsFull) {
-            console.log(arrayProductsFull[productIndex].length);
             //arrayProducts.push(': \n' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');//Todo, construire la phrase dans le sayproducts
             //si le produit est en promo
             if (arrayProductsFull[productIndex][7].Label) {
