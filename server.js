@@ -910,7 +910,7 @@ function processV1Request(request, response) {
             }
             //si il est en promo
             else {
-                text = text + ': \n' + arrayProductsFull[productIndex][0] + ' ' + arrayProductsFull[productIndex][4] + " qui est en promotion à " + arrayProductsFull[productIndex][5] + " au lieu de " + (parseFloat(arrayProductsFull[productIndex][5]) + parseFloat(arrayProductsFull[productIndex][7].Label)) + "€";
+                text = text + ': \n' + arrayProductsFull[productIndex][0] + ' ' + arrayProductsFull[productIndex][4] + " qui est en promotion à " + arrayProductsFull[productIndex][5] + " au lieu de " + (parseFloat(arrayProductsFull[productIndex][5].replace(",", ".")) + parseFloat(arrayProductsFull[productIndex][7].Label.replace(",", "."))) + "€";
             }
             //text = text + arrayProducts[productIndex];
             //const myCard = app.buildRichResponse()
