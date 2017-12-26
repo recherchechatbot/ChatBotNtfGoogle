@@ -904,7 +904,6 @@ function processV1Request(request, response) {
     }
 
     function sayProducts(text) {
-        if (arrayProductsFull) {
             //arrayProducts.push(': \n' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');//Todo, construire la phrase dans le sayproducts
             //si le produit est en promo
             if (arrayProductsFull[productIndex][7].Label) {
@@ -925,7 +924,6 @@ function processV1Request(request, response) {
             //console.log("ma carte: " + JSON.stringify(myCard));
             //app.ask(myCard);
             sendGoogleResponse(text);
-        }
         return text;
     }
 
