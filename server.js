@@ -10,7 +10,7 @@ const myApp = express();
 
 //Memoire de la derniere recherche
 var arrayProducts = [];//array qui contient les strings qu'on veut renvoyer'
-var arrayProductsFull = [];//[[libelle, id, stock,image],...]
+var arrayProductsFull = [];//[[r[i].Libelle, r[i].IdProduit, r[i].Stock, r[i].NomImage, r[i].Marque,r[i].Prix,r[i].Conditionnement, r[i].ReductionBRI],...]
 var productIndex = 0;//Savoir où on est dans array products
 var actualProduct = [];//produit actuel
 var indicateurOutOfStock = 0;//indicateur séparateur de l'intent de confirmation de produit'
@@ -563,7 +563,7 @@ function processV1Request(request, response) {
                     arrayProducts = [];
                     arrayProductsFull = [];
                     matchFavori = [];
-                    var myText = "Je peux te proposer: ";
+                    var myText = "Je peux te proposer ";
                     for (var i = 0; i < r.length; i++) {
                         if (r[i].StockEpuise == false) {
                             //Comparaison avec les produits favoris
@@ -572,8 +572,13 @@ function processV1Request(request, response) {
                                     matchFavori.push([produitsFavoris[j].Libelle, produitsFavoris[j].IdProduit, r[i].Stock, produitsFavoris[j].Marque]);
                                 }
                             }
-                            arrayProducts.push(' \n'+ r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');//Todo, construire la phrase dans le sayproducts
-                            arrayProductsFull.push([r[i].Libelle, r[i].IdProduit, r[i].Stock, r[i].NomImage]);
+                            if (r[i].ReductionBRI != null) {
+                                //Si le produit est en réduction, je l'ajoute au début de l'array (pour pouvoir pousser ces produits en premier)
+                                arrayProductsFull.unshift([r[i].Libelle, r[i].IdProduit, r[i].Stock, r[i].NomImage, r[i].Marque, r[i].Prix, r[i].Conditionnement, r[i].ReductionBRI]);
+                            } else {
+                                arrayProductsFull.push([r[i].Libelle, r[i].IdProduit, r[i].Stock, r[i].NomImage, r[i].Marque, r[i].Prix, r[i].Conditionnement]);
+                            }
+                            
                         }
                     }
                     if (matchFavori.length > 0) {
@@ -898,7 +903,16 @@ function processV1Request(request, response) {
 
     function sayProducts(text) {
         if (arrayProducts) {
-            text = text + arrayProducts[productIndex];
+            //arrayProducts.push(': \n' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');//Todo, construire la phrase dans le sayproducts
+            //Si le produit n'est pas en promo'
+            if (arrayProductsFull[productIndex].length < 7) {
+                text = text + ': \n' + arrayProductsFull[productIndex][0] + ' ' + arrayProductsFull[productIndex][4] + ', ' + arrayProductsFull[productIndex][5] + ' ' + arrayProductsFull[productIndex][6] + ', '
+            }
+            //si il est en promo
+            else {
+                text = text + ': \n' + arrayProductsFull[productIndex][0] + ' ' + arrayProductsFull[productIndex][4] + " qui est en promotion à " + arrayProductsFull[productIndex][5] + " au lieu de " + (parseFloat(arrayProductsFull[productIndex][5]) + parseFloat(arrayProductsFull[productIndex][7].Label)) + "€");
+            }
+            //text = text + arrayProducts[productIndex];
             //const myCard = app.buildRichResponse()
             //    .addSimpleResponse(text)
             //    .addBasicCard(app.buildBasicCard(text)
