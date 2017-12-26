@@ -826,6 +826,7 @@ function processV1Request(request, response) {
             });
             // Optional: Overwrite previous response with rich response
             if (responseToUser.googleRichResponse) {
+                console.log("on est au bon endroit à priori");
                 googleResponse = responseToUser.googleRichResponse;
             }
             // Optional: add contexts (https://dialogflow.com/docs/contexts)
@@ -1042,6 +1043,7 @@ const googleRichResponse = app.buildRichResponse()
         speech: 'This is another simple response',
         displayText: 'This is the another simple response ??'
     });
+console.log("mon google rich response generique tout pourri: " + googleRichResponse);
 // Rich responses for Slack and Facebook for v1 webhook requests
 const richResponsesV1 = {
     'slack': {
