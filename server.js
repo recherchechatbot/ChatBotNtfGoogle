@@ -909,8 +909,7 @@ function processV1Request(request, response) {
 
     function sayProducts(text) {
         console.log("voici l'array du produit: " + JSON.stringify(arrayProductsFull[productIndex]));
-        console.log("voici mes parseFloats: " + parseFloat(arrayProductsFull[productIndex][5].replace(",", ".")) + "et le second: " + parseFloat(arrayProductsFull[productIndex][7].Label.replace(",", ".")));
-            //arrayProducts.push(': \n' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');//Todo, construire la phrase dans le sayproducts
+        //arrayProducts.push(': \n' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');//Todo, construire la phrase dans le sayproducts
         //Si le produit est un favori
         if (arrayProductsFull[productIndex][7] === "favori") {
         console.log("on est dans le cas où on doit prononcer un favori");
