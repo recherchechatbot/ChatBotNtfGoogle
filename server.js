@@ -802,35 +802,10 @@ function processV1Request(request, response) {
             }
         },
         'google.rich.responses': () => {
-
-            //let responseToUser = {
-            //    googleRichResponse: googleRichResponse
-            //}
-
-            let test = {
-                "google": {
-                    "expect_user_response": true,
-                    "rich_response": {
-                        "items": [
-                            {
-                                "simple_response": {
-                                    "text_to_speech": "This might be the first response"
-                                }
-                            },
-                            {
-                                "basic_card": {
-                                    "image": {
-                                        "url": "http://rathankalluri.com/tr-in/agents/tr-1024.jpg",
-                                        "accessibility_text": "Travel India text"
-                                    }
-                                }
-                            }
-                        ]
-                    }
-                }
-            }
-            //sendGoogleResponse(responseToUser);
-            app.ask(test);
+            let responseToUser = {
+                googleRichResponse: googleRichResponse
+            }   
+            sendGoogleResponse(responseToUser);
         }
     };
     // If undefined or unknown action use the default handler
@@ -842,7 +817,7 @@ function processV1Request(request, response) {
     // Function to send correctly formatted Google Assistant responses to Dialogflow which are then sent to the user
     function sendGoogleResponse(responseToUser) {
         if (typeof responseToUser === 'string') {
-            app.ask(responseToUser); // Google Assistant response
+            app.tell(responseToUser); // Google Assistant response
             
         } else {
             // If speech or displayText is defined use it to respond
