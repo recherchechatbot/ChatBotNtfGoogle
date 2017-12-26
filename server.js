@@ -802,10 +802,35 @@ function processV1Request(request, response) {
             }
         },
         'google.rich.responses': () => {
-            let responseToUser = {
-                googleRichResponse: googleRichResponse
+
+            //let responseToUser = {
+            //    googleRichResponse: googleRichResponse
+            //}
+
+            let test = {
+                "google": {
+                    "expect_user_response": true,
+                    "rich_response": {
+                        "items": [
+                            {
+                                "simple_response": {
+                                    "text_to_speech": "This might be the first response"
+                                }
+                            },
+                            {
+                                "basic_card": {
+                                    "image": {
+                                        "url": "http://rathankalluri.com/tr-in/agents/tr-1024.jpg",
+                                        "accessibility_text": "Travel India text"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
             }
-            sendGoogleResponse(responseToUser);
+            //sendGoogleResponse(responseToUser);
+            app.ask(test);
         }
     };
     // If undefined or unknown action use the default handler
@@ -818,6 +843,7 @@ function processV1Request(request, response) {
     function sendGoogleResponse(responseToUser) {
         if (typeof responseToUser === 'string') {
             app.ask(responseToUser); // Google Assistant response
+            
         } else {
             // If speech or displayText is defined use it to respond
             let googleResponse = app.buildRichResponse().addSimpleResponse({
@@ -1024,25 +1050,25 @@ const app = new DialogflowApp();
 console.log("PAR ICIIIIIIIIIII: " + JSON.stringify(app.ask));
 const googleRichResponse = app.buildRichResponse()
     .addSimpleResponse('This is the first simple response for Google Assistant')
- //   .addSuggestions(
- //   ['Suggestion Chip', 'Another Suggestion Chip'])
- //   // Create a basic card and add it to the rich response
- //   .addBasicCard(app.buildBasicCard(`This is a basic card.  Text in a
- //basic card can include "quotes" and most other unicode characters
- //including emoji ??.  Basic cards also support some markdown
- //formatting like *emphasis* or _italics_, **strong** or __bold__,
- //and ***bold itallic*** or ___strong emphasis___ as well as other things
- //like line  \nbreaks`) // Note the two spaces before '\n' required for a
- //       // line break to be rendered in the card
- //       .setSubtitle('This is a subtitle')
- //       .setTitle('Title: this is a title')
- //       .addButton('This is a button', 'https://assistant.google.com/')
- //       .setImage('https://developers.google.com/actions/images/badges/XPM_BADGING_GoogleAssistant_VER.png',
- //       'Image alternate text'))
- //   .addSimpleResponse({
- //       speech: 'This is another simple response',
- //       displayText: 'This is the another simple response ??'
- //   });
+    .addSuggestions(
+    ['Suggestion Chip', 'Another Suggestion Chip'])
+    // Create a basic card and add it to the rich response
+    .addBasicCard(app.buildBasicCard(`This is a basic card.  Text in a
+ basic card can include "quotes" and most other unicode characters
+ including emoji ??.  Basic cards also support some markdown
+ formatting like *emphasis* or _italics_, **strong** or __bold__,
+ and ***bold itallic*** or ___strong emphasis___ as well as other things
+ like line  \nbreaks`) // Note the two spaces before '\n' required for a
+        // line break to be rendered in the card
+        .setSubtitle('This is a subtitle')
+        .setTitle('Title: this is a title')
+        .addButton('This is a button', 'https://assistant.google.com/')
+        .setImage('https://developers.google.com/actions/images/badges/XPM_BADGING_GoogleAssistant_VER.png',
+        'Image alternate text'))
+    .addSimpleResponse({
+        speech: 'This is another simple response',
+        displayText: 'This is the another simple response ??'
+    });
 console.log("mon google rich response generique tout pourri: " + JSON.stringify(googleRichResponse));
 // Rich responses for Slack and Facebook for v1 webhook requests
 const richResponsesV1 = {
