@@ -912,7 +912,7 @@ function processV1Request(request, response) {
             //si le produit est en promo
             if (arrayProductsFull[productIndex][7]!=null) {
                 console.log("promo");
-                text = text + ': \n' + arrayProductsFull[productIndex][0] + ' ' + arrayProductsFull[productIndex][4] + " qui est en promotion à " + arrayProductsFull[productIndex][5] + " au lieu de " + (parseFloat(arrayProductsFull[productIndex][5].replace(",", ".")) + parseFloat(arrayProductsFull[productIndex][7].Label.replace(",", "."))) + "€";
+                text = text + ': \n' + arrayProductsFull[productIndex][0] + ' ' + arrayProductsFull[productIndex][4] + " qui est en promotion à " + arrayProductsFull[productIndex][5] + " au lieu de " + (parseFloat(arrayProductsFull[productIndex][5].replace(",", ".")) + parseFloat(arrayProductsFull[productIndex][7].Label.replace(",", "."))).toFixed(2) + "€";
             }
             //Si le produit n'est pas en promo'
             else {
