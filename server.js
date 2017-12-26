@@ -913,11 +913,13 @@ function processV1Request(request, response) {
         text = "j'ai trouvé " + arrayProductsFull[productIndex][0] + " de " + arrayProductsFull[productIndex][4] + " dans tes favoris, on reste là dessus?"
         }
         //si le produit est en promo
-        else if (arrayProductsFull[productIndex][7]!==null) {
+        else if (arrayProductsFull[productIndex][7] !== null) {
+            console.log("on est dans la partie promo");
             text = text + ': \n' + arrayProductsFull[productIndex][0] + ' ' + arrayProductsFull[productIndex][4] + " qui est en promotion à " + arrayProductsFull[productIndex][5] + " au lieu de " + (parseFloat(arrayProductsFull[productIndex][5].replace(",", ".")) + parseFloat(arrayProductsFull[productIndex][7].Label.replace(",", "."))).toFixed(2) + "€";
         }
         //Si le produit n'est pas en promo'
         else {
+            console.log("le cas où c'est un produit banal");
             text = text + ': \n' + arrayProductsFull[productIndex][0] + ' ' + arrayProductsFull[productIndex][4] + ', ' + arrayProductsFull[productIndex][5] + ' ' + arrayProductsFull[productIndex][6] + ', '
         }
         //const myCard = app.buildRichResponse()
