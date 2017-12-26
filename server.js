@@ -904,7 +904,7 @@ function processV1Request(request, response) {
     }
 
     function sayProducts(text) {
-        console.log("voici l'array du produit: " + JSON.stringify(arrayProductsFull[productIndex]);
+        console.log("voici l'array du produit: " + JSON.stringify(arrayProductsFull[productIndex]));
             //arrayProducts.push(': \n' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');//Todo, construire la phrase dans le sayproducts
             //si le produit est en promo
             if (arrayProductsFull[productIndex][7]!=null) {
