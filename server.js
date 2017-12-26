@@ -560,7 +560,7 @@ function processV1Request(request, response) {
             }
             getProduit(myProduct, myIdPdv, cookie)
                 .then((r) => {
-                    arrayProducts = [];
+                    //arrayProducts = [];
                     arrayProductsFull = [];
                     matchFavori = [];
                     var myText = "Je peux te proposer ";
