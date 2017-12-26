@@ -573,9 +573,11 @@ function processV1Request(request, response) {
                                 }
                             }
                             if (r[i].ReductionBRI != null) {
+                                console.log("PROMO");
                                 //Si le produit est en réduction, je l'ajoute au début de l'array (pour pouvoir pousser ces produits en premier)
                                 arrayProductsFull.unshift([r[i].Libelle, r[i].IdProduit, r[i].Stock, r[i].NomImage, r[i].Marque, r[i].Prix, r[i].Conditionnement, r[i].ReductionBRI]);
                             } else {
+                                console.log("PAS PROMO")
                                 arrayProductsFull.push([r[i].Libelle, r[i].IdProduit, r[i].Stock, r[i].NomImage, r[i].Marque, r[i].Prix, r[i].Conditionnement]);
                             }
                             
@@ -875,7 +877,7 @@ function processV1Request(request, response) {
     function nextProducts() {
         matchFavori = [];
         productIndex += 1;
-        if (arrayProducts[productIndex]) {
+        if (arrayProductsFull[productIndex]) {
             let myText = "Voici le produit suivant: ";
             sayProducts(myText);
         }
@@ -902,7 +904,7 @@ function processV1Request(request, response) {
     }
 
     function sayProducts(text) {
-        if (arrayProducts) {
+        if (arrayProductsFull) {
             //arrayProducts.push(': \n' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');//Todo, construire la phrase dans le sayproducts
             //Si le produit n'est pas en promo'
             if (arrayProductsFull[productIndex].length < 7) {
