@@ -581,16 +581,9 @@ function processV1Request(request, response) {
                                 console.log("PAS PROMO")
                                 arrayProductsFull.push([r[i].Libelle, r[i].IdProduit, r[i].Stock, r[i].NomImage, r[i].Marque, r[i].Prix, r[i].Conditionnement]);
                             }
-
                         }
                     }
                     if (matchFavori.length > 0) {
-                        //console.log("on a un favori");//TODO les ajouter à la liste pour pas en rater, là il n'y en a qu'un
-                        //if (requestSource === googleAssistantRequest) {
-                        //    sendGoogleResponse(matchFavori[0][0] + " de " + matchFavori[0][3] + " comme d'habitude?");
-                        //} else {
-                        //    sendResponse(matchFavori[0][0] + " de " + matchFavori[0][3] + " comme d'habitude?");
-                        //}
                         //On pousse les favoris à la toute fin pour qu'ils soient en premier'
                         for (var i = 0; i < matchFavori.length; i++) {
                             arrayProductsFull.unshift(matchFavori[i])
@@ -807,6 +800,11 @@ function processV1Request(request, response) {
                 };
                 sendResponse(responseToUser);
             }
+        },
+        'google.rich.responses': () => {
+            let responseToUser = {
+                googleRichResponse: googleRichResponse
+            }
         }
     };
     // If undefined or unknown action use the default handler
@@ -908,8 +906,6 @@ function processV1Request(request, response) {
     }
 
     function sayProducts(text) {
-        console.log("voici l'array du produit: " + JSON.stringify(arrayProductsFull[productIndex]));
-        //arrayProducts.push(': \n' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');//Todo, construire la phrase dans le sayproducts
         //Si le produit est un favori
         if (arrayProductsFull[productIndex][7] === "favori") {
         console.log("on est dans le cas où on doit prononcer un favori");
@@ -917,15 +913,12 @@ function processV1Request(request, response) {
         }
         //si le produit est en promo
         else if (arrayProductsFull[productIndex][7]!==null) {
-            console.log("promo");
             text = text + ': \n' + arrayProductsFull[productIndex][0] + ' ' + arrayProductsFull[productIndex][4] + " qui est en promotion à " + arrayProductsFull[productIndex][5] + " au lieu de " + (parseFloat(arrayProductsFull[productIndex][5].replace(",", ".")) + parseFloat(arrayProductsFull[productIndex][7].Label.replace(",", "."))).toFixed(2) + "€";
         }
         //Si le produit n'est pas en promo'
         else {
-            console.log("pas promo");
             text = text + ': \n' + arrayProductsFull[productIndex][0] + ' ' + arrayProductsFull[productIndex][4] + ', ' + arrayProductsFull[productIndex][5] + ' ' + arrayProductsFull[productIndex][6] + ', '
         }
-        //text = text + arrayProducts[productIndex];
         //const myCard = app.buildRichResponse()
         //    .addSimpleResponse(text)
         //    .addBasicCard(app.buildBasicCard(text)
