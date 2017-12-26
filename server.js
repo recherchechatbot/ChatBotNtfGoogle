@@ -569,7 +569,8 @@ function processV1Request(request, response) {
                             //Comparaison avec les produits favoris
                             for (var j = 0; j < produitsFavoris.length; j++) {
                                 if (r[i].IdProduit === produitsFavoris[j].IdProduit) {
-                                    matchFavori.push([produitsFavoris[j].Libelle, produitsFavoris[j].IdProduit, r[i].Stock, produitsFavoris[j].Marque]);
+                                    //matchFavori.push([produitsFavoris[j].Libelle, produitsFavoris[j].IdProduit, r[i].Stock, produitsFavoris[j].Marque]);
+                                    matchFavori.push([r[i].Libelle, r[i].IdProduit, r[i].Stock, r[i].NomImage, r[i].Marque, r[i].Prix, r[i].Conditionnement, "favori"]);
                                 }
                             }
                             if (r[i].ReductionBRI != null) {
@@ -580,21 +581,22 @@ function processV1Request(request, response) {
                                 console.log("PAS PROMO")
                                 arrayProductsFull.push([r[i].Libelle, r[i].IdProduit, r[i].Stock, r[i].NomImage, r[i].Marque, r[i].Prix, r[i].Conditionnement]);
                             }
-                            
+
                         }
                     }
                     if (matchFavori.length > 0) {
-                        console.log("on a un favori");//TODO les ajouter à la liste pour pas en rater, là il n'y en a qu'un
-                        if (requestSource === googleAssistantRequest) {
-                            sendGoogleResponse(matchFavori[0][0] + " de " + matchFavori[0][3] + " comme d'habitude?");
-                        } else {
-                            sendResponse(matchFavori[0][0] + " de " + matchFavori[0][3] + " comme d'habitude?");
+                        //console.log("on a un favori");//TODO les ajouter à la liste pour pas en rater, là il n'y en a qu'un
+                        //if (requestSource === googleAssistantRequest) {
+                        //    sendGoogleResponse(matchFavori[0][0] + " de " + matchFavori[0][3] + " comme d'habitude?");
+                        //} else {
+                        //    sendResponse(matchFavori[0][0] + " de " + matchFavori[0][3] + " comme d'habitude?");
+                        //}
+                        //On pousse les favoris à la toute fin pour qu'ils soient en premier'
+                        for (var i = 0; i < matchFavori.length; i++) {
+                            arrayProductsFull.unshift(matchFavori[i])
                         }
-                    } else {
-                        console; Log("pas de favori à priori");
-                        sayProducts(myText);
                     }
-
+                    sayProducts(text);
                 })
                 .catch((err) => {
                     if (requestSource === googleAssistantRequest) {
@@ -913,6 +915,10 @@ function processV1Request(request, response) {
             if (arrayProductsFull[productIndex][7]!=null) {
                 console.log("promo");
                 text = text + ': \n' + arrayProductsFull[productIndex][0] + ' ' + arrayProductsFull[productIndex][4] + " qui est en promotion à " + arrayProductsFull[productIndex][5] + " au lieu de " + (parseFloat(arrayProductsFull[productIndex][5].replace(",", ".")) + parseFloat(arrayProductsFull[productIndex][7].Label.replace(",", "."))).toFixed(2) + "€";
+            }
+            else if (arrayProductsFull[productIndex][7] === "favori") {
+                console.log("on est dans le cas où on doit prononcer un favori");
+                text = "j'ai trouvé " + arrayProductsFull[productIndex][0] + " de " + arrayProductsFull[productIndex][4] + " dans tes favoris, on reste là dessus?"
             }
             //Si le produit n'est pas en promo'
             else {
