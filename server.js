@@ -596,7 +596,7 @@ function processV1Request(request, response) {
                             arrayProductsFull.unshift(matchFavori[i])
                         }
                     }
-                    sayProducts(text);
+                    sayProducts(myText);
                 })
                 .catch((err) => {
                     if (requestSource === googleAssistantRequest) {
