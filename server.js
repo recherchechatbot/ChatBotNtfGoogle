@@ -904,9 +904,10 @@ function processV1Request(request, response) {
     }
 
     function sayProducts(text) {
+        console.log("voici l'array du produit: " + JSON.stringify(arrayProductsFull[productIndex]);
             //arrayProducts.push(': \n' + r[i].Libelle + ' ' + r[i].Marque + ', ' + r[i].Prix + ' ' + r[i].Conditionnement + ', ');//Todo, construire la phrase dans le sayproducts
             //si le produit est en promo
-            if (arrayProductsFull[productIndex][7].Label) {
+            if (arrayProductsFull[productIndex][7]!=null) {
                 console.log("promo");
                 text = text + ': \n' + arrayProductsFull[productIndex][0] + ' ' + arrayProductsFull[productIndex][4] + " qui est en promotion à " + arrayProductsFull[productIndex][5] + " au lieu de " + (parseFloat(arrayProductsFull[productIndex][5].replace(",", ".")) + parseFloat(arrayProductsFull[productIndex][7].Label.replace(",", "."))) + "€";
             }
