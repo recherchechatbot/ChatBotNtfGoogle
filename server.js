@@ -625,9 +625,9 @@ function processV1Request(request, response) {
                             addProductBasketFront(actualProduct[1], cookieSession)
                                 .then((r) => {
                                     if (requestSource === googleAssistantRequest) {
-                                        sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
+                                        sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' pack de ' + actualProduct[0] + ' \u00E0 ton panier');//TODO enlever le pack de
                                     } else {
-                                        sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
+                                        sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' pack de ' + actualProduct[0] + ' \u00E0 ton panier');//TODO enlever le pack de
                                     }
                                 })
                         })
@@ -659,9 +659,9 @@ function processV1Request(request, response) {
                             addProductBasketFront(actualProduct[1], cookieSession)
                                 .then((r) => {
                                     if (requestSource === googleAssistantRequest) {
-                                        sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
+                                        sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' pack de ' + actualProduct[0] + ' \u00E0 ton panier');//TODO enlever le pack de
                                     } else {
-                                        sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' ' + actualProduct[0] + ' \u00E0 ton panier');
+                                        sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' pack de ' + actualProduct[0] + ' \u00E0 ton panier');//TODO enlever le pack de
                                     }
                                 })
                         })
