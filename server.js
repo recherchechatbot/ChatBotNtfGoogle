@@ -821,7 +821,7 @@ function processV1Request(request, response) {
             //    )
             //));
 
-            app.ask({
+            app.ask(JSON.parse({
                 "speech": "This is a simple response for a carousel",
                 "data": {
                     "google": {
@@ -861,10 +861,10 @@ function processV1Request(request, response) {
                         }
                     ]
                 }
-            });
+            }));
         
             
-            console.log("my response to user: " +JSON.stringify(responseToUser));
+            
            
         }
     };
