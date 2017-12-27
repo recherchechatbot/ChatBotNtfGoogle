@@ -961,7 +961,12 @@ function processV1Request(request, response) {
         //si le produit est en promo !
         else if (arrayProductsFull[productIndex][7] && arrayProductsFull[productIndex][7] !== null) {
             console.log("on est dans la partie promo");
-            text = text + ': \n' + arrayProductsFull[productIndex][0] + ' ' + arrayProductsFull[productIndex][4] + " qui est en promotion à " + arrayProductsFull[productIndex][5] + " au lieu de " + (parseFloat(arrayProductsFull[productIndex][5].replace(",", ".")) + parseFloat(arrayProductsFull[productIndex][7].Label.replace(",", "."))).toFixed(2) + "€";
+            if (arrayProductsFull[productIndex][7].Symbole === "%") {
+                text = text + ': \n' + arrayProductsFull[productIndex][0] + ' ' + arrayProductsFull[productIndex][4] + " qui est en promotion à " + arrayProductsFull[productIndex][5] + " au lieu de " + (parseFloat(arrayProductsFull[productIndex][5].replace(",", ".")) * 100 / (100 - parseFloat(arrayProductsFull[productIndex][7].Label.replace(",", ".")))  ).toFixed(2) + "€";
+            }
+            else if (arrayProductsFull[productIndex][7].Symbole === "€") {
+                text = text + ': \n' + arrayProductsFull[productIndex][0] + ' ' + arrayProductsFull[productIndex][4] + " qui est en promotion à " + arrayProductsFull[productIndex][5] + " au lieu de " + (parseFloat(arrayProductsFull[productIndex][5].replace(",", ".")) + parseFloat(arrayProductsFull[productIndex][7].Label.replace(",", "."))).toFixed(2) + "€";
+            }
         }
         //Si le produit n'est pas en promo'
         else {
