@@ -1050,20 +1050,11 @@ function processV1Request(request, response) {
         }
         //Si l'user n'a pas encore rentré de quantité:
         else {
-            if (matchFavori.length > 0) {
                 if (requestSource === googleAssistantRequest) {
-                    sendGoogleResponse("Tu as choisi " + matchFavori[0][0] + ". C'est bien cela? Si oui combien en veux-tu?");
+                    sendGoogleResponse("Ok, combien en veux-tu ?");
                 } else {
-                    sendResponse("Tu as choisi " + matchFavori[0][0] + ". C'est bien cela? Si oui combien en veux-tu?");
+                    sendResponse("Ok, combien en veux-tu ?");
                 }
-            }
-            else {
-                if (requestSource === googleAssistantRequest) {
-                    sendGoogleResponse("Tu as choisi " + arrayProductsFull[productIndex][0] + ". C'est bien cela? Si oui combien en veux-tu?");
-                } else {
-                    sendResponse("Tu as choisi " + arrayProductsFull[productIndex][0] + ". C'est bien cela? Si oui combien en veux-tu?");
-                }
-            }
         }
     }
 }
