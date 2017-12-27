@@ -802,11 +802,11 @@ function processV1Request(request, response) {
             }
         },
         'google.rich.responses': () => {
-            let responseToUser = {
-                googleRichResponse: googleRichResponse
-            }   
-            sendGoogleResponse(responseToUser);
-            app.ask(app.buildRichResponse()
+            //let responseToUser = {
+            //    googleRichResponse: googleRichResponse
+            //}   
+            //sendGoogleResponse(responseToUser);
+            app.ask(JSON.stringify(app.buildRichResponse()
                 // Create a basic card and add it to the rich response
                 .addSimpleResponse('Math and prime numbers it is!')
                 .addBasicCard(app.buildBasicCard('42 is an even composite number. It' +
@@ -819,9 +819,9 @@ function processV1Request(request, response) {
                     .setImage('https://developers.google.com/actions/images/badges/XPM_BADGING_GoogleAssistant_VER.png', 'Image alternate text')
                     .setImageDisplay('CROPPED')
                 )
-            );
-            app.ask(JSON.stringify(responseToUser));
-            console.log("my response to user: " + JSON.stringify(responseToUser));
+            ));
+            
+            console.log("my response to user: " +JSON.stringify(responseToUser));
            
         }
     };
