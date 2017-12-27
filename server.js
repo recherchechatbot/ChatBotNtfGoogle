@@ -1002,9 +1002,9 @@ function processV1Request(request, response) {
                                 addProductBasketFront(matchFavori[0][1], cookieSession)
                                     .then((r) => {
                                         if (requestSource === googleAssistantRequest) {
-                                            sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + numberProduct + ' ' + matchFavori[0][0] + ' \u00E0 ton panier, tu veux autre chose?');
+                                            sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + numberProduct + ' pack de ' + matchFavori[0][0] + ' \u00E0 ton panier, tu veux autre chose?');//TODO enlever le pack après le tournage de la vidéo
                                         } else {
-                                            sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + numberProduct + ' ' + actualProduct[0][0] + ' \u00E0 ton panier, tu veux autre chose?');
+                                            sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + numberProduct + ' pack de ' + actualProduct[0][0] + ' \u00E0 ton panier, tu veux autre chose?');//TODO enlever le pack après le tournage de la vidéo
                                         }
                                     })
                             })
@@ -1031,9 +1031,9 @@ function processV1Request(request, response) {
                                 addProductBasketFront(actualProduct[1], cookieSession)
                                     .then((r) => {
                                         if (requestSource === googleAssistantRequest) {
-                                            sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + numberProduct + ' ' + actualProduct[0] + ' \u00E0 ton panier, tu veux autre chose?');
+                                            sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + numberProduct + ' pack de ' + actualProduct[0] + ' \u00E0 ton panier, tu veux autre chose?');//TODO enlever le pack après le tournage de la vidéo
                                         } else {
-                                            sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + numberProduct + ' ' + actualProduct[0] + ' \u00E0 ton panier, tu veux autre chose?');
+                                            sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + numberProduct + ' pack de ' + actualProduct[0] + ' \u00E0 ton panier, tu veux autre chose?');//TODO enlever le pack après le tournage de la vidéo
                                         }
                                     })
                             })
