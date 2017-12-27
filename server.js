@@ -821,7 +821,7 @@ function processV1Request(request, response) {
             //    )
             //));
 
-            app.ask(JSON.parse({
+            app.ask({
                 "speech": "This is a simple response for a carousel",
                 "data": {
                     "google": {
@@ -861,7 +861,7 @@ function processV1Request(request, response) {
                         }
                     ]
                 }
-            }));
+            });
         
             
             
