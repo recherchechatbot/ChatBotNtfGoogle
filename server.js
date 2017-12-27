@@ -806,20 +806,63 @@ function processV1Request(request, response) {
             //    googleRichResponse: googleRichResponse
             //}   
             //sendGoogleResponse(responseToUser);
-            app.ask(JSON.stringify(app.buildRichResponse()
-                // Create a basic card and add it to the rich response
-                .addSimpleResponse('Math and prime numbers it is!')
-                .addBasicCard(app.buildBasicCard('42 is an even composite number. It' +
-                    'is composed of three distinct prime numbers multiplied together. It' +
-                    'has a total of eight divisors. 42 is an abundant number, because the' +
-                    'sum of its proper divisors 54 is greater than itself. To count from' +
-                    '1 to 42 would take you about twenty-one…')
-                    .setTitle('Math & prime numbers')
-                    .addButton('Read more', 'https://example.google.com/mathandprimes')
-                    .setImage('https://developers.google.com/actions/images/badges/XPM_BADGING_GoogleAssistant_VER.png', 'Image alternate text')
-                    .setImageDisplay('CROPPED')
-                )
-            ));
+            //app.ask(JSON.stringify(app.buildRichResponse()
+            //    // Create a basic card and add it to the rich response
+            //    .addSimpleResponse('Math and prime numbers it is!')
+            //    .addBasicCard(app.buildBasicCard('42 is an even composite number. It' +
+            //        'is composed of three distinct prime numbers multiplied together. It' +
+            //        'has a total of eight divisors. 42 is an abundant number, because the' +
+            //        'sum of its proper divisors 54 is greater than itself. To count from' +
+            //        '1 to 42 would take you about twenty-one…')
+            //        .setTitle('Math & prime numbers')
+            //        .addButton('Read more', 'https://example.google.com/mathandprimes')
+            //        .setImage('https://developers.google.com/actions/images/badges/XPM_BADGING_GoogleAssistant_VER.png', 'Image alternate text')
+            //        .setImageDisplay('CROPPED')
+            //    )
+            //));
+
+            app.ask(JSON.stringify({
+                "speech": "This is a simple response for a carousel",
+                "data": {
+                    "google": {
+                        "expectUserResponse": true,
+                        "richResponse": {
+                            "items": [
+                                {
+                                    "simpleResponse": {
+                                        "textToSpeech": "This is a simple response for a carousel"
+                                    }
+                                },
+                                {
+                                    "basicCard": {
+                                        "title": "Math & prime numbers",
+                                        "formattedText": "42 is an even composite number. It\n    is composed of three distinct prime numbers multiplied together. It\n    has a total of eight divisors. 42 is an abundant number, because the\n    sum of its proper divisors 54 is greater than itself. To count from\n    1 to 42 would take you about twenty-one…",
+                                        "image": {
+                                            "url": "https://example.google.com/42.png",
+                                            "accessibilityText": "Image alternate text"
+                                        },
+                                        "buttons": [
+                                            {
+                                                "title": "Read more",
+                                                "openUrlAction": {
+                                                    "url": "https://example.google.com/mathandprimes"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "suggestions": []
+                        }
+                    },
+                    "possibleIntents": [
+                        {
+                            "intent": "actions.intent.TEXT"
+                        }
+                    ]
+                }
+            }));
+        
             
             console.log("my response to user: " +JSON.stringify(responseToUser));
            
