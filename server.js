@@ -685,9 +685,11 @@ function processV1Request(request, response) {
                         var horairesDimFermeture = horairesDim.slice(-5);
                         var namePdvFavori = fichePdv.Site;
                         if (requestSource === googleAssistantRequest) {
-                            sendGoogleResponse(prenom + ', ' + 'ton magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture + ' et le Dimanche de ' + horairesDimOuverture + " a " + horairesDimFermeture);
+                            //sendGoogleResponse(prenom + ', ' + 'ton magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture + ' et le Dimanche de ' + horairesDimOuverture + " a " + horairesDimFermeture);
+                            sendGoogleResponse(prenom + ', ' + 'ton magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert toute la semaine de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture);
                         } else {
-                            sendResponse(prenom + ', ' + 'ton magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture + ' et le Dimanche de ' + horairesDimOuverture + " a " + horairesDimFermeture);
+                            //sendResponse(prenom + ', ' + 'ton magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert du Lundi au Samedi de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture + ' et le Dimanche de ' + horairesDimOuverture + " a " + horairesDimFermeture);
+                            sendResponse(prenom + ', ' + 'ton magasin situ\u00E9 \u00E0 ' + namePdvFavori + ' est ouvert toute la semaine de ' + horairesSemaineOuverture + " a " + horairesSemaineFermeture);//TODO remettre autrement après le tournage
                         }
                     }
                 })
