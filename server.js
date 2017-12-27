@@ -552,6 +552,7 @@ function processV1Request(request, response) {
             let myProduct = parameters.Nourriture;
             let myIdPdv = 1;
             let cookie = 'ASP.NET_SessionId=' + ASPSessionId + ';IdPdv=' + myIdPdv;
+            productIndex = 0;
             //IF l'user rentre une quantité'
             if (parameters.number.length > 0) {
                 numberProduct = parseInt(parameters.number);
