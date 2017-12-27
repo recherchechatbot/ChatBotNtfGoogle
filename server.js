@@ -58,6 +58,7 @@ myApp.post('/login', function (req, res) {
                                             getProduitsFavoris(cookieSession)
                                                 .then((r) => {
                                                     produitsFavoris = r.Produits;
+                                                    console.log("mes produits favoris: " + produitsFavoris);
                                                 })
                                         })
                                 })
