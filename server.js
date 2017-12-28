@@ -47,7 +47,6 @@ myApp.post('/login', function (req, res) {
                         if (r.TokenAuthentification) {
                             email = resultat.email;
                             myToken = r.TokenAuthentification;
-                            console.log("le token a bien été récupéré");
                             const redirectURISuccess = `${resultat.redirectURI}#access_token=${myToken}&token_type=bearer&state=${resultat.state}`;
                             getAspNetSessionId(resultat.email, resultat.mdp)
                                 .then((c) => {
@@ -58,7 +57,6 @@ myApp.post('/login', function (req, res) {
                                             getProduitsFavoris(cookieSession)
                                                 .then((r) => {
                                                     produitsFavoris = r.Produits;
-                                                    console.log("mes produits favoris: " + JSON.stringify(produitsFavoris));
                                                 })
                                         })
                                 })
@@ -432,7 +430,6 @@ function getRecapPanier(c) {
         console.log("on passe ça dans le request: " + JSON.stringify(options));
         request(options, (error, response) => {
             if (!error && response.statusCode == 200) {
-                console.log("On est dans le promise, et ya pas d'erreur");
                 resolve(response.body);
             }
             else {
@@ -454,7 +451,6 @@ function emptyBasket(token) {
     return new Promise((resolve, reject) => {
         request(options, (error, response) => {
             if (!error && response.statusCode == 200) {
-                console.log("à priori le panier devrait être vidé");
                 resolve(response.body);//A priori pas necessaire car pas juste "null" dans le body en cas de success
             } else {
                 console.log("Il y a eu un problème lors du vidage du panier");
@@ -500,8 +496,6 @@ function processV1Request(request, response) {
     let requestSource = (body.originalRequest) ? body.originalRequest.source : undefined;
     const googleAssistantRequest = 'google'; // Constant to identify Google Assistant requests
     const app = new DialogflowApp({ request: request, response: response });
-    console.log("ou laaaaaaaaaaaaaaaaa:" + app);
-    console.log("ICIIIIIIIIIIIIIIII: " + app.buildRichResponse);
     // Create handlers for Dialogflow actions as well as a 'default' handler
     const actionHandlers = {
         // The default welcome intent has been matched, welcome the user (https://dialogflow.com/docs/events#default_welcome_intent)
@@ -517,9 +511,9 @@ function processV1Request(request, response) {
         'input.unknown': () => {
             // Use the Actions on Google lib to respond to Google requests; for other requests use JSON
             if (requestSource === googleAssistantRequest) {
-                sendGoogleResponse('I\'m having trouble, can you try that again?'); // Send simple response to user
+                sendGoogleResponse("J'ai un peu de mal à te comprendre. Peux-tu répéter s'il te plaît?"); // Send simple response to user
             } else {
-                sendResponse('I\'m having trouble, can you try that again?'); // Send simple response to user
+                sendResponse("J'ai un peu de mal à te comprendre. Peux-tu répéter s'il te plaît?"); // Send simple response to user
             }
         },
         'recherche.recette': () => {
@@ -674,12 +668,9 @@ function processV1Request(request, response) {
             getNamePdv(idPdvFavori)
                 .then((fichePdv) => {
                     if (fichePdv.Site && fichePdv.HorairesLundi && fichePdv.HorairesDimanche) {
-                        console.log("on est dans le if youpi");
                         var horairesSemaine = fichePdv.HorairesLundi.replace(/\;/g, "");
-                        console.log("horaires semaine avec le regex: " + horairesSemaine);
                         var horairesSemaineOuverture = horairesSemaine.slice(0, 5);
                         var horairesSemaineFermeture = horairesSemaine.slice(-5);//TODO PEUT ETRE SEPARER LE SAMEDI?
-                        console.log("On vient de défnir les horaires de la semaine: " + horairesSemaineOuverture + " a " + horairesSemaineFermeture);
                         var horairesDim = fichePdv.HorairesLundi.replace(/\;/g, "");
                         var horairesDimOuverture = horairesDim.slice(0, 5);
                         var horairesDimFermeture = horairesDim.slice(-5);
@@ -744,6 +735,15 @@ function processV1Request(request, response) {
                         }
                     }
                 })
+                //On devrait arriver ici si l'utilisateur veut un créneau qui n'existe pas (i.e qui n'est pas dans la liste des créneaux possibles, par exemple à une horaire ou le magasin n'est pas ouvert)
+                .catch(err => {
+                    if (requestSource === googleAssistantRequest) {
+                        sendGoogleResponse("Oups, je n'ai pas r\u00E9ussi");//TODO annulation & recap date et heure
+                    } else {
+                        sendResponseFollowUp("Oups, je n'ai pas r\u00E9ussi");
+                    }
+                })
+
             //TO DO, séparer si l'utilisateur met seulement un jour ou seulement une heure'
 
         },
@@ -775,13 +775,10 @@ function processV1Request(request, response) {
                 })
         },
         'goodbye': () => {
-            console.log("dans le bon action");
             if (requestSource === googleAssistantRequest) {
                 endGoogleSession("Au revoir " + userInfos.AdresseDeFacturation.Prenom + ", à bientôt !");
-                console.log("dans google");
             } else {
                 sendResponse("Au revoir " + userInfos.AdresseDeFacturation.Prenom + ", à bientôt !");
-                console.log("pas dans google");
             }
         },
         // Default handler for unknown or undefined actions
@@ -806,8 +803,6 @@ function processV1Request(request, response) {
             }
         }
         //'google.rich.responses': () => {
-            
-
         //    app.ask({
         //        "speech": "This is a simple response for a carousel",
         //        "data": {
@@ -849,10 +844,6 @@ function processV1Request(request, response) {
         //            ]
         //        }
         //    });
-        
-            
-            
-           
         //}
     };
     // If undefined or unknown action use the default handler
@@ -874,7 +865,6 @@ function processV1Request(request, response) {
             });
             // Optional: Overwrite previous response with rich response
             if (responseToUser.googleRichResponse) {
-                console.log("on est au bon endroit à priori");
                 googleResponse = responseToUser.googleRichResponse;
             }
             // Optional: add contexts (https://dialogflow.com/docs/contexts)
@@ -959,12 +949,10 @@ function processV1Request(request, response) {
         console.log("voici l'array du produit actuel :" + JSON.stringify(arrayProductsFull[productIndex]));
         //Si le produit est un favori
         if (arrayProductsFull[productIndex][7] === "favori") {
-        console.log("on est dans le cas où on doit prononcer un favori");
         text = "j'ai trouvé " + arrayProductsFull[productIndex][0] + " de " + arrayProductsFull[productIndex][4] + " dans tes favoris, on reste là dessus?"
         }
         //si le produit est en promo !
         else if (arrayProductsFull[productIndex][7] && arrayProductsFull[productIndex][7] !== null) {
-            console.log("on est dans la partie promo");
             if (arrayProductsFull[productIndex][7].Symbole === "%") {
                 text = text + ': \n' + arrayProductsFull[productIndex][0] + ' ' + arrayProductsFull[productIndex][4] + " qui est en promotion à " + arrayProductsFull[productIndex][5] + " au lieu de " + (parseFloat(arrayProductsFull[productIndex][5].replace(",", ".")) * 100 / (100 - parseFloat(arrayProductsFull[productIndex][7].Label.replace(",", ".")))  ).toFixed(2) + "€";
             }
@@ -974,16 +962,8 @@ function processV1Request(request, response) {
         }
         //Si le produit n'est pas en promo'
         else {
-            console.log("le cas où c'est un produit banal");
             text = text + ': \n' + arrayProductsFull[productIndex][0] + ' ' + arrayProductsFull[productIndex][4] + ', ' + arrayProductsFull[productIndex][5] + ' ' + arrayProductsFull[productIndex][6] + ', '
         }
-        //const myCard = app.buildRichResponse()
-        //    .addSimpleResponse(text)
-        //    .addBasicCard(app.buildBasicCard(text)
-        //        .setTitle(arrayProductsFull[productIndex][0])
-        //        .setImage(arrayProductsFull[productIndex][3],'ok'))
-        //console.log("ma carte: " + JSON.stringify(myCard));
-        //app.ask(myCard);
         sendGoogleResponse(text);
         return text;
     }
@@ -1087,7 +1067,7 @@ const googleRichResponse = app.buildRichResponse()
         speech: 'This is another simple response',
         displayText: 'This is the another simple response ??'
     });
-console.log("mon google rich response generique tout pourri: " + JSON.stringify(googleRichResponse));
+
 // Rich responses for Slack and Facebook for v1 webhook requests
 const richResponsesV1 = {
     'slack': {
