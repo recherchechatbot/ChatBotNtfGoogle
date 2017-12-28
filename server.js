@@ -120,7 +120,7 @@ myApp.post('/webhook', (request, response) => {
         return response.status(400).end('Invalid Webhook Request (expecting v1 or v2 webhook request)');
     }
 });
-//Login referentiel client, permet de récupérer idRc'
+//Login référentiel client, permet de récupérer idRc'
 function loginRC(email, mdp) {
     console.log("Email : " + email);
     console.log("Mdp : " + mdp);
@@ -209,7 +209,6 @@ function loginMCommerce(email, mdp, idrc) {
 //Recherche recette sur mcommerce (too long pour l'instant pour dialogflow')
 function getRecette(product, token) {
     let url = "https://wsmcommerce.intermarche.com/api/v1/recherche/recette?mot=" + product;
-    console.log("URRRRLL:" + url);
     var options = {
         method: 'GET',
         uri: url,
@@ -249,7 +248,7 @@ function getProduit(produit, idPdv, c) {
                 resolve(response.body);
             }
             else {
-                console.log("ON FAIT UN REJECT");
+                console.log("Erreur recherche produit");
                 reject(error);
             }
         })
@@ -453,7 +452,7 @@ function emptyBasket(token) {
             if (!error && response.statusCode == 200) {
                 resolve(response.body);//A priori pas necessaire car pas juste "null" dans le body en cas de success
             } else {
-                console.log("Il y a eu un problème lors du vidage du panier");
+                console.log("Il y a eu un problème lors de la vidange du panier");
                 reject(error);
             }
         })
@@ -570,17 +569,15 @@ function processV1Request(request, response) {
                                 }
                             }
                             if (r[i].ReductionBRI != null) {
-                                console.log("PROMO");
-                                //Si le produit est en réduction, je l'ajoute au début de l'array (pour pouvoir pousser ces produits en premier)
+                                //Si le produit est en réduction, je l'ajoute au début de l'array (pour pouvoir pousser ces produits avant les produits normaux)
                                 arrayProductsFull.unshift([r[i].Libelle, r[i].IdProduit, r[i].Stock, r[i].NomImage, r[i].Marque, r[i].Prix, r[i].Conditionnement, r[i].ReductionBRI]);
                             } else {
-                                console.log("PAS PROMO")
                                 arrayProductsFull.push([r[i].Libelle, r[i].IdProduit, r[i].Stock, r[i].NomImage, r[i].Marque, r[i].Prix, r[i].Conditionnement]);
                             }
                         }
                     }
                     if (matchFavori.length > 0) {
-                        //On pousse les favoris à la toute fin pour qu'ils soient en premier'
+                        //On pousse les favoris à la toute fin pour qu'ils soient en premier
                         for (var i = 0; i < matchFavori.length; i++) {
                             arrayProductsFull.unshift(matchFavori[i])
                         }
