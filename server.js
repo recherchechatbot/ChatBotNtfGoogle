@@ -738,9 +738,9 @@ function processV1Request(request, response) {
                 //On devrait arriver ici si l'utilisateur veut un créneau qui n'existe pas (i.e qui n'est pas dans la liste des créneaux possibles, par exemple à une horaire ou le magasin n'est pas ouvert)
                 .catch(err => {
                     if (requestSource === googleAssistantRequest) {
-                        sendGoogleResponse("Oups, je n'ai pas r\u00E9ussi");//TODO annulation & recap date et heure
+                        sendGoogleResponse("Ce créneau n'existe pas, merci d'en choisir un autre");//TODO annulation & recap date et heure
                     } else {
-                        sendResponseFollowUp("Oups, je n'ai pas r\u00E9ussi");
+                        sendResponseFollowUp("Ce créneau n'existe pas, merci d'en choisir un autre");
                     }
                 })
 
