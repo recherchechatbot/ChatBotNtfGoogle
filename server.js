@@ -424,9 +424,7 @@ function getRecapPanier(c) {
             cookie: c
         }
     };
-
     return new Promise((resolve, reject) => {
-        console.log("on passe ça dans le request: " + JSON.stringify(options));
         request(options, (error, response) => {
             if (!error && response.statusCode == 200) {
                 resolve(response.body);
@@ -515,12 +513,11 @@ function processV1Request(request, response) {
                 sendResponse("J'ai un peu de mal à te comprendre. Peux-tu répéter s'il te plaît?"); // Send simple response to user
             }
         },
-        'recherche.recette': () => {
+        'recherche.recette': () => {//Ne fonctionne pas
             let myText = 'Voici quelques recettes pour toi: ';
             console.log("myText:" + myText);
             getRecette('poulet', myToken)
                 .then((r) => {
-                    console.log("Resultat de la requete http des recettes: " + r);
                     let listeRecettes = JSON.parse(r);
                     let len = listeRecettes.Recettes.length;
                     for (var i = 0; i < len; i++) {
@@ -616,9 +613,9 @@ function processV1Request(request, response) {
                             addProductBasketFront(actualProduct[1], cookieSession)
                                 .then((r) => {
                                     if (requestSource === googleAssistantRequest) {
-                                        sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' pack de ' + actualProduct[0] + ' \u00E0 ton panier');//TODO enlever le pack de
+                                        sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' pack de ' + actualProduct[0] + ' \u00E0 ton panier, tu veux autre chose?');//TODO enlever le pack de
                                     } else {
-                                        sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' pack de ' + actualProduct[0] + ' \u00E0 ton panier');//TODO enlever le pack de
+                                        sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' pack de ' + actualProduct[0] + ' \u00E0 ton panier, tu veux autre chose?');//TODO enlever le pack de
                                     }
                                 })
                         })
@@ -650,9 +647,9 @@ function processV1Request(request, response) {
                             addProductBasketFront(actualProduct[1], cookieSession)
                                 .then((r) => {
                                     if (requestSource === googleAssistantRequest) {
-                                        sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' pack de ' + actualProduct[0] + ' \u00E0 ton panier');//TODO enlever le pack de
+                                        sendGoogleResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' pack de ' + actualProduct[0] + ' \u00E0 ton panier, tu veux autre chose?');//TODO enlever le pack de
                                     } else {
-                                        sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' pack de ' + actualProduct[0] + ' \u00E0 ton panier');//TODO enlever le pack de
+                                        sendResponse('\u00C7a marche, j\'ai ajout\u00E9 ' + myNumber + ' pack de ' + actualProduct[0] + ' \u00E0 ton panier, tu veux autre chose?');//TODO enlever le pack de
                                     }
                                 })
                         })
@@ -740,9 +737,7 @@ function processV1Request(request, response) {
                         sendResponseFollowUp("Ce créneau n'existe pas, merci d'en choisir un autre");
                     }
                 })
-
             //TO DO, séparer si l'utilisateur met seulement un jour ou seulement une heure'
-
         },
         'montant.panier': () => {
             var cookieSession = 'ASP.NET_SessionId=' + ASPSessionId;
@@ -756,11 +751,9 @@ function processV1Request(request, response) {
                             } else {
                                 sendResponse("Le montant total de ton panier s\'\u00E9l\u00E8ve \u00E0 " + resParsed.Total);
                             }
-
                         })
                 })
         },
-
         'vider.panier.confirmation': () => {
             emptyBasket(myToken)
                 .then((r) => {
@@ -785,16 +778,16 @@ function processV1Request(request, response) {
                 let responseToUser = {
                     //googleRichResponse: googleRichResponse, // Optional, uncomment to enable
                     //googleOutputContexts: ['weather', 2, { ['city']: 'rome' }], // Optional, uncomment to enable
-                    speech: 'This message is from Dialogflow\'s Cloud Functions for Firebase editor!', // spoken response
-                    text: 'This is from Dialogflow\'s Cloud Functions for Firebase editor! :-)' // displayed response
+                    speech: "Je suis désolé, je n'ai pas compris ta demande, peux-tu répéter s'il te plaît ?", // spoken response
+                    text: "Je suis désolé, je n'ai pas compris ta demande, peux-tu répéter s'il te plaît ?" // displayed response
                 };
                 sendGoogleResponse(responseToUser);
             } else {
                 let responseToUser = {
                     //data: richResponsesV1, // Optional, uncomment to enable
                     //outputContexts: [{'name': 'weather', 'lifespan': 2, 'parameters': {'city': 'Rome'}}], // Optional, uncomment to enable
-                    speech: 'This message is from Dialogflow\'s Cloud Functions for Firebase editor!', // spoken response
-                    text: 'This is from Dialogflow\'s Cloud Functions for Firebase editor! :-)' // displayed response
+                    speech: "Je suis désolé, je n'ai pas compris ta demande, peux-tu répéter s'il te plaît ?", // spoken response
+                    text: "Je suis désolé, je n'ai pas compris ta demande, peux-tu répéter s'il te plaît ?" // displayed response
                 };
                 sendResponse(responseToUser);
             }
@@ -882,7 +875,6 @@ function processV1Request(request, response) {
         googleResponse.data.google.expect_user_response = false;
         response.json(googleResponse);
     }
-
     // Function to send correctly formatted responses to Dialogflow which are then sent to the user
     function sendResponse(responseToUser) {
         // if the response is a string send it as a response to the user
