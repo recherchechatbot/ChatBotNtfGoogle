@@ -1,176 +1,178 @@
 <!DOCTYPE html>
 <html>
-	<head>
-            <meta charset="UTF-8">
-            <title>Connexion Drive-intermarché</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-                <style type="text/css">
-                    body{
-                        font-family:arial;
-                        height:300px;
-                    }
-                    h1{
-                        margin:5px;
-                        text-align:center;
-                    }
-                    img{
-                        display:block;
-                        margin:auto;
-                        margin-top:5px;
-                    }
-                    label{
-                        position:relative;
-                        width:125px;
-                    }
-                    label:after{
-                        position:absolute;
-                        right:15px;
-                        content:':';
-                    }
-                    .inline{
-                        display:inline-block;
-                    }
-                    input.inline{
-                        width:180px;
-                            height:25px;
-                        line-height:25px;
-                    }
-                    .popup{
-                        position:relative;
-                        margin:auto;
-                        width:100%;
-                        text-align:center;
-                    }
-                    .popup .popup_content > .inline{
-                        display:inline-block;
-                        vertical-align:top;
-                        width:450px;
-                        height:300px;
-                    }
-                    .connexion_titre{
-                        font-size:20px;
-                        margin:10px 20px;
-                        text-align:left;
-                    }
-                    p{
-                        margin:0 20px;
-                        text-align:left;
-                    }
-                    button{
-                        position: relative;
-                        height: 35px;
-                        margin: auto;
-                        margin-top:20px;
-                        width:135px;
-                        text-transform: uppercase;
-                        font-size: 16px;
-                        padding: 8px 20px;
-                        color:#fff;
-                        border:none;
-                        display:block;
-    
-                    }
-                    .relative{
-                        position:relative;
-                    }
-                    .centrer{
-                        position:relative;
-                       width:250px;
-                       margin:auto;
-                       margin-top:40px;
-                    }
-                    .centrer p{
-                        text-align:center;
-                        font-size:20px;
-                        text-transform:uppercase;
-                        margin-top:20px;
-                    }
-                    .red{
-                        background-color:#b80002;
-                    }
-                    .grey{
-                        background-color:#ece6e6;
-                    }
-                    .popup .inline.red *{
-                        color:#fff;
-                    }
-                    .form-elt{
-                        margin-top:20px;
-                    }
-                    @media screen and(min-width: 950px){
-                        .popup{
-                            width:950px;
-                            margin:auto;
-                        } 
-                    }
-                    @media screen and(max-width: 950px){
-                        .popup{
-                            width:450px;
-                            margin:auto;
-                        } 
-                    }
-                </style>
-	</head>
-        
-<div class="popup">
-    <div class="popup_content">
-        <div class="inline red">
+   <head>
+      <meta charset="UTF-8">
+      <title>Connexion Drive-intermarché</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+      <style type="text/css">
+         body{
+         font-family:arial;
+         height:300px;
+         }
+         h1{
+         margin:5px;
+         text-align:center;
+         }
+         img{
+         display:block;
+         margin:auto;
+         margin-top:5px;
+         }
+         label{
+         position:relative;
+         width:125px;
+         }
+         label:after{
+         position:absolute;
+         right:15px;
+         content:':';
+         }
+         .inline{
+         display:inline-block;
+         }
+         input.inline{
+         width:180px;
+         height:25px;
+         line-height:25px;
+         }
+         .popup{
+         position:relative;
+         margin:auto;
+         width:100%;
+         text-align:center;
+         }
+         .popup .popup_content > .inline{
+         display:inline-block;
+         vertical-align:top;
+         width:450px;
+         height:300px;
+         }
+         .connexion_titre{
+         font-size:20px;
+         margin:10px 20px;
+         text-align:left;
+         }
+         p{
+         margin:0 20px;
+         text-align:left;
+         }
+         button{
+         position: relative;
+         height: 35px;
+         margin: auto;
+         margin-top:20px;
+         width:135px;
+         text-transform: uppercase;
+         font-size: 16px;
+         padding: 8px 20px;
+         color:#fff;
+         border:none;
+         display:block;
+         }
+         .relative{
+         position:relative;
+         }
+         .centrer{
+         position:relative;
+         width:250px;
+         margin:auto;
+         margin-top:40px;
+         }
+         .centrer p{
+         text-align:center;
+         font-size:20px;
+         text-transform:uppercase;
+         margin-top:20px;
+         }
+         .red{
+         background-color:#b80002;
+         }
+         .grey{
+         background-color:#ece6e6;
+         }
+         .popup .inline.red *{
+         color:#fff;
+         }
+         .form-elt{
+         margin-top:20px;
+         }
+         @media screen and(min-width: 950px){
+         .popup{
+         width:950px;
+         margin:auto;
+         } 
+         }
+         @media screen and(max-width: 950px){
+         .popup{
+         width:450px;
+         margin:auto;
+         } 
+         }
+      </style>
+   </head>
+   <div class="popup">
+      <div class="popup_content">
+         <div class="inline red">
             <h1>Accédez à votre compte</h1>
             <p class="connexion_titre">Connectez-vous simplement</p>
             <p>Passez vos commandes avec votre voix, et rien d'autre !</p>
-            
             <div class="centrer">
-                <p>Rapide</p>
-                <p>Pratique</p>
-                <p>Simple</p>
+               <p>Rapide</p>
+               <p>Pratique</p>
+               <p>Simple</p>
             </div>
-        </div>
-        <div class="inline grey relative">
+         </div>
+         <div class="inline grey relative">
             <form name="connexion" action="/login" method="post" id="identification">
-                <img src="http://foimg1-delta.integration.eco/Content/images/logos/logo2_fr-FR.png" alt="votre drive intermarché">
-                <p class="connexion_titre">On se connait ?</p>
-                 <p>Connectez-vous pour que nous puissions accéder à vos préférences</p>
-                <p class="form-elt"><label class="inline" for="email">Email  </label><input class="inline" type="text" name="email" id="email"></p>
-                <p class="form-elt"><label class="inline" for="password">Mot de passe</label><input class="inline" type="password" name="password" id="password"></p>
-		<input type="hidden" id="accountLinkingToken" name="accountLinkingToken" value="<%= accountLinkingToken %>">
-		<input type="hidden" id="redirectURI" name="redirectURI" value="<%= redirectURI %>">
-		<input type="hidden" id="state" name="state" value="<%= state %>">
-	   <button class="red">Connexion</button>
+               <img src="https://driveimg1.intermarche.com/fr/Content/images/logos/logo2_fr-FR.png" alt="votre drive intermarché">
+               <p class="connexion_titre">On se connait ?</p>
+               <p>Connectez-vous pour que nous puissions accéder à vos préférences</p>
+               <p class="form-elt"><label class="inline" for="email">Email  </label><input class="inline" type="text" name="email" id="email"></p>
+               <p class="form-elt"><label class="inline" for="password">Mot de passe</label><input class="inline" type="password" name="password" id="password"></p>
+               <input type="hidden" id="accountLinkingToken" name="accountLinkingToken" value="<%= accountLinkingToken %>">
+               <input type="hidden" id="redirectURI" name="redirectURI" value="<%= redirectURI %>">
+               <input type="hidden" id="state" name="state" value="<%= state %>">
+               <button class="red">Connexion</button>
             </form>
-        </div>
-    </div>
-    
-</div>
-	
-	<script type="text/javascript">
-		$( document ).ready(function() {
-			/* attach a submit handler to the form */
-			$("#identification").submit(function(event) {
-
-				/* stop form from submitting normally */
-				event.preventDefault();
-
-				/* get the action attribute from the <form action=""> element */
-				var $form = $( this ),
-					url = $form.attr( 'action' );
-				  
-				$.ajax({
-					type: "POST",
-					url: url,
-					data: JSON.stringify({ email: $('#email').val(), mdp: $('#password').val(), accountLinkingToken: $('#accountLinkingToken').val(), redirectURI: $('#redirectURI').val(), state: $('#state').val() }),
-					contentType: 'application/json',
-					success: function(reponse) {
-						if (reponse && !reponse.EstEnErreur) {
-							// reponse.redirect contains the string URL to redirect to
-							window.location.href = reponse.urlRedirection;
-						}
-						else {
-							alert("e-mail ou mot de passe erroné, merci de réessayer");
-						}
-					}
-				});
-			});
-		});
-	</script>
+         </div>
+      </div>
+   </div>
+   <script type="text/javascript">
+      $( document ).ready(function() {
+      	/* attach a submit handler to the form */
+      	$("#identification").submit(function(event) {
+      
+      		/* stop form from submitting normally */
+      		event.preventDefault();
+      
+      		/* get the action attribute from the <form action=""> element */
+      		var $form = $( this );
+      		var	url = $form.attr( 'action' );
+      		  
+      		$.ajax({
+      			type: "POST",
+      			url: url,
+      			data: JSON.stringify(
+					{ 
+						email: $('#email').val(), 
+						mdp: $('#password').val(), 
+						accountLinkingToken: $('#accountLinkingToken').val(), 
+						redirectURI: $('#redirectURI').val(), 
+						state: $('#state').val() 
+					}),
+      			contentType: 'application/json',
+      			success: function(reponse) {
+      				if (reponse && !reponse.EstEnErreur) {
+      					// reponse.redirect contains the string URL to redirect to
+      					window.location.href = reponse.urlRedirection;
+      				}
+      				else {
+      					alert("e-mail ou mot de passe erroné, merci de réessayer");
+      				}
+      			}
+      		});
+      	});
+      });
+   </script>
 </html>
